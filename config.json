@@ -2,9 +2,10 @@
   "autoLeaveVoice": true,
   "autoLoadSounds": false,
   "botPrefix": "bot",
-  "botToken": "APP_BOT_USER_TOKEN",
+  "botToken": "MjM2MzE0MTc3Mjk4MzY2NDY5.CuHkjQ.fd2rUEZshM0d4QpzPPbH4TV5uuw",
   "commandTrigger": "!",
   "demoMode": true,
   "soundPath": "./sounds/",
-  "statsFileName": "./stats.json"
+  "statsFileName": "./stats.json",
+  "banList": "Commix"
 }
