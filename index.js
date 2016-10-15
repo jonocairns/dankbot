@@ -76,7 +76,7 @@ commands.set(/!smell/i, ['sound', 'smell.mp3']);
 commands.set(/!choppa/i, ['sound', 'choppa.mp3']);
 commands.set(/!yeahboy/i, ['sound', 'yeahboy.mp3']);
 commands.set(/!money/i, ['sound', 'money.mp3']);
-commands.set(/!epic/i, ['sound', 'epic.mp3']);
+commands.set(/!rekt/i, ['sound', 'epic.mp3']);
 commands.set(/!justdoit/i, ['sound', 'justdoit.mp3']);
 commands.set(/!tralala/i, ['sound', 'tralala.mp3']);
 commands.set(/!yeeah/i, ['sound', 'yeeah.mp3']);
@@ -136,7 +136,34 @@ commands.set(/!who/i, ['sound', 'who.mp3']);
 commands.set(/!whelps/i, ['sound', 'whelps.mp3']);
 commands.set(/!high/i, ['sound', 'high.mp3']);
 commands.set(/!fix/i, ['sound', 'fix.mp3']);
+commands.set(/!shh/i, ['sound', 'shh.mp3']);
+commands.set(/!dream/i, ['sound', 'dream.mp3']);
+commands.set(/!weak/i, ['sound', 'weak.mp3']);
+commands.set(/!shitsweak/i, ['sound', 'shitsweak.mp3']);
+commands.set(/!chigga/i, ['sound', 'chigga.mp3']);
+commands.set(/!bigboy/i, ['sound', 'bigboy.mp3']);
+commands.set(/!sombody/i, ['sound', 'sombody.mp3']);
+commands.set(/!getfucked/i, ['sound', 'getfucked.mp3']);
+commands.set(/!fight/i, ['sound', 'fight.mp3']);
+commands.set(/!come/i, ['sound', 'come.mp3']);
 
+commands.set(/!belly/i, ['sound', 'belly.mp3']);
+commands.set(/!stopvape/i, ['sound', 'stopvape.mp3']);
+commands.set(/!purp/i, ['sound', 'purp.mp3']);
+commands.set(/!clouds/i, ['sound', 'clouds.mp3']);
+commands.set(/!yeahvape/i, ['sound', 'yeahvape.mp3']);
+commands.set(/!see/i, ['sound', 'cantsee.mp3']);
+commands.set(/!senses/i, ['sound', 'senses.mp3']);
+commands.set(/!cant/i, ['sound', 'cant.mp3']);
+commands.set(/!chem/i, ['sound', 'chem.mp3']);
+commands.set(/!sniff/i, ['sound', 'sniff.m4a']);
+commands.set(/!numa/i, ['sound', 'numa.mp3']);
+commands.set(/!no/i, ['sound', 'no.mp3']);
+commands.set(/!yes/i, ['sound', 'yes.mp3']);
+commands.set(/!nma/i, ['sound', 'numa2.mp3']);
+commands.set(/!leroy/i, ['sound', 'leroy.mp3']);
+commands.set(/!noone/i, ['sound', 'noone.mp3']);
+commands.set(/!holes/i, ['sound', 'holes.mp3']);
 // commands.set(//i, ['', '']);
 
 function incrementSoundStats(command) {
@@ -273,6 +300,9 @@ function displayCommands(message) {
 
   if(message.content.split(' ')[2]) {
     var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
+
+
+
     commands.forEach(function(fileName, command){
       if(command.toString().match(helpFilter)) {
         helpMessage += regExpToCommand(command) + '\n';
@@ -342,6 +372,18 @@ bot.on('message', function(message) {
   }
 });
 
+// bot.on('voiceSpeaking', function(channel, user) {
+//     var messageChannel = bot.channels.get("name", "hashfag");
+//     //console.log(user);
+//     //console.log(channel);
+//     if(isUserBanned(user.username) && user.speaking) {
+//         console.log('nope');
+//         sendMessage(messageChannel, "What's that?");   
+//     } else {
+//         console.log('allowed');
+//     }
+// });
+
 bot.on('voiceSwitch', function(oldChannel, newChannel, user) {
       var messageChannel = bot.channels.get("name", "hashfag");
 
@@ -383,7 +425,14 @@ bot.on('voiceSwitch', function(oldChannel, newChannel, user) {
   });
 
 (function init() {
+
+  bot.on("debug", (m) => console.log("[debug]", m));
+  bot.on("warn", (m) => console.log("[warn]", m));
+  bot.on('error', e => { console.error(e); });
+
   bot.loginWithToken(config.botToken);
+
+
 
   if(config.autoLoadSounds) {
     addSoundsTo(commands, config.soundPath);
