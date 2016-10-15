@@ -1,5 +1,5 @@
 {
-  "autoLeaveVoice": true,
+  "autoLeaveVoice": false,
   "autoLoadSounds": false,
   "botPrefix": "bot",
   "botToken": "MjM2MzE0MTc3Mjk4MzY2NDY5.CuHkjQ.fd2rUEZshM0d4QpzPPbH4TV5uuw",
@@ -7,5 +7,7 @@
   "demoMode": true,
   "soundPath": "./sounds/",
   "statsFileName": "./stats.json",
-  "banList": "Commix"
+  "banList": "",
+  "randomMin": 1,
+  "randomMax": 60
 }
