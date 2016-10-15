@@ -92,7 +92,7 @@ function leaveVoiceChannel(message) {
 }
 
 function playSound(authorChannel, authorVoiceChannel, command, sound) {
-  if(authorVoiceChannel && authorVoiceChannel.members > 0) {
+  if(authorVoiceChannel) {
       bot.joinVoiceChannel(authorVoiceChannel).then(function(connection, joinError) {
     if(joinError) {
       var joinErrorMessage = 'Error joining voice channel: ';
