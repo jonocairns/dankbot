@@ -1,14 +1,31 @@
-# dank bot` 
-A meme generator
+# dankbot
+A dank soundboard for discord. Check out the sounds folder for all the current lols.
 
 ## Mini Docs
+Add memes to the sounds folder. Whatever you name the file will be ready when you launch the app. Eg dank.mp3 can be run with !dank.
+
+If you know some basic coding, you can go in to the index.js file and alter the introSounds function. This can be used to play sounds when a particular user joins a voice channel. 
+
 `autoLeaveVoice` - When set to `true`, the bot will leave after playing a sound. The sound of a bot joining/leaving a voice channel can be annoying, so by setting this to false, the bot will stay in the voice channel until told to leave by the `!bot exit` command.
 
 `autoLoadSounds` - When set to `true`, the bot will attempt to load in every file placed in the `sounds` directory. To generate the sound's command, `soundCommandTrigger` is prepended, the audio extension is stripped off, and hyphens are converted to spaces.
 
-Add memes to the sounds folder. Whatever you name the file will be ready when you launch the app. Eg dank.mp3 can be run with !dank.
-
 `commands.set(<regexp>, array[type, reply])` - `regexp` is what your bot will match messages against, regular expressions are used here mainly to make things case-insensitive. `type` can currently be `function`, `sound`, or `text`, but can be extended further if your bot requires additional functionality.
+
+Ban people from using the command by going in to the config.json file and adding them in to a comma separated list. eg. "user1,user2" 
+
+## Roadmap
+- If banned people start talking in voice chat they can be airhorned.
+
+- Ability to easily add new sounds (somehow). Maybe looking for mp3ish files in chat then downloading them to the sounds folder?
+
+- Image search
+
+- Wiki search
+
+- Reminders
+
+- PM command list instead of listing it in chat
 
 ## Getting Started
 1. Clone this repository
@@ -28,6 +45,6 @@ Add memes to the sounds folder. Whatever you name the file will be ready when yo
   - Create a bot user and keep its `Token` handy
 
 ## Acknowledgments
-- **Michael Deeb** - *provided the base* - [michaeljdeeb](https://github.com/michaeljdeeb)
+- **Michael Deeb** - *provided the base project* - [michaeljdeeb](https://github.com/michaeljdeeb)
 - [Discord](https://discordapp.com/)
 - [discord.js](https://github.com/hydrabolt/discord.js)
