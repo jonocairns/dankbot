@@ -10,5 +10,7 @@
   "ttsFileName": "./tts.json",
   "banList": "",
   "randomMin": 1,
-  "randomMax": 60
+  "randomMax": 60,
+  "isLoggingEnabled": true,
+  "logToFile": true
 }

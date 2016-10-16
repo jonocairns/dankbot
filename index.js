@@ -1,6 +1,7 @@
 'use strict';
 var fs = require('fs');
 var config = require('./config.json');
+var logger = require('./logger.js');
 var Discord = require('discord.js');
 var bot = new Discord.Client({
     autoReconnect: true
@@ -97,8 +98,7 @@ function tryMe(fn, msg) {
     try {
         fn();
     } catch (error) {
-        console.log(`an unhandled exception occured. ${msg}`);
-        console.log(error);
+        logger.logError(error, `an unhandled exception occured. ${msg}`);
     }
 }
 
@@ -119,7 +119,7 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
             if (joinError) {
                 var joinErrorMessage =
                     'Error joining voice channel: ';
-                console.log(joinErrorMessage, joinError);
+                logger.logError(joinError, joinErrorMessage);
                 bot.sendMessage(authorChannel, joinErrorMessage +
                     joinError);
             }
@@ -128,15 +128,14 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
                     if (playError) {
                         var playErrorMessage =
                             'Error playing sound file: ';
-                        console.log(playErrorMessage, playError);
+                        logger.logError(playError, playErrorMessage);
                         bot.sendMessage(authorChannel,
                             playErrorMessage + playError);
                     }
                     intent.on('error', function(streamError) {
                         var streamErrorMessage =
                             'Error streaming sound file: ';
-                        console.log(streamErrorMessage,
-                            streamError);
+                        logger.logError(streamError, streamErrorMessage);
                         bot.sendMessage(authorChannel,
                             streamErrorMessage +
                             streamError);
@@ -148,12 +147,12 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
                         });
                     }
                 }).catch(function() {
-                console.log(
+                logger.trace(
                     `There was an issue attempting to play the file ${sound}`
                 );
             });
         }).catch(function() {
-            console.log(
+            logger.trace(
                 `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
             );
         });
@@ -205,8 +204,8 @@ function saveTts(message) {
             bot.sendMessage(message.channel, 'That command already exists you dickface.');
         }
     } catch(err) {
-        console.log('fail');
-        console.log(err);
+        logger.logError(err, 'fail');
+        bot.sendMessage(message.channel, 'Something bad happened. Try again niggah. use (exclamation)bot tts "some text" (exclamation)bindtouse');
     }
     
 }
@@ -219,7 +218,7 @@ function loadTtsFile() {
                 fs.writeFileSync(config.ttsFileName, JSON.stringify([]));
                 savedTts = [];
             } else {
-                console.log('Error: ', error);
+                logger.logError(error, 'Error: ');
             }
         } else {
             try {
@@ -235,7 +234,7 @@ function loadTtsFile() {
                 }
                 
             } catch (parsingError) {
-                console.log('Error parsing JSON: ', parsingError);
+                logger.logError(parsingError, 'Error parsing JSON: ');
                 savedTts = [];
             }
         }
@@ -312,7 +311,7 @@ function getRandomArbitrary() {
 function timer() {
     var nextIn = getRandomArbitrary();
     nextIn = Math.floor(nextIn);
-    console.log(nextIn);
+    logger.trace(`Next random meme in: ${nextIn}ms`);
     if (timerMessage && isTimerActive) {
         playRandomSound(timerMessage);
         setTimeout(timer, nextIn);
@@ -324,17 +323,20 @@ function messageHandler(message) {
     if (message.content === "!feet") {
         var item = feet[Math.floor(Math.random() * feet.length)];
         sendMessage(message.channel, item);
+        message.delete();
     }
 
     if(message.content === "!timeroff"){
         isTimerActive = false;
         sendMessage(message.channel, "Timer is off. RIP in peace.");
+        message.delete();
     }
     if(message.content === "!timer") {
         isTimerActive = true;
         timerMessage = message;
         timer();
         sendMessage(message.channel, "Tick tock, check out my cock.");
+        message.delete();
     }
     if (message.author.username !== bot.user.username && !isUserBanned(
         message.author.username)) {
@@ -343,14 +345,17 @@ function messageHandler(message) {
                 switch (botReply[0]) {
                     case 'function':
                         botReply[1](message);
+                        message.delete();
                         break;
                     case 'sound':
                         playSound(message.channel, message.author.voiceChannel,
                             regExpToCommand(regexp), botReply[1]
                         );
+                        message.delete();
                         break;
                     case 'text':
                         sendMessage(message.channel, botReply[1]);
+                        message.delete();
                         break;
                     default:
                         break;
@@ -425,11 +430,13 @@ bot.on('message', function(message) {
 });
 
 bot.on('voiceJoin', function(channel, user) {
-    if (!firstConnect) {
-        tryMe(function() {
-            introSounds(channel, user)
-        });
-    }
+    tryMe(function() {
+        if (!firstConnect) {
+            tryMe(function() {
+                introSounds(channel, user)
+            });
+        }
+    })
 });
 bot.on('voiceSwitch', function(oldChannel, newChannel, user) {
     tryMe(function() {
@@ -438,29 +445,30 @@ bot.on('voiceSwitch', function(oldChannel, newChannel, user) {
 });
 
 function bindSoundsFolder() {
-        console.log('Loading sounds...');
-        fs.readdir('./sounds', {}, function(err, files) {
-            files.forEach(function(element, index, array) {
-                var cmd = element.split('.')[0];
-                if (cmd) {
-                    var reg = new RegExp(`!${cmd}`, 'i');
-                    commands.set(reg, ['sound', element]);
-                }
-            });
-            console.log(`Completed loading ${files.length} files!`);
+    console.log('Loading sounds...');
+    fs.readdir('./sounds', {}, function(err, files) {
+        files.forEach(function(element, index, array) {
+            var cmd = element.split('.')[0];
+            if (cmd) {
+                var reg = new RegExp(`!${cmd}`, 'i');
+                commands.set(reg, ['sound', element]);
+            }
         });
+        console.log(`Completed loading ${files.length} files!`);
+    });
+}
+(function init() {
+    //bot.on("debug", (m) => console.log("[debug]", m));
+    //bot.on("warn", (m) => console.log("[warn]", m));
+
+    bot.on('error', e => {
+        logger.logError(e);
+    });
+    bindSoundsFolder();
+    bot.loginWithToken(config.botToken);
+    if (config.autoLoadSounds) {
+        addSoundsTo(commands, config.soundPath);
     }
-    (function init() {
-        //bot.on("debug", (m) => console.log("[debug]", m));
-        //bot.on("warn", (m) => console.log("[warn]", m));
-        bot.on('error', e => {
-            console.error(e);
-        });
-        bindSoundsFolder();
-        bot.loginWithToken(config.botToken);
-        if (config.autoLoadSounds) {
-            addSoundsTo(commands, config.soundPath);
-        }
-        loadStatsFile();
-        loadTtsFile();
-    })();
+    loadStatsFile();
+    loadTtsFile();
+})();
