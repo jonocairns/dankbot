@@ -163,15 +163,25 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
 function saveTts(message) {
     // cmd will be !bot tts "content" cmd
     try {
-        var reg = new RegExp()
+        var reg = new RegExp();
+        // get the "content" inside double quotes
         var content = message.content.match(/"(.*?)"/)[0];
-        content = content.replace('"', '');
+        if(content.length === 0) {
+            bot.sendMessage(message.channel, 'Do it properly.');
+            return;
+        }
+        // remove quotes
+        let replaced = content.replace('"', '').replace('"', '');
+        // find the last quote and get the index of the next character
         var indexOfLastQuote = message.content.lastIndexOf('"') + 1;
-        // get the last cmd 
+        // get the final parameter (from the last index of the quote to the end of the string)
         var localCmd = message.content.substr(indexOfLastQuote);
+        // remove any spaces
         var splitCmd = localCmd.replace(/ /g,'');
+        // replace the ! prefix if it's there
         splitCmd = splitCmd.replace('!', '');
         
+        // check if the commant already exists
         var cmdExists = false;
         commands.forEach(function(fileName, command) {
             let test = '!' + splitCmd;
@@ -181,9 +191,8 @@ function saveTts(message) {
         });
 
         if(content.length && indexOfLastQuote !== -1 && !cmdExists) {
-
             var obj = {
-                content: content,
+                content: replaced,
                 cmd: splitCmd
             };
             savedTts.push(obj);
