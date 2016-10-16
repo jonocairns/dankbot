@@ -9,6 +9,7 @@ var isTimerActive = false;
 var stats;
 var commands = new Map();
 var triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
+var firstConnect = true;
 
 commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function', displayCommands]);
 commands.set(new RegExp(triggerPrefix + 'random', 'i'), ['function', playRandomSound]);
@@ -205,7 +206,7 @@ function timer() {
 
 
 function messageHandler(message) {
-    
+  firstConnect = false;
   if(message.content === "!feet"){
       var item = feet[Math.floor(Math.random()*feet.length)];
       sendMessage(message.channel, item);
@@ -244,12 +245,12 @@ function messageHandler(message) {
   }
 }
 
-function introSounds(oldChannel, newChannel, user) {
+function introSounds(newChannel, user) {
   var messageChannel = bot.channels.get("name", "hashfag");
-
+  console.log(newChannel);
       if(user.status === 'online') {
           if(user.username === 'jonosma') {
-              playSound(messageChannel, newChannel, regExpToCommand("!bekfast"), "bekfast-short.mp3");
+              playSound(messageChannel, newChannel, regExpToCommand("!bekfast"), "bekfast.mp3");
           } 
       
           if(user.username === 'ddynz') {
@@ -296,17 +297,22 @@ bot.on('message', function(message) {
 //     var messageChannel = bot.channels.get("name", "hashfag");
 //     //console.log(user);
 //     //console.log(channel);
-//     if(isUserBanned(user.username) && user.speaking) {
+//     if(isUserBanned(user.username)) {
 //         console.log('nope');
-//         sendMessage(messageChannel, "What's that?");   
+//         //playSound(messageChannel, channel, regExpToCommand("!horn"), "horn.mp3");  
 //     } else {
 //         console.log('allowed');
 //     }
 // });
 
+bot.on('voiceJoin', function(channel, user) {
+    if(!firstConnect){
+        tryMe(function() { introSounds(channel, user) });
+    }
+});
 
 bot.on('voiceSwitch', function(oldChannel, newChannel, user) {
-    tryMe(function() { introSounds(oldChannel, newChannel, user) });
+    tryMe(function() { introSounds(newChannel, user) });
 });
 
 function bindSoundsFolder() {
@@ -327,8 +333,8 @@ function bindSoundsFolder() {
 
 (function init() {
 
-  bot.on("debug", (m) => console.log("[debug]", m));
-  bot.on("warn", (m) => console.log("[warn]", m));
+  //bot.on("debug", (m) => console.log("[debug]", m));
+  //bot.on("warn", (m) => console.log("[warn]", m));
   bot.on('error', e => { console.error(e); });
   bindSoundsFolder();
   bot.loginWithToken(config.botToken);

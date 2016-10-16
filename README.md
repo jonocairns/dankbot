@@ -1,5 +1,5 @@
-# discordjs-starter-bot
-A sample Discord bot that send messages and plays sounds. Built using [discord.js](https://github.com/hydrabolt/discord.js).
+# dank bot` 
+A meme generator
 
 ## Mini Docs
 `autoLeaveVoice` - When set to `true`, the bot will leave after playing a sound. The sound of a bot joining/leaving a voice channel can be annoying, so by setting this to false, the bot will stay in the voice channel until told to leave by the `!bot exit` command.
@@ -27,18 +27,8 @@ A sample Discord bot that send messages and plays sounds. Built using [discord.j
   - Create a new application and keep its `Application ID` handy
   - Create a bot user and keep its `Token` handy
 
-## Contributing
-I created this bot as a good jumping off point for what most bot makers will want their bots to do. If something about it is confusing, please submit a PR.
-
-## Authors
-- **Michael Deeb** - *Initial work* - [michaeljdeeb](https://github.com/michaeljdeeb)
-
-See also the list of [contributors](https://github.com/michaeljdeeb/discordjs-starter-bot/graphs/contributors) who participated in this project.
-
-## License
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details
-
 ## Acknowledgments
+- **Michael Deeb** - *provided the base* - [michaeljdeeb](https://github.com/michaeljdeeb)
 - [Discord](https://discordapp.com/)
 - [discord.js](https://github.com/hydrabolt/discord.js)
 - [NASA](http://www.nasa.gov/connect/sounds/index.html) for the sample sound used by the bot.
