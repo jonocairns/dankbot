@@ -31,4 +31,3 @@ A meme generator
 - **Michael Deeb** - *provided the base* - [michaeljdeeb](https://github.com/michaeljdeeb)
 - [Discord](https://discordapp.com/)
 - [discord.js](https://github.com/hydrabolt/discord.js)
-- [NASA](http://www.nasa.gov/connect/sounds/index.html) for the sample sound used by the bot.
