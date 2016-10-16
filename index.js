@@ -165,6 +165,7 @@ function saveTts(message) {
     try {
         var reg = new RegExp()
         var content = message.content.match(/"(.*?)"/)[0];
+        content = content.replace('"', '');
         var indexOfLastQuote = message.content.lastIndexOf('"') + 1;
         // get the last cmd 
         var localCmd = message.content.substr(indexOfLastQuote);
