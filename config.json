@@ -7,6 +7,7 @@
   "demoMode": true,
   "soundPath": "./sounds/",
   "statsFileName": "./stats.json",
+  "ttsFileName": "./tts.json",
   "banList": "",
   "randomMin": 1,
   "randomMax": 60

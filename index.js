@@ -8,6 +8,7 @@ var bot = new Discord.Client({
 var timerMessage;
 var isTimerActive = false;
 var stats;
+var savedTts;
 var commands = new Map();
 var triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
 var firstConnect = true;
@@ -19,6 +20,9 @@ commands.set(new RegExp(triggerPrefix + 'random', 'i'), ['function',
 ]);
 commands.set(new RegExp(triggerPrefix + 'popular', 'i'), ['function',
     sendPopularCommands
+]);
+commands.set(new RegExp(triggerPrefix + 'tts', 'i'), ['function',
+    saveTts
 ]);
 commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function',
     leaveVoiceChannel
@@ -156,6 +160,78 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
     }
 }
 
+function saveTts(message) {
+    // cmd will be !bot tts "content" cmd
+    try {
+        var reg = new RegExp()
+        var content = message.content.match(/"(.*?)"/)[0];
+        var indexOfLastQuote = message.content.lastIndexOf('"') + 1;
+        // get the last cmd 
+        var localCmd = message.content.substr(indexOfLastQuote);
+        var splitCmd = localCmd.replace(/ /g,'');
+        splitCmd = splitCmd.replace('!', '');
+        
+        var cmdExists = false;
+        commands.forEach(function(fileName, command) {
+            let test = '!' + splitCmd;
+            if(test.match(command)) {
+                cmdExists = true;
+            }
+        });
+
+        if(content.length && indexOfLastQuote !== -1 && !cmdExists) {
+
+            var obj = {
+                content: content,
+                cmd: splitCmd
+            };
+            savedTts.push(obj);
+            fs.writeFile(config.ttsFileName, JSON.stringify(savedTts));
+            var reg = new RegExp(`!${obj.cmd}`, 'i');
+            commands.set(reg, ['text', obj.content]);
+        }
+
+        if(cmdExists) {
+            bot.sendMessage(message.channel, 'That command already exists you dickface.');
+        }
+    } catch(err) {
+        console.log('fail');
+        console.log(err);
+    }
+    
+}
+
+function loadTtsFile() {
+    console.log(`Loading tts commands...`);
+    fs.readFile(config.ttsFileName, 'utf-8', function(error, data) {
+        if (error) {
+            if (error.code === 'ENOENT') {
+                fs.writeFileSync(config.ttsFileName, JSON.stringify([]));
+                savedTts = [];
+            } else {
+                console.log('Error: ', error);
+            }
+        } else {
+            try {
+                savedTts = JSON.parse(data);
+                savedTts.forEach(function(element, index, array) {
+                    var reg = new RegExp(`!${element.cmd}`, 'i');
+                    commands.set(reg, ['text', element.content]);
+                });
+                if(savedTts.length > 0) {
+                    console.log(`Completed loading ${savedTts.length} tts command(s)`);
+                } else {
+                    console.log(`There are currently no stored tts commands.`);
+                }
+                
+            } catch (parsingError) {
+                console.log('Error parsing JSON: ', parsingError);
+                savedTts = [];
+            }
+        }
+    });
+}
+
 function sendPopularCommands(message) {
     var total = 0;
     var statsArray = [];
@@ -239,16 +315,17 @@ function messageHandler(message) {
         var item = feet[Math.floor(Math.random() * feet.length)];
         sendMessage(message.channel, item);
     }
-    // if(message.content === "!timeroff"){
-    //     isTimerActive = false;
-    //     sendMessage(message.channel, "Timer is off. RIP in peace.");
-    // }
-    // if(message.content === "!timer") {
-    //     isTimerActive = true;
-    //     timerMessage = message;
-    //     timer();
-    //     sendMessage(message.channel, "Tick tock, check out my cock.");
-    // }
+
+    if(message.content === "!timeroff"){
+        isTimerActive = false;
+        sendMessage(message.channel, "Timer is off. RIP in peace.");
+    }
+    if(message.content === "!timer") {
+        isTimerActive = true;
+        timerMessage = message;
+        timer();
+        sendMessage(message.channel, "Tick tock, check out my cock.");
+    }
     if (message.author.username !== bot.user.username && !isUserBanned(
         message.author.username)) {
         commands.forEach(function(botReply, regexp) {
@@ -336,17 +413,7 @@ bot.on('message', function(message) {
         messageHandler(message)
     });
 });
-// bot.on('voiceSpeaking', function(channel, user) {
-//     var messageChannel = bot.channels.get("name", "hashfag");
-//     //console.log(user);
-//     //console.log(channel);
-//     if(isUserBanned(user.username)) {
-//         console.log('nope');
-//         //playSound(messageChannel, channel, regExpToCommand("!horn"), "horn.mp3");  
-//     } else {
-//         console.log('allowed');
-//     }
-// });
+
 bot.on('voiceJoin', function(channel, user) {
     if (!firstConnect) {
         tryMe(function() {
@@ -385,4 +452,5 @@ function bindSoundsFolder() {
             addSoundsTo(commands, config.soundPath);
         }
         loadStatsFile();
+        loadTtsFile();
     })();
