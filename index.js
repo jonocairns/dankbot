@@ -23,7 +23,7 @@ commands.set(/!tony/i, ['text', 'A real decision is measured by the fact that yo
 commands.set(/!crains/i, ['text', 'I will lift your spirits with my big black cock']);
 
 function incrementSoundStats(command) {
-  if(stats[command]) {
+  if(stats[command]) { 
     stats[command]++;
   } else {
     stats[command] = 1;
@@ -247,7 +247,7 @@ function messageHandler(message) {
 
 function introSounds(newChannel, user) {
   var messageChannel = bot.channels.get("name", "hashfag");
-  console.log(newChannel);
+  
       if(user.status === 'online') {
           if(user.username === 'jonosma') {
               playSound(messageChannel, newChannel, regExpToCommand("!bekfast"), "bekfast.mp3");
@@ -258,7 +258,7 @@ function introSounds(newChannel, user) {
           } 
           
           if(user.username === 'J1s') {
-              playSound(messageChannel, newChannel, regExpToCommand("!reese"), "reese.mp3");       
+              playSound(messageChannel, newChannel, regExpToCommand("!reese"), "reese.wav");       
           } 
           
           if(user.username === 'Commix') {
@@ -270,7 +270,7 @@ function introSounds(newChannel, user) {
           } 
           
           if(user.username === 'joshr4h') {
-              playSound(messageChannel, newChannel, regExpToCommand("!wololo"), "wololo.mp3");       
+              playSound(messageChannel, newChannel, regExpToCommand("!dkp"), "dkp.mp3");       
           } 
           
           if(user.username === 'jamie') {
