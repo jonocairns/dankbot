@@ -1,19 +1,20 @@
 'use strict';
 const fs = require('fs');
 const config = require('./config.json');
+const intro = require('./intro.json');
 const logger = require('./logger.js');
 const file = require('./file.js');
 const Discord = require('discord.js');
-var bot = new Discord.Client({
+const bot = new Discord.Client({
     autoReconnect: true
 });
-var timerMessage;
-var isTimerActive = false;
+const triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
+
 var stats;
 var savedTts;
 var commands = new Map();
-var triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
 var firstConnect = true;
+
 commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function',
     displayCommands
 ]);
@@ -28,20 +29,6 @@ commands.set(new RegExp(triggerPrefix + 'tts', 'i'), ['function',
 ]);
 commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function',
     leaveVoiceChannel
-]);
-commands.set(/!liftoff/i, ['text', 'Hey look at me, I can suck my own Dee']);
-commands.set(/!chairs/i, ['text', 'boys']);
-commands.set(/!toby/i, ['text',
-    'Quality questions create a quality life. Successful people ask better questions, and as a result, they get better answers.'
-]);
-commands.set(/!wabbins/i, ['text',
-    'CREATE A VISION AND NEVER LET THE ENVIRONMENT, OTHER PEOPLE’S BELIEFS, OR THE LIMITS OF WHAT HAS BEEN DONE IN THE PAST SHAPE YOUR DECISIONS.'
-]);
-commands.set(/!tony/i, ['text',
-    'A real decision is measured by the fact that you’ve taken a new action. If there’s no action, you haven’t truly decided.'
-]);
-commands.set(/!crains/i, ['text',
-    'I will lift your spirits with my big black cock'
 ]);
 
 function fileToCommand(file) {
@@ -90,34 +77,26 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
     console.log(authorVoiceChannel);
     if (authorVoiceChannel) {
         console.log('inside authorVoiceChannel');
-        bot.joinVoiceChannel(authorVoiceChannel).then(function(connection,
+        authorVoiceChannel.join().then(function(connection,
             joinError) {
                 console.log('inside join channel');
             if (joinError) {
                 var joinErrorMessage =
                     'Error joining voice channel: ';
                 logger.logError(joinError, joinErrorMessage);
-                bot.sendMessage(authorChannel, joinErrorMessage +
+                authorChannel.sendMessage(authorChannel, joinErrorMessage +
                     joinError);
             }
-            connection.playFile(config.soundPath + sound).then(
-                function(intent, playError) {
-                    console.log('playing sound er');
-                    if (playError) {
-                        var playErrorMessage =
-                            'Error playing sound file: ';
-                        logger.logError(playError, playErrorMessage);
-                        bot.sendMessage(authorChannel,
-                            playErrorMessage + playError);
-                    }
+            const dispatcher = connection.playFile(config.soundPath + sound).then(
+                function(intent) {
                     intent.on('error', function(streamError) {
                         var streamErrorMessage =
                             'Error streaming sound file: ';
                         logger.logError(streamError, streamErrorMessage);
-                        bot.sendMessage(authorChannel,
+                        authorChannel.sendMessage(authorChannel,
                             streamErrorMessage +
                             streamError);
-                    });
+                     });
                     file.incrementSoundStats(command, stats);
                     if (config.autoLeaveVoice) {
                         intent.on('end', function() {
@@ -144,7 +123,7 @@ function saveTts(message) {
         // get the "content" inside double quotes
         var content = message.content.match(/"(.*?)"/)[0];
         if(content.length === 0) {
-            bot.sendMessage(message.channel, 'Do it properly.');
+            message.channel.sendMessage(message.channel, 'Do it properly.');
             return;
         }
         // remove quotes
@@ -179,11 +158,11 @@ function saveTts(message) {
         }
 
         if(cmdExists) {
-            bot.sendMessage(message.channel, 'That command already exists you dickface.');
+            message.channel.sendMessage(message.channel, 'That command already exists you dickface.');
         }
     } catch(err) {
         logger.logError(err, 'fail');
-        bot.sendMessage(message.channel, 'Something bad happened. Try again niggah. use (exclamation)bot tts "some text" (exclamation)bindtouse');
+        message.channel.sendMessage(message.channel, 'Something bad happened. Try again niggah. use (exclamation)bot tts "some text" (exclamation)bindtouse');
     }
     
 }
@@ -207,7 +186,7 @@ function sendPopularCommands(message) {
             i][1] / total) * 100) + '%\n';
         i++;
     }
-    bot.sendMessage(message.channel, popularMessage);
+    message.channel.sendMessage(message.channel, popularMessage);
 }
 
 function playRandomSound(message) {
@@ -247,7 +226,7 @@ function displayCommands(message) {
             helpMessage += regExpToCommand(command) + '\n';
         });
     }
-    bot.sendMessage(message.channel, helpMessage);
+    message.channel.sendMessage(message.channel, helpMessage);
 }
 
 function messageHandler(message) {
@@ -263,7 +242,7 @@ function messageHandler(message) {
                         break;
                     case 'sound':
                         console.log('playing sound');
-                        playSound(message.channel, message.author.voiceChannel,
+                        playSound(message.channel, message.member.voiceChannel,
                             regExpToCommand(regexp), botReply[1]
                         );
                         message.delete();
@@ -283,42 +262,14 @@ function messageHandler(message) {
 function introSounds(newChannel, user) {
     var messageChannel = bot.channels.get("name", "hashfag");
     if (user.status === 'online') {
-        if (user.username === 'jonosma') {
-            playSound(messageChannel, newChannel, regExpToCommand(
-                "!bekfast"), "bekfast.mp3");
-        }
-        if (user.username === 'ddynz') {
-            playSound(messageChannel, newChannel, regExpToCommand("!men"),
-                "men.mp3");
-        }
-        if (user.username === 'J1s') {
-            playSound(messageChannel, newChannel, regExpToCommand("!reese"),
-                "reese.wav");
-        }
-        if (user.username === 'Commix') {
-            playSound(messageChannel, newChannel, regExpToCommand(
-                "!surprise"), "surprise.mp3");
-        }
-        if (user.username === 'The Penetrator') {
-            playSound(messageChannel, newChannel, regExpToCommand(
-                "!inception"), "inception.mp3");
-        }
-        if (user.username === 'joshr4h') {
-            playSound(messageChannel, newChannel, regExpToCommand("!dkp"),
-                "dkp.mp3");
-        }
-        if (user.username === 'jamie') {
-            playSound(messageChannel, newChannel, regExpToCommand(
-                "!stonecold"), "stonecold.mp3");
-        }
-        if (user.username === 'Vashkar') {
-            playSound(messageChannel, newChannel, regExpToCommand(
-                "!justdoit"), "justdoit.mp3");
-        }
-        if (user.username === 'Onez') {
-            playSound(messageChannel, newChannel, regExpToCommand("!cena"),
-                "cena.mp3");
-        }
+
+        intro.forEach(function(element, index, array) {
+            if (user.username === element.user) {
+                let cmd = `!${element.sound}`;
+                let fileName = `${element.sound}.${element.ext}`;
+                playSound(messageChannel, newChannel, cmd, fileName);
+            }
+        });
     }
 }
 
