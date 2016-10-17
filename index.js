@@ -30,6 +30,29 @@ commands.set(new RegExp(triggerPrefix + 'tts', 'i'), ['function',
 commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function',
     leaveVoiceChannel
 ]);
+commands.set(new RegExp(triggerPrefix + 'game', 'i'), ['function',
+    letsPlay
+]);
+
+function letsPlay() {
+    console.log('triggered');
+    var messageChannel = bot.channels.get("name", "hashfag");
+    console.log(messageChannel);
+    messageChannel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
+
+    let usersNamesOnline = [];
+    bot.users.forEach(function(user){
+        if(user.status === 'online') {
+            usersNamesOnline.push(user.username);
+            user.sendMessage(`Keen for cs?`);
+        }
+    });
+
+    let usersOnline = usersNamesOnline.join(', ')
+
+    messageChannel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
+    
+}
 
 function fileToCommand(file) {
     return config.commandTrigger + file.split('.')[0].split('-').join(' ');
@@ -73,13 +96,9 @@ function leaveVoiceChannel(message) {
 }
 
 function playSound(authorChannel, authorVoiceChannel, command, sound) {
-    console.log('inside playSound');
-    console.log(authorVoiceChannel);
     if (authorVoiceChannel) {
-        console.log('inside authorVoiceChannel');
         authorVoiceChannel.join().then(function(connection,
             joinError) {
-                console.log('inside join channel');
             if (joinError) {
                 var joinErrorMessage =
                     'Error joining voice channel: ';
@@ -197,7 +216,7 @@ function playRandomSound(message) {
         randomKey = keys[Math.round(keys.length * Math.random())];
         randomValue = commands.get(randomKey);
     }
-    playSound(message.channel, message.author.voiceChannel, regExpToCommand(
+    playSound(message.channel, message.member.voiceChannel, regExpToCommand(
         randomKey), randomValue[1]);
 }
 
@@ -278,6 +297,8 @@ bot.on('message', function(message) {
         messageHandler(message)
     });
 });
+
+// looks like these have been changed to voiceStateUpdate
 
 bot.on('voiceJoin', function(channel, user) {
     tryMe(function() {
