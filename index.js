@@ -1,8 +1,9 @@
 'use strict';
-var fs = require('fs');
-var config = require('./config.json');
-var logger = require('./logger.js');
-var Discord = require('discord.js');
+const fs = require('fs');
+const config = require('./config.json');
+const logger = require('./logger.js');
+const file = require('./file.js');
+const Discord = require('discord.js');
 var bot = new Discord.Client({
     autoReconnect: true
 });
@@ -42,34 +43,6 @@ commands.set(/!tony/i, ['text',
 commands.set(/!crains/i, ['text',
     'I will lift your spirits with my big black cock'
 ]);
-
-function incrementSoundStats(command) {
-    if (stats[command]) {
-        stats[command]++;
-    } else {
-        stats[command] = 1;
-    }
-    fs.writeFile(config.statsFileName, JSON.stringify(stats));
-}
-
-function loadStatsFile() {
-    fs.readFile(config.statsFileName, 'utf-8', function(error, data) {
-        if (error) {
-            if (error.code === 'ENOENT') {
-                fs.writeFileSync(config.statsFileName, JSON.stringify({}));
-                stats = {};
-            } else {
-                console.log('Error: ', error);
-            }
-        } else {
-            try {
-                stats = JSON.parse(data);
-            } catch (parsingError) {
-                console.log('Error parsing JSON: ', parsingError);
-            }
-        }
-    });
-}
 
 function fileToCommand(file) {
     return config.commandTrigger + file.split('.')[0].split('-').join(' ');
@@ -113,9 +86,13 @@ function leaveVoiceChannel(message) {
 }
 
 function playSound(authorChannel, authorVoiceChannel, command, sound) {
+    console.log('inside playSound');
+    console.log(authorVoiceChannel);
     if (authorVoiceChannel) {
+        console.log('inside authorVoiceChannel');
         bot.joinVoiceChannel(authorVoiceChannel).then(function(connection,
             joinError) {
+                console.log('inside join channel');
             if (joinError) {
                 var joinErrorMessage =
                     'Error joining voice channel: ';
@@ -125,6 +102,7 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
             }
             connection.playFile(config.soundPath + sound).then(
                 function(intent, playError) {
+                    console.log('playing sound er');
                     if (playError) {
                         var playErrorMessage =
                             'Error playing sound file: ';
@@ -140,7 +118,7 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
                             streamErrorMessage +
                             streamError);
                     });
-                    incrementSoundStats(command);
+                    file.incrementSoundStats(command, stats);
                     if (config.autoLeaveVoice) {
                         intent.on('end', function() {
                             connection.destroy();
@@ -210,37 +188,6 @@ function saveTts(message) {
     
 }
 
-function loadTtsFile() {
-    console.log(`Loading tts commands...`);
-    fs.readFile(config.ttsFileName, 'utf-8', function(error, data) {
-        if (error) {
-            if (error.code === 'ENOENT') {
-                fs.writeFileSync(config.ttsFileName, JSON.stringify([]));
-                savedTts = [];
-            } else {
-                logger.logError(error, 'Error: ');
-            }
-        } else {
-            try {
-                savedTts = JSON.parse(data);
-                savedTts.forEach(function(element, index, array) {
-                    var reg = new RegExp(`!${element.cmd}`, 'i');
-                    commands.set(reg, ['text', element.content]);
-                });
-                if(savedTts.length > 0) {
-                    console.log(`Completed loading ${savedTts.length} tts command(s)`);
-                } else {
-                    console.log(`There are currently no stored tts commands.`);
-                }
-                
-            } catch (parsingError) {
-                logger.logError(parsingError, 'Error parsing JSON: ');
-                savedTts = [];
-            }
-        }
-    });
-}
-
 function sendPopularCommands(message) {
     var total = 0;
     var statsArray = [];
@@ -303,41 +250,8 @@ function displayCommands(message) {
     bot.sendMessage(message.channel, helpMessage);
 }
 
-function getRandomArbitrary() {
-    return (Math.random() * (config.randomMax - config.randomMin) + config.randomMin) *
-        60000;
-}
-
-function timer() {
-    var nextIn = getRandomArbitrary();
-    nextIn = Math.floor(nextIn);
-    logger.trace(`Next random meme in: ${nextIn}ms`);
-    if (timerMessage && isTimerActive) {
-        playRandomSound(timerMessage);
-        setTimeout(timer, nextIn);
-    }
-}
-
 function messageHandler(message) {
     firstConnect = false;
-    if (message.content === "!feet") {
-        var item = feet[Math.floor(Math.random() * feet.length)];
-        sendMessage(message.channel, item);
-        message.delete();
-    }
-
-    if(message.content === "!timeroff"){
-        isTimerActive = false;
-        sendMessage(message.channel, "Timer is off. RIP in peace.");
-        message.delete();
-    }
-    if(message.content === "!timer") {
-        isTimerActive = true;
-        timerMessage = message;
-        timer();
-        sendMessage(message.channel, "Tick tock, check out my cock.");
-        message.delete();
-    }
     if (message.author.username !== bot.user.username && !isUserBanned(
         message.author.username)) {
         commands.forEach(function(botReply, regexp) {
@@ -348,6 +262,7 @@ function messageHandler(message) {
                         message.delete();
                         break;
                     case 'sound':
+                        console.log('playing sound');
                         playSound(message.channel, message.author.voiceChannel,
                             regExpToCommand(regexp), botReply[1]
                         );
@@ -406,23 +321,7 @@ function introSounds(newChannel, user) {
         }
     }
 }
-var feet = [
-    'http://images.mentalfloss.com/sites/default/files/styles/article_640x430/public/foot_0.jpg',
-    'http://crossfitaerial.com/wp-content/uploads/2015/07/400-06178255c_998_380.jpg',
-    'http://kelownafootclinic.com/images/kelowna/foot-problems-flat-feet-kelowna.jpg',
-    'http://www.nhs.uk/Livewell/foothealth/PublishingImages/feet-in-diabetes_377x171_ACX55Y.jpg',
-    'http://cdn.images.dailystar.co.uk/dynamic/162/photos/472000/Woman-s-feet-542472.jpg',
-    'https://groomingguru.files.wordpress.com/2011/05/frodo4.jpg?w=350&h=200&crop=1',
-    'http://www.top10homeremedies.com/wp-content/uploads/2013/03/cracked-feet-ft-e1423045913855.jpg',
-    'http://i.huffpost.com/gen/1829303/thumbs/r-MASSAGE-FEET-large570.jpg',
-    'http://www.sciencebuzz.org/sites/default/files/images/tootsies2_006.jpg',
-    'https://s-media-cache-ak0.pinimg.com/originals/fb/b5/83/fbb5837a74193a98fe6734f55aa7fbd0.jpg',
-    'https://s-media-cache-ak0.pinimg.com/originals/28/74/42/287442c1313ce90bd2a4c1e858ef1add.jpg',
-    'http://www.bajiroo.com/wp-content/uploads/2013/04/weird_bad_ugly_scary_strange_feet_foot_people_fingers_images_photos_pictures_19.jpg',
-    'http://themorningspew.com/wp-content/uploads/2011/10/Feet-300x201.jpg',
-    'https://farm4.staticflickr.com/3388/3409883915_34507999be_z.jpg?zz=1',
-    'http://s2.storage.snapzu.com/61/29/4a/f2/drunkenninja/snaps/93/9b/133689/thumbs/5304479ffde664e2_fpi_small.jpg'
-];
+
 bot.on('message', function(message) {
     tryMe(function() {
         messageHandler(message)
@@ -444,19 +343,28 @@ bot.on('voiceSwitch', function(oldChannel, newChannel, user) {
     });
 });
 
-function bindSoundsFolder() {
-    console.log('Loading sounds...');
-    fs.readdir('./sounds', {}, function(err, files) {
-        files.forEach(function(element, index, array) {
-            var cmd = element.split('.')[0];
-            if (cmd) {
-                var reg = new RegExp(`!${cmd}`, 'i');
-                commands.set(reg, ['sound', element]);
-            }
-        });
-        console.log(`Completed loading ${files.length} files!`);
+function loadStatsFile() {
+    file.loadFile(config.statsFileName, {}, function(data) {
+        stats = data;
     });
 }
+
+function loadTtsFile() {
+    console.log(`Loading tts commands...`);
+    file.loadFile(config.ttsFileName, [], function(data){
+        savedTts = data;
+        savedTts.forEach(function(element, index, array) {
+            var reg = new RegExp(`!${element.cmd}`, 'i');
+            commands.set(reg, ['text', element.content]);
+        });
+        if(savedTts.length > 0) {
+            console.log(`Completed loading ${savedTts.length} tts command(s)`);
+        } else {
+            console.log(`There are currently no stored tts commands.`);
+        }
+    });
+}
+
 (function init() {
     //bot.on("debug", (m) => console.log("[debug]", m));
     //bot.on("warn", (m) => console.log("[warn]", m));
@@ -464,11 +372,18 @@ function bindSoundsFolder() {
     bot.on('error', e => {
         logger.logError(e);
     });
-    bindSoundsFolder();
-    bot.loginWithToken(config.botToken);
-    if (config.autoLoadSounds) {
-        addSoundsTo(commands, config.soundPath);
-    }
+
+    file.readSoundFiles(function(cmds) {
+        commands = cmds;
+        if (config.autoLoadSounds) {
+            addSoundsTo(commands, config.soundPath);
+        }
+    })
+    bot.login(config.botToken);
+    
+    file.loadFile(config.statsFileName, {}, function(data) {
+        stats = data;
+    });
     loadStatsFile();
     loadTtsFile();
 })();
