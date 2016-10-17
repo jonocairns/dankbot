@@ -8,6 +8,7 @@
   "soundPath": "./sounds/",
   "statsFileName": "./stats.json",
   "ttsFileName": "./tts.json",
+  "introFileName": "./intro.json",
   "banList": "",
   "randomMin": 1,
   "randomMax": 60,

@@ -1,7 +1,6 @@
 'use strict';
 const fs = require('fs');
 const config = require('./config.json');
-const intro = require('./intro.json');
 const logger = require('./logger.js');
 const file = require('./file.js');
 const Discord = require('discord.js');
@@ -10,8 +9,7 @@ const bot = new Discord.Client({
 });
 const triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
 
-var stats;
-var savedTts;
+var stats, savedTts, intro;
 var commands = new Map();
 var firstConnect = true;
 
@@ -34,11 +32,9 @@ commands.set(new RegExp(triggerPrefix + 'game', 'i'), ['function',
     letsPlay
 ]);
 
-function letsPlay() {
-    console.log('triggered');
-    var messageChannel = bot.channels.get("name", "hashfag");
-    console.log(messageChannel);
-    messageChannel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
+function letsPlay(message) {
+
+    message.channel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
 
     let usersNamesOnline = [];
     bot.users.forEach(function(user){
@@ -50,7 +46,7 @@ function letsPlay() {
 
     let usersOnline = usersNamesOnline.join(', ')
 
-    messageChannel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
+    message.channel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
     
 }
 
@@ -86,7 +82,7 @@ function tryMe(fn, msg) {
 }
 
 function sendMessage(authorChannel, text) {
-    bot.sendTTSMessage(authorChannel, text);
+    authorChannel.sendTTSMessage(text);
 }
 
 function leaveVoiceChannel(message) {
@@ -95,7 +91,7 @@ function leaveVoiceChannel(message) {
     }
 }
 
-function playSound(authorChannel, authorVoiceChannel, command, sound) {
+function playSound(authorVoiceChannel, command, sound) {
     if (authorVoiceChannel) {
         authorVoiceChannel.join().then(function(connection,
             joinError) {
@@ -103,8 +99,6 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
                 var joinErrorMessage =
                     'Error joining voice channel: ';
                 logger.logError(joinError, joinErrorMessage);
-                authorChannel.sendMessage(authorChannel, joinErrorMessage +
-                    joinError);
             }
             const dispatcher = connection.playFile(config.soundPath + sound).then(
                 function(intent) {
@@ -112,9 +106,7 @@ function playSound(authorChannel, authorVoiceChannel, command, sound) {
                         var streamErrorMessage =
                             'Error streaming sound file: ';
                         logger.logError(streamError, streamErrorMessage);
-                        authorChannel.sendMessage(authorChannel,
-                            streamErrorMessage +
-                            streamError);
+
                      });
                     file.incrementSoundStats(command, stats);
                     if (config.autoLeaveVoice) {
@@ -142,7 +134,7 @@ function saveTts(message) {
         // get the "content" inside double quotes
         var content = message.content.match(/"(.*?)"/)[0];
         if(content.length === 0) {
-            message.channel.sendMessage(message.channel, 'Do it properly.');
+            message.channel.sendMessage('Do it properly.');
             return;
         }
         // remove quotes
@@ -177,11 +169,11 @@ function saveTts(message) {
         }
 
         if(cmdExists) {
-            message.channel.sendMessage(message.channel, 'That command already exists you dickface.');
+            message.channel.sendMessage('That command already exists you dickface.');
         }
     } catch(err) {
         logger.logError(err, 'fail');
-        message.channel.sendMessage(message.channel, 'Something bad happened. Try again niggah. use (exclamation)bot tts "some text" (exclamation)bindtouse');
+        message.channel.sendMessage('Something bad happened. Try again niggah. use (exclamation)bot tts "some text" (exclamation)bindtouse');
     }
     
 }
@@ -205,7 +197,7 @@ function sendPopularCommands(message) {
             i][1] / total) * 100) + '%\n';
         i++;
     }
-    message.channel.sendMessage(message.channel, popularMessage);
+    message.channel.sendMessage(popularMessage);
 }
 
 function playRandomSound(message) {
@@ -216,7 +208,7 @@ function playRandomSound(message) {
         randomKey = keys[Math.round(keys.length * Math.random())];
         randomValue = commands.get(randomKey);
     }
-    playSound(message.channel, message.member.voiceChannel, regExpToCommand(
+    playSound(message.member.voiceChannel, regExpToCommand(
         randomKey), randomValue[1]);
 }
 
@@ -245,29 +237,32 @@ function displayCommands(message) {
             helpMessage += regExpToCommand(command) + '\n';
         });
     }
-    message.channel.sendMessage(message.channel, helpMessage);
+    message.channel.sendMessage(helpMessage);
 }
 
 function messageHandler(message) {
     firstConnect = false;
+
     if (message.author.username !== bot.user.username && !isUserBanned(
         message.author.username)) {
+        
         commands.forEach(function(botReply, regexp) {
+            
             if (message.content.match(regexp)) {
+                
                 switch (botReply[0]) {
                     case 'function':
                         botReply[1](message);
                         message.delete();
                         break;
                     case 'sound':
-                        console.log('playing sound');
-                        playSound(message.channel, message.member.voiceChannel,
+                        playSound(message.member.voiceChannel,
                             regExpToCommand(regexp), botReply[1]
                         );
                         message.delete();
                         break;
                     case 'text':
-                        sendMessage(message.channel, botReply[1]);
+                        sendMessage(botReply[1]);
                         message.delete();
                         break;
                     default:
@@ -279,17 +274,13 @@ function messageHandler(message) {
 }
 
 function introSounds(newChannel, user) {
-    var messageChannel = bot.channels.get("name", "hashfag");
-    if (user.status === 'online') {
-
-        intro.forEach(function(element, index, array) {
-            if (user.username === element.user) {
-                let cmd = `!${element.sound}`;
-                let fileName = `${element.sound}.${element.ext}`;
-                playSound(messageChannel, newChannel, cmd, fileName);
-            }
-        });
-    }
+    intro.forEach(function(element, index, array) {
+        if (user.user.username === element.user) {
+            let cmd = `!${element.sound}`;
+            let fileName = `${element.sound}.${element.ext}`;
+            playSound(newChannel, cmd, fileName);
+        }
+    });
 }
 
 bot.on('message', function(message) {
@@ -298,26 +289,22 @@ bot.on('message', function(message) {
     });
 });
 
-// looks like these have been changed to voiceStateUpdate
+bot.on('voiceStateUpdate', function(oldUser, newUser) {
 
-bot.on('voiceJoin', function(channel, user) {
     tryMe(function() {
-        if (!firstConnect) {
-            tryMe(function() {
-                introSounds(channel, user)
-            });
-        }
-    })
-});
-bot.on('voiceSwitch', function(oldChannel, newChannel, user) {
-    tryMe(function() {
-        introSounds(newChannel, user)
+        introSounds(newUser.voiceChannel, newUser);
     });
 });
 
 function loadStatsFile() {
     file.loadFile(config.statsFileName, {}, function(data) {
         stats = data;
+    });
+}
+
+function loadIntros() {
+    file.loadFile(config.introFileName, [], function(data) {
+        intro = data;
     });
 }
 
@@ -346,7 +333,8 @@ function loadTtsFile() {
     });
 
     file.readSoundFiles(function(cmds) {
-        commands = cmds;
+        commands = new Map([...cmds, ...commands]);
+
         if (config.autoLoadSounds) {
             addSoundsTo(commands, config.soundPath);
         }
@@ -358,4 +346,5 @@ function loadTtsFile() {
     });
     loadStatsFile();
     loadTtsFile();
+    loadIntros();
 })();
