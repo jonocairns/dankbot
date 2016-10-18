@@ -97,14 +97,14 @@ function leaveVoiceChannel(message) {
 
 bot.on('message', function(message) {
     tryMe(function() {
-        msg.messageHandler(message, bot)
+        msg.messageHandler(message, bot, commands)
     });
 });
 
 bot.on('voiceStateUpdate', function(oldUser, newUser) {
 
     tryMe(function() {
-        msg.introSounds(newUser.voiceChannel, newUser);
+        player.introSounds(newUser.voiceChannel, newUser);
     });
 });
 

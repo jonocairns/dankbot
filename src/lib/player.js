@@ -55,5 +55,16 @@ var playRandomSound = function(message) {
         randomKey), randomValue[1]);
 }
 
+var introSounds = function(newChannel, user) {
+    intro.forEach(function(element, index, array) {
+        if (user.user.username === element.user) {
+            let cmd = `!${element.sound}`;
+            let fileName = `${element.sound}.${element.ext}`;
+            playSound(newChannel, cmd, fileName);
+        }
+    });
+}
+
+module.exports.introSounds = introSounds;
 module.exports.playSound = playSound;
 module.exports.playRandomSound = playRandomSound;

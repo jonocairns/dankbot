@@ -1,5 +1,6 @@
 'use strict';
 const config = require('../config.json');
+const player = require('./player.js');
 
 var isUserBanned = function(username) {
     var banlist = config.banList.split(',');
@@ -12,7 +13,7 @@ var isUserBanned = function(username) {
     return isBanned;
 }
 
-var messageHandler = function(message, bot) {
+var messageHandler = function(message, bot, commands) {
     if (message.author.username !== bot.user.username && !isUserBanned(
         message.author.username)) {
         
@@ -32,7 +33,7 @@ var messageHandler = function(message, bot) {
                         message.delete();
                         break;
                     case 'text':
-                        sendMessage(botReply[1]);
+                        message.channel.sendMessage(botReply[1]);
                         message.delete();
                         break;
                     default:
