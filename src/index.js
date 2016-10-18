@@ -114,7 +114,7 @@ function loadTtsFile() {
             addSoundsTo(commands, config.soundPath);
         }
     })
-    bot.login(DISCORD_BOT_TOKEN);
+    bot.login(config.botToken);
     
     file.loadFile(config.statsFileName, {}, function(data) {
         stats = data;
