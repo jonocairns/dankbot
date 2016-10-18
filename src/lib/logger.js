@@ -1,6 +1,6 @@
 'use strict';
 var fs = require('fs');
-var config = require('./config.json');
+var config = require('../config.json');
 
 function toJSONLocal (date) {
     var local = new Date(date);

@@ -32,9 +32,9 @@ Ban people from using the command by going in to the config.json file and adding
 ## Getting Started
 1. Clone this repository
 2. After completing the prerequisites, run `npm install` on this project making sure nothing fails, particularly `node-opus`
-3. Open `index.js` and add your bot's `Token` where it says `APP_BOT_USER_TOKEN`
+3. Open `config.json` and add your bot's `Token` where it says `APP_BOT_USER_TOKEN`
 4. Authorize your bot using this URL `https://discordapp.com/oauth2/authorize?client_id=APPLICATION_ID&scope=bot&permissions=0` where APPLICATION_ID is your `Application ID` and add it to a server you manage.
-5. Run `node index.js` from the project and type `liftoff` into the Discord server chat or type !smallstep while connected to a voice channel on the server.
+5. Run `npm run start` from the project
 
 ### Prerequisites
 1. Everything from the [discord.js documentation](http://discordjs.readthedocs.io/en/latest/installing.html), which generally includes

@@ -1,29 +1,28 @@
 {
-  "name": "discordjs-voice-bot",
-  "version": "0.9.0",
-  "description": "A sample Discord bot that plays sounds. Built using discord.js",
-  "main": "index.js",
+  "name": "dankbot",
+  "version": "0.0.2",
+  "description": "A dank discord bot",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "start": "node index.js"
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michaeljdeeb/discordjs-voice-bot.git"
+    "url": "git+https://github.com/jonocairns/dankbot.git"
   },
   "keywords": [
     "discordjs",
-    "bot",
-    "sample"
+    "bot"
   ],
-  "author": "Michael Deeb",
-  "license": "ISC",
+  "author": "Jono Cairns",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/michaeljdeeb/discordjs-voice-bot/issues"
+    "url": "https://github.com/jonocairns/dankbot/issues"
   },
-  "homepage": "https://github.com/michaeljdeeb/discordjs-voice-bot#readme",
+  "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
-    "discord.js": "^9.3.0"
+    "discord.js": "~9.3.0"
   },
   "engines": {
     "node": "6.8.1"
