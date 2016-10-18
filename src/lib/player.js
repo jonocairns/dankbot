@@ -13,26 +13,7 @@ var playSound = function(authorVoiceChannel, command, sound) {
                     'Error joining voice channel: ';
                 logger.logError(joinError, joinErrorMessage);
             }
-            connection.playFile(config.soundPath + sound).then(
-                function(intent) {
-                    intent.on('error', function(streamError) {
-                        var streamErrorMessage =
-                            'Error streaming sound file: ';
-                        logger.logError(streamError, streamErrorMessage);
-
-                     });
-                    file.incrementSoundStats(command, stats);
-                    if (config.autoLeaveVoice) {
-                        intent.on('end', function() {
-                            connection.destroy();
-                        });
-                    }
-                }).catch(function(e) {
-                logger.trace(
-                    `There was an issue attempting to play the file ${sound}`
-                );
-                logger.logError(e);
-            });
+            connection.playFile(config.soundPath + sound);
         }).catch(function(e) {
             logger.trace(
                 `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
