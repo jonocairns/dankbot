@@ -1,8 +1,8 @@
 # dankbot
 A dank soundboard for discord. Check out the sounds folder for all the current lols.
 
-![Circle CI](https://circleci.com/gh/jonocairns/dankbot.svg?style=svg)](https://circleci.com/gh/jonocairns/dankbot)
-![Heroku](http://heroku-badge.herokuapp.com/?app=dankbot-69&style=flat)
+[![Circle CI](https://circleci.com/gh/jonocairns/dankbot.svg?style=svg)](https://circleci.com/gh/jonocairns/dankbot)
+[![Heroku](http://heroku-badge.herokuapp.com/?app=dankbot-69&style=flat)
 
 ## Mini Docs
 Add memes to the sounds folder. Whatever you name the file will be ready when you launch the app. Eg dank.mp3 can be run with !dank.
