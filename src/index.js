@@ -6,7 +6,7 @@ const logger = require('./lib/logger.js');
 const player = require('./lib/player.js');
 const file = require('./lib/file.js');
 const tts = require('./lib/tts.js');
-const message = require('./lib/message.js');
+const msg = require('./lib/message.js');
 
 const bot = new Discord.Client({
     autoReconnect: true
@@ -17,7 +17,7 @@ var stats, savedTts, intro;
 var commands = new Map();
 
 commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function',
-    message.displayCommands
+    msg.displayCommands
 ]);
 commands.set(new RegExp(triggerPrefix + 'random', 'i'), ['function',
     player.playRandomSound
@@ -29,7 +29,7 @@ commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function',
     leaveVoiceChannel
 ]);
 commands.set(new RegExp(triggerPrefix + 'game', 'i'), ['function',
-    message.letsPlay
+    msg.letsPlay
 ]);
 
 function addSoundsTo(map, fromDirectoryPath) {
@@ -63,14 +63,14 @@ function leaveVoiceChannel(message) {
 
 bot.on('message', function(message) {
     tryMe(function() {
-        message.messageHandler(message)
+        msg.messageHandler(message)
     });
 });
 
 bot.on('voiceStateUpdate', function(oldUser, newUser) {
 
     tryMe(function() {
-        message.introSounds(newUser.voiceChannel, newUser);
+        msg.introSounds(newUser.voiceChannel, newUser);
     });
 });
 
