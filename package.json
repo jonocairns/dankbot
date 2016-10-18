@@ -4,7 +4,8 @@
   "description": "A sample Discord bot that plays sounds. Built using discord.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\"",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -23,9 +24,6 @@
   "homepage": "https://github.com/michaeljdeeb/discordjs-voice-bot#readme",
   "dependencies": {
     "discord.js": "^9.3.0"
-  },
-  "scripts": {
-    "start": "node index.js"
   },
   "engines": {
     "node": "6.8.1"
