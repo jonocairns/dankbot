@@ -55,7 +55,7 @@ var playRandomSound = function(message) {
         randomKey), randomValue[1]);
 }
 
-var introSounds = function(newChannel, user) {
+var introSounds = function(newChannel, user, intro) {
     intro.forEach(function(element, index, array) {
         if (user.user.username === element.user) {
             let cmd = `!${element.sound}`;

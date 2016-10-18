@@ -104,7 +104,7 @@ bot.on('message', function(message) {
 bot.on('voiceStateUpdate', function(oldUser, newUser) {
 
     tryMe(function() {
-        player.introSounds(newUser.voiceChannel, newUser);
+        player.introSounds(newUser.voiceChannel, newUser, intro);
     });
 });
 
