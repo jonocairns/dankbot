@@ -30,8 +30,6 @@ var isUserBanned = function(username) {
 }
 
 var messageHandler = function(message) {
-    firstConnect = false;
-
     if (message.author.username !== bot.user.username && !isUserBanned(
         message.author.username)) {
         
