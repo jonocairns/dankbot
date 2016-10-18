@@ -2,6 +2,7 @@
 var fs = require('fs');
 var logger = require('./logger.js');
 var file = require('./file.js');
+const config = require('../config.json');
 
 var playSound = function(authorVoiceChannel, command, sound) {
     if (authorVoiceChannel) {
