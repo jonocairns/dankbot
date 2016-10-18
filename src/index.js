@@ -17,7 +17,7 @@ var stats, savedTts, intro;
 var commands = new Map();
 
 commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function',
-    msg.displayCommands
+    displayCommands
 ]);
 commands.set(new RegExp(triggerPrefix + 'random', 'i'), ['function',
     player.playRandomSound
@@ -29,8 +29,42 @@ commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function',
     leaveVoiceChannel
 ]);
 commands.set(new RegExp(triggerPrefix + 'game', 'i'), ['function',
-    msg.letsPlay
+    letsPlay
 ]);
+
+function letsPlay(message) {
+
+    message.channel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
+
+    let usersNamesOnline = [];
+    bot.users.forEach(function(user){
+        if(user.status === 'online') {
+            usersNamesOnline.push(user.username);
+            user.sendMessage(`Keen for cs?`);
+        }
+    });
+
+    let usersOnline = usersNamesOnline.join(', ')
+
+    message.channel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
+}
+
+function displayCommands(message) {
+    var helpMessage = '';
+    if (message.content.split(' ')[2]) {
+        var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
+        commands.forEach(function(fileName, command) {
+            if (command.toString().match(helpFilter)) {
+                helpMessage += regExpToCommand(command) + '\n';
+            }
+        });
+    } else {
+        commands.forEach(function(fileName, command) {
+            helpMessage += regExpToCommand(command) + '\n';
+        });
+    }
+    message.member.sendMessage(helpMessage);
+}
 
 function addSoundsTo(map, fromDirectoryPath) {
     var soundFiles = fs.readdir(fromDirectoryPath, function(err, files) {
@@ -63,7 +97,7 @@ function leaveVoiceChannel(message) {
 
 bot.on('message', function(message) {
     tryMe(function() {
-        msg.messageHandler(message)
+        msg.messageHandler(message, bot)
     });
 });
 
