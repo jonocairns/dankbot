@@ -26,15 +26,17 @@ var playSound = function(authorVoiceChannel, command, sound) {
                             connection.destroy();
                         });
                     }
-                }).catch(function() {
+                }).catch(function(e) {
                 logger.trace(
                     `There was an issue attempting to play the file ${sound}`
                 );
+                logger.logError(e);
             });
-        }).catch(function() {
+        }).catch(function(e) {
             logger.trace(
                 `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
             );
+            logger.logError(e);
         });
     }
 }
