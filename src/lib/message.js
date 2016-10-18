@@ -13,6 +13,10 @@ var isUserBanned = function(username) {
     return isBanned;
 }
 
+var regExpToCommand = function(command) {
+    return command.toString().split('/')[1];
+}
+
 var messageHandler = function(message, bot, commands) {
     if (message.author.username !== bot.user.username && !isUserBanned(
         message.author.username)) {
