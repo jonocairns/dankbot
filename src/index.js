@@ -55,12 +55,12 @@ function displayCommands(message) {
         var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
         commands.forEach(function(fileName, command) {
             if (command.toString().match(helpFilter)) {
-                helpMessage += regExpToCommand(command) + '\n';
+                helpMessage += msg.regExpToCommand(command) + '\n';
             }
         });
     } else {
         commands.forEach(function(fileName, command) {
-            helpMessage += regExpToCommand(command) + '\n';
+            helpMessage += msg.regExpToCommand(command) + '\n';
         });
     }
     message.member.sendMessage(helpMessage);

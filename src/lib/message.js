@@ -47,5 +47,5 @@ var messageHandler = function(message, bot, commands) {
         });
     }
 }
-
+module.exports.regExpToCommand = regExpToCommand;
 module.exports.messageHandler = messageHandler;
