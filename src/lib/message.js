@@ -15,7 +15,7 @@ var displayCommands = function(message) {
             helpMessage += regExpToCommand(command) + '\n';
         });
     }
-    message.channel.sendMessage(helpMessage);
+    message.member.sendMessage(helpMessage);
 }
 
 var isUserBanned = function(username) {
