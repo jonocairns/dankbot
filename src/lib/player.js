@@ -13,7 +13,7 @@ var playSound = function(authorVoiceChannel, command, sound) {
                     'Error joining voice channel: ';
                 logger.logError(joinError, joinErrorMessage);
             }
-            const dispatcher = connection.playFile(config.soundPath + sound).then(
+            connection.playFile(config.soundPath + sound).then(
                 function(intent) {
                     intent.on('error', function(streamError) {
                         var streamErrorMessage =
