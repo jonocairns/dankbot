@@ -2,7 +2,6 @@
   "autoLeaveVoice": false,
   "autoLoadSounds": false,
   "botPrefix": "bot",
-  "botToken": "MjM2MzE0MTc3Mjk4MzY2NDY5.Cudp6Q.sqK1X3BhFltq_wTF5FmV2cPkiqA",
   "commandTrigger": "!",
   "demoMode": true,
   "soundPath": "../sounds/",
