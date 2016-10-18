@@ -37,7 +37,7 @@ var messageHandler = function(message, bot, commands) {
                         message.delete();
                         break;
                     case 'text':
-                        message.channel.sendMessage(botReply[1]);
+                        message.channel.sendTTSMessage(botReply[1]);
                         message.delete();
                         break;
                     default:
