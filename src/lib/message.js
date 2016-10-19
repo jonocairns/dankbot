@@ -19,31 +19,32 @@ class Message {
     }
 
     messageHandler(message, bot, commands) {
-        if (message.author.username !== bot.user.username && !isUserBanned(
+        if (message.author.username !== bot.user.username && !this.isUserBanned(
             message.author.username)) {
             
             commands.forEach((botReply, regexp) => {
                 
                 if (message.content.match(regexp)) {
-                    
-                    switch (botReply[0]) {
-                        case 'function':
-                            botReply[1](message, commands);
-                            message.delete();
-                            break;
-                        case 'sound':
-                            player.playSound(message.member.voiceChannel,
-                                regExpToCommand(regexp), botReply[1]
-                            );
-                            message.delete();
-                            break;
-                        case 'text':
-                            message.channel.sendTTSMessage(botReply[1]);
-                            message.delete();
-                            break;
-                        default:
-                            break;
+                    try {
+                        switch (botReply[0]) {
+                            case 'function':
+                                botReply[1](message, commands);
+                                break;
+                            case 'sound':
+                                player.playSound(message.member.voiceChannel,
+                                    this.regExpToCommand(regexp), botReply[1]
+                                );
+                                break;
+                            case 'text':
+                                message.channel.sendTTSMessage(botReply[1]);
+                                break;
+                            default:
+                                break;
+                        }
+                    } finally {
+                        message.delete();
                     }
+                    
                 }
             });
         }

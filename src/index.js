@@ -50,14 +50,14 @@ class Dank {
         });
         
         this.bot.on('message', (message) => {
-            tryMe(() => {
-                msg.messageHandler(message, bot, commands)
+            this.tryMe(() => {
+                msg.messageHandler(message, this.bot, this.commands)
             });
         });
 
         this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
-            tryMe(() => {
-                player.introSounds(newUser.voiceChannel, newUser, intro);
+            this.tryMe(() => {
+                player.introSounds(newUser.voiceChannel, newUser, this.intro);
             });
         });
     }
@@ -84,7 +84,7 @@ class Dank {
         message.channel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
 
         let usersNamesOnline = [];
-        bot.users.forEach((user) =>{
+        this.bot.users.forEach((user) =>{
             if(user.status === 'online') {
                 usersNamesOnline.push(user.username);
                 user.sendMessage(`Keen for cs?`);

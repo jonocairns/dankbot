@@ -59,7 +59,7 @@ class Player {
             if (user.user.username === element.user) {
                 let cmd = `!${element.sound}`;
                 let fileName = `${element.sound}.${element.ext}`;
-                playSound(newChannel, cmd, fileName);
+                this.playSound(newChannel, cmd, fileName);
             }
         });
     }

@@ -17,7 +17,7 @@ class Logger {
         if(config.isLoggingEnabled && config.logToFile) {
             let sep = '--------------------';
             let nl = '\r\n';
-            message = `${nl}${sep}${nl}timestamp:${toJSONLocal(new Date())}${nl}message:${message}${nl}`;
+            message = `${nl}${sep}${nl}timestamp:${this.toJSONLocal(new Date())}${nl}message:${message}${nl}`;
             fs.appendFile('log.txt', message, (err) => {
             if(err) {
                 console.log(`There was an error attempting to log, see stack for details. ${err}. Message attempting to log: ${message}`);
@@ -34,9 +34,9 @@ class Logger {
             message = '';
         }
 
-        message = `${nl}${sep}${nl}timestamp:${toJSONLocal(new Date())}${nl}name:${error.name}${nl}${message}${error.stack}${nl}${error.message}${nl}${sep}${nl}`;
+        message = `${nl}${sep}${nl}timestamp:${this.toJSONLocal(new Date())}${nl}name:${error.name}${nl}${message}${error.stack}${nl}${error.message}${nl}${sep}${nl}`;
 
-        trace(message);
+        this.trace(message);
     }
 }
 
