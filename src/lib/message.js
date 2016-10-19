@@ -27,7 +27,7 @@ var messageHandler = function(message, bot, commands) {
                 
                 switch (botReply[0]) {
                     case 'function':
-                        botReply[1](message);
+                        botReply[1](message, commands);
                         message.delete();
                         break;
                     case 'sound':

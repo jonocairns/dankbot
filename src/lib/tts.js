@@ -3,7 +3,7 @@ const fs = require('fs');
 const config = require('../config.json');
 const logger = require('./logger.js');
 
-var saveTts = function(message) {
+var saveTts = function(message, commands) {
     // cmd will be !bot tts "content" cmd
     try {
         var reg = new RegExp();
