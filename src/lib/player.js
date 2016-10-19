@@ -26,11 +26,7 @@ class Player {
         }
     }
 
-    regExpToCommand(command) {
-        return command.toString().split('/')[1];
-    }
-
-    playRandomSound(message) {
+    playRandomSound(message, commands) {
         var keys = [...commands.keys()];
         var randomKey;
         var randomValue = ['', ''];
@@ -38,20 +34,7 @@ class Player {
             randomKey = keys[Math.round(keys.length * Math.random())];
             randomValue = commands.get(randomKey);
         }
-        this.playSound(message.member.voiceChannel, this.regExpToCommand(
-            randomKey), randomValue[1]);
-    }
-
-    playRandomSound(message) {
-        var keys = [...commands.keys()];
-        var randomKey;
-        var randomValue = ['', ''];
-        while (randomValue[0] !== 'sound') {
-            randomKey = keys[Math.round(keys.length * Math.random())];
-            randomValue = commands.get(randomKey);
-        }
-        this.playSound(message.member.voiceChannel, regExpToCommand(
-            randomKey), randomValue[1]);
+        this.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
     }
 
     introSounds(newChannel, user, intro) {
