@@ -1,10 +1,12 @@
 'use strict';
 var Logger = require('./logger.js');
 const config = require('../config.json');
+const Database = require('./db.js')
 
 class Player {
     constructor() {
         this.logger = new Logger();
+        this.db = new Database();
     }
 
     playSound(authorVoiceChannel, command, sound) {
@@ -24,6 +26,16 @@ class Player {
                     );
                 });
                 dispatcher.on('end', () => {
+                    this.db.load({ command: command }, 'stats', (i) => {
+                        console.log(i);
+                        if(i.length === 0){
+                            this.db.update({ command: command}, { $setOnInsert: { count: 1 }}, 'stats', (err,data) => {
+                            });
+                        } else {
+                            this.db.update({ command: command}, { $inc: { count: 1 }}, 'stats', (err,data) => {
+                            });
+                        }
+                    });
                 });
             }).catch((e) => {
                 this.logger.trace(

@@ -1,5 +1,4 @@
 'use strict';
-var fs = require('fs');
 var config = require('../config.json');
 
 class Logger {
@@ -10,20 +9,10 @@ class Logger {
     }
 
     trace(message) {
-        if(!config.logToFile) {
-            console.log(message);
-        }
-
-        if(config.isLoggingEnabled && config.logToFile) {
-            let sep = '--------------------';
-            let nl = '\r\n';
-            message = `${nl}${sep}${nl}timestamp:${this.toJSONLocal(new Date())}${nl}message:${message}${nl}`;
-            fs.appendFile('log.txt', message, (err) => {
-            if(err) {
-                console.log(`There was an error attempting to log, see stack for details. ${err}. Message attempting to log: ${message}`);
-            }
-            });
-        }
+        let sep = '--------------------';
+        let nl = '\r\n';
+        message = `${nl}${sep}${nl}timestamp:${this.toJSONLocal(new Date())}${nl}message:${message}${nl}`;
+        console.log(message);
     }
 
     logError(error, message) {

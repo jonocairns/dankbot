@@ -1,5 +1,4 @@
 'use strict';
-const fs = require('fs');
 const config = require('../config.json');
 const Logger = require('./logger.js');
 
@@ -8,7 +7,7 @@ class Tts {
         this.logger = new Logger();
     }
 
-     saveTts(message, commands) {
+     process(message, commands) {
         // cmd will be !bot tts "content" cmd
         try {
             var reg = new RegExp();
@@ -38,19 +37,22 @@ class Tts {
                 }
             });
 
-            if(content.length && indexOfLastQuote !== -1 && !cmdExists) {
-                var obj = {
-                    content: replaced,
-                    cmd: splitCmd
-                };
-                savedTts.push(obj);
-                fs.writeFile(config.ttsFileName, JSON.stringify(savedTts));
-                var reg = new RegExp(`!${obj.cmd}`, 'i');
-                commands.set(reg, ['text', obj.content]);
-            }
-
             if(cmdExists) {
                 message.channel.sendMessage('That command already exists you dickface.');
+            }
+
+            if(content.length && indexOfLastQuote !== -1 && !cmdExists) {
+                return {
+                    content: replaced,
+                    cmd: splitCmd,
+                    isEmpty: false
+                };
+            }
+
+            return {
+                content: '',
+                cmd: '', 
+                isEmpty: true
             }
         } catch(err) {
             logger.logError(err, 'fail');

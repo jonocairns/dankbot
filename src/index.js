@@ -7,6 +7,7 @@ const Player = require('./lib/player.js');
 const File = require('./lib/file.js');
 const Tts = require('./lib/tts.js');
 const Message = require('./lib/message.js');
+const Database = require('./lib/db.js');
 
 class Dank {
     constructor() {
@@ -20,6 +21,7 @@ class Dank {
         this.file = new File();
         this.tts = new Tts();
         this.msg = new Message();
+        this.db = new Database();
     }
 
     init() {
@@ -38,11 +40,8 @@ class Dank {
             this.commands = new Map([...cmds, ...this.commands]);
         });
     
-        this.file.loadFile(config.statsFileName, {}, (data) => {
-            this.stats = data;
-        });
-        this.loadStatsFile();
-        this.loadTtsFile();
+        this.loadStats();
+        this.loadTts();
         this.loadIntros();
     }
 
@@ -69,10 +68,10 @@ class Dank {
             this.msg.displayCommands
         ]);
         this.commands.set(new RegExp(this.triggerPrefix + 'random', 'i'), ['function',
-            this.playRandomSound
+            this.playRandomSound.bind(this)
         ]);
         this.commands.set(new RegExp(this.triggerPrefix + 'tts', 'i'), ['function',
-            this.tts.saveTts
+            this.speech.bind(this)
         ]);
         this.commands.set(new RegExp(this.triggerPrefix + 'exit', 'i'), ['function',
             this.leaveVoiceChannel
@@ -80,6 +79,16 @@ class Dank {
         this.commands.set(new RegExp(this.triggerPrefix + 'game', 'i'), ['function',
             this.msg.letsPlay
         ]);
+    }
+
+    speech(message) {
+        var obj = this.tts.process(message, this.commands);
+
+        if(!obj.isEmpty) {
+            this.db.save(obj, 'tts');
+            var reg = new RegExp(`!${obj.cmd}`, 'i');
+            this.commands.set(reg, ['text', obj.content]);
+        }
     }
 
     playRandomSound(message, commands) {
@@ -90,7 +99,7 @@ class Dank {
             randomKey = keys[Math.round(keys.length * Math.random())];
             randomValue = commands.get(randomKey);
         }
-        new Player().playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
+        this.player.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
     }
 
     tryMe(fn, msg) {
@@ -104,25 +113,28 @@ class Dank {
         }
     }
 
-    leaveVoiceChannel(message, commands, bot) {
-        message.member.voiceChannel.leave();
+    leaveVoiceChannel(message) {
+        if(message.member.voiceChannel) {
+            message.member.voiceChannel.leave();
+        }
     }
 
-    loadStatsFile() {
-        this.file.loadFile(config.statsFileName, {}, (data) => {
+    loadStats() {
+        this.db.loadMany('stats', (data) => {
             this.stats = data;
         });
     }
 
     loadIntros() {
-        this.file.loadFile(config.introFileName, [], (data) => {
+        this.db.loadMany('tts', (data) => {
             this.intro = data;
         });
     }
 
-    loadTtsFile() {
+    loadTts() {
         console.log(`Loading tts commands...`);
-        this.file.loadFile(config.ttsFileName, [], (data) => {
+
+        this.db.loadMany('tts', (data) => {
             this.savedTts = data;
             this.savedTts.forEach((element, index, array) => {
                 let reg = new RegExp(`!${element.cmd}`, 'i');

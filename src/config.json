@@ -13,5 +13,6 @@
   "randomMin": 1,
   "randomMax": 60,
   "isLoggingEnabled": true,
-  "logToFile": false
+  "logToFile": false,
+  "mongo": "mongodb://anne:dank@ds061676.mlab.com:61676/dankdb"
 }

@@ -28,15 +28,6 @@ class File {
         });
     }
 
-    incrementSoundStats(command, stats) {
-        if (stats[command]) {
-            stats[command]++;
-        } else {
-            stats[command] = 1;
-        }
-        fs.writeFile(config.statsFileName, JSON.stringify(stats));
-    }
-
     readSoundFiles(callback) {
         console.log('Loading sounds...');
         fs.readdir('./sounds', {}, (err, files) => {
