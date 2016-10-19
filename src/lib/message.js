@@ -14,8 +14,37 @@ class Message {
         return isBanned;
     }
 
-    regExpToCommand(command) {
-        return command.toString().split('/')[1];
+    displayCommands(message, commands) {
+        var helpMessage = '';
+        if (message.content.split(' ')[2]) {
+            var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
+            commands.forEach((fileName, command) => {
+                if (command.toString().match(helpFilter)) {
+                    helpMessage += `${command.toString().split('/')[1]}\t`;
+                }
+            });
+        } else {
+            commands.forEach((fileName, command) => {
+                helpMessage += `${command.toString().split('/')[1]}\t`;
+            });
+        }
+        message.member.sendMessage(helpMessage);
+    }
+
+    letsPlay(message, commands, bot) {
+        message.channel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
+
+        let usersNamesOnline = [];
+        bot.users.forEach((user) =>{
+            if(user.status === 'online') {
+                usersNamesOnline.push(user.username);
+                user.sendMessage(`Keen for cs?`);
+            }
+        });
+
+        let usersOnline = usersNamesOnline.join(', ')
+
+        message.channel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
     }
 
     messageHandler(message, bot, commands) {
@@ -28,11 +57,11 @@ class Message {
                     try {
                         switch (botReply[0]) {
                             case 'function':
-                                botReply[1](message, commands);
+                                botReply[1](message, commands, bot);
                                 break;
                             case 'sound':
                                 player.playSound(message.member.voiceChannel,
-                                    this.regExpToCommand(regexp), botReply[1]
+                                    regexp.toString().split('/')[1], botReply[1]
                                 );
                                 break;
                             case 'text':
@@ -51,4 +80,4 @@ class Message {
     }
 }
 
-module.exports = new Message;
+module.exports = new Message();

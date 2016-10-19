@@ -56,4 +56,4 @@ class Tts {
 }
 
 
-module.exports = new Tts;
+module.exports = new Tts();

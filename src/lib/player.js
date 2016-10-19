@@ -65,4 +65,4 @@ class Player {
     }
 }
 
-module.exports = new Player;
+module.exports = new Player();
