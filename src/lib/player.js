@@ -16,10 +16,14 @@ class Player {
                         'Error joining voice channel: ';
                     this.logger.logError(joinError, joinErrorMessage);
                 }
-                connection.playFile(config.soundPath + sound).on('error', (err) => {
+                const dispatcher = connection.playFile(config.soundPath + sound);
+                
+                dispatcher.on('error', (err) => {
                     this.logger.logError(err,
                         `There was an playing the sound ${config.soundPath + sound}`
                     );
+                });
+                dispatcher.on('end', () => {
                 });
             }).catch((e) => {
                 this.logger.trace(
