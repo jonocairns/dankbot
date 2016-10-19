@@ -8,152 +8,171 @@ const file = require('./lib/file.js');
 const tts = require('./lib/tts.js');
 const msg = require('./lib/message.js');
 
-const bot = new Discord.Client({
-    autoReconnect: true
-});
-const triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
+class Dank {
+    constructor() {
+        this.stats = {};
+        this.savedTts = [];
+        this.intro = [];
+        this.commands = new Map();
+    }
 
-var stats, savedTts, intro;
-var commands = new Map();
+    init() {
+        this.bot = new Discord.Client({
+            autoReconnect: true
+        });
+        this.bot.login(config.botToken);
+        this.triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
+        this.setDefaultCommands();
+        this.setEventHandlers();
+        this.loadFiles();
+    }
 
-commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function',
-    displayCommands
-]);
-commands.set(new RegExp(triggerPrefix + 'random', 'i'), ['function',
-    player.playRandomSound
-]);
-commands.set(new RegExp(triggerPrefix + 'tts', 'i'), ['function',
-    tts.saveTts
-]);
-commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function',
-    leaveVoiceChannel
-]);
-commands.set(new RegExp(triggerPrefix + 'game', 'i'), ['function',
-    letsPlay
-]);
+    loadFiles() {
+        file.readSoundFiles((cmds) => {
+            this.commands = new Map([...cmds, ...this.commands]);
 
-function letsPlay(message) {
-
-    message.channel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
-
-    let usersNamesOnline = [];
-    bot.users.forEach(function(user){
-        if(user.status === 'online') {
-            usersNamesOnline.push(user.username);
-            user.sendMessage(`Keen for cs?`);
-        }
-    });
-
-    let usersOnline = usersNamesOnline.join(', ')
-
-    message.channel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
-}
-
-function displayCommands(message) {
-    var helpMessage = '';
-    if (message.content.split(' ')[2]) {
-        var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
-        commands.forEach(function(fileName, command) {
-            if (command.toString().match(helpFilter)) {
-                helpMessage += msg.regExpToCommand(command) + '\n';
+            if (config.autoLoadSounds) {
+                this.addSoundsTo(commands, config.soundPath);
             }
         });
-    } else {
-        commands.forEach(function(fileName, command) {
-            helpMessage += msg.regExpToCommand(command) + '\n';
-        });
-    }
-    message.member.sendMessage(helpMessage);
-}
-
-function addSoundsTo(map, fromDirectoryPath) {
-    var soundFiles = fs.readdir(fromDirectoryPath, function(err, files) {
-        files.forEach(function(file) {
-            if (file[0] !== '.') {
-                var command = config.commandTrigger + file.split('.')[0].split('-').join(' ');
-                var commandRegExp = new RegExp(command, 'i');
-                map.set(commandRegExp, ['sound', file]);
-            }
-        });
-    });
-}
-
-function tryMe(fn, msg) {
-    if (!msg) {
-        msg = '';
-    }
-    try {
-        fn();
-    } catch (error) {
-        logger.logError(error, `an unhandled exception occured. ${msg}`);
-    }
-}
-
-function leaveVoiceChannel(message) {
-    if (bot.voiceConnections.get('server', message.server)) {
-        bot.voiceConnections.get('server', message.server).destroy();
-    }
-}
-
-bot.on('message', function(message) {
-    tryMe(function() {
-        msg.messageHandler(message, bot, commands)
-    });
-});
-
-bot.on('voiceStateUpdate', function(oldUser, newUser) {
-
-    tryMe(function() {
-        player.introSounds(newUser.voiceChannel, newUser, intro);
-    });
-});
-
-function loadStatsFile() {
-    file.loadFile(config.statsFileName, {}, function(data) {
-        stats = data;
-    });
-}
-
-function loadIntros() {
-    file.loadFile(config.introFileName, [], function(data) {
-        intro = data;
-    });
-}
-
-function loadTtsFile() {
-    console.log(`Loading tts commands...`);
-    file.loadFile(config.ttsFileName, [], function(data){
-        savedTts = data;
-        savedTts.forEach(function(element, index, array) {
-            var reg = new RegExp(`!${element.cmd}`, 'i');
-            commands.set(reg, ['text', element.content]);
-        });
-        if(savedTts.length > 0) {
-            console.log(`Completed loading ${savedTts.length} tts command(s)`);
-        } else {
-            console.log(`There are currently no stored tts commands.`);
-        }
-    });
-}
-
-(function init() {
-    bot.on('error', e => {
-        logger.logError(e);
-    });
-
-    file.readSoundFiles(function(cmds) {
-        commands = new Map([...cmds, ...commands]);
-
-        if (config.autoLoadSounds) {
-            addSoundsTo(commands, config.soundPath);
-        }
-    })
-    bot.login(config.botToken);
     
-    file.loadFile(config.statsFileName, {}, function(data) {
-        stats = data;
-    });
-    loadStatsFile();
-    loadTtsFile();
-    loadIntros();
-})();
+        file.loadFile(config.statsFileName, {}, (data) => {
+            this.stats = data;
+        });
+        this.loadStatsFile();
+        this.loadTtsFile();
+        this.loadIntros();
+    }
+
+    setEventHandlers() {
+        this.bot.on('error', e => {
+            logger.logError(e);
+        });
+        
+        this.bot.on('message', (message) => {
+            tryMe(() => {
+                msg.messageHandler(message, bot, commands)
+            });
+        });
+
+        this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
+            tryMe(() => {
+                player.introSounds(newUser.voiceChannel, newUser, intro);
+            });
+        });
+    }
+
+    setDefaultCommands() {
+        this.commands.set(new RegExp(this.triggerPrefix + 'help', 'i'), ['function',
+            this.displayCommands
+        ]);
+        this.commands.set(new RegExp(this.triggerPrefix + 'random', 'i'), ['function',
+            player.playRandomSound
+        ]);
+        this.commands.set(new RegExp(this.triggerPrefix + 'tts', 'i'), ['function',
+            tts.saveTts
+        ]);
+        this.commands.set(new RegExp(this.triggerPrefix + 'exit', 'i'), ['function',
+            this.leaveVoiceChannel
+        ]);
+        this.commands.set(new RegExp(this.triggerPrefix + 'game', 'i'), ['function',
+            this.letsPlay
+        ]);
+    }
+
+    letsPlay(message) {
+        message.channel.sendTTSMessage(`It's time for some cs boys. Chairs boys.`);
+
+        let usersNamesOnline = [];
+        bot.users.forEach((user) =>{
+            if(user.status === 'online') {
+                usersNamesOnline.push(user.username);
+                user.sendMessage(`Keen for cs?`);
+            }
+        });
+
+        let usersOnline = usersNamesOnline.join(', ')
+
+        message.channel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
+    }
+
+    displayCommands(message) {
+        var helpMessage = '';
+        if (message.content.split(' ')[2]) {
+            var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
+            this.commands.forEach((fileName, command) => {
+                if (command.toString().match(helpFilter)) {
+                    helpMessage += msg.regExpToCommand(command) + ', ';
+                }
+            });
+        } else {
+            this.commands.forEach((fileName, command) => {
+                helpMessage += msg.regExpToCommand(command) + ', ';
+            });
+        }
+        message.member.sendMessage(helpMessage);
+    }
+
+    addSoundsTo(map, fromDirectoryPath) {
+        fs.readdir(fromDirectoryPath, (err, files) => {
+            this.files.forEach((file) => {
+                if (file[0] !== '.') {
+                    var command = config.commandTrigger + file.split('.')[0].split('-').join(' ');
+                    var commandRegExp = new RegExp(command, 'i');
+                    map.set(commandRegExp, ['sound', file]);
+                }
+            });
+        });
+    }
+
+    tryMe(fn, msg) {
+        if (!msg) {
+            msg = '';
+        }
+        try {
+            fn();
+        } catch (error) {
+            logger.logError(error, `an unhandled exception occured. ${msg}`);
+        }
+    }
+
+    leaveVoiceChannel(message) {
+        if (this.bot.voiceConnections.get('server', message.server)) {
+            this.bot.voiceConnections.get('server', message.server).destroy();
+        }
+    }
+
+    loadStatsFile() {
+        file.loadFile(config.statsFileName, {}, (data) => {
+            this.stats = data;
+        });
+    }
+
+    loadIntros() {
+        file.loadFile(config.introFileName, [], (data) => {
+            this.intro = data;
+        });
+    }
+
+    loadTtsFile() {
+        console.log(`Loading tts commands...`);
+        file.loadFile(config.ttsFileName, [], (data) => {
+            this.savedTts = data;
+            this.savedTts.forEach((element, index, array) => {
+                let reg = new RegExp(`!${element.cmd}`, 'i');
+                this.commands.set(reg, ['text', element.content]);
+            });
+            if(this.savedTts.length > 0) {
+                console.log(`Completed loading ${this.savedTts.length} tts command(s)`);
+            } else {
+                console.log(`There are currently no stored tts commands.`);
+            }
+        });
+    }
+}
+
+(() => {
+    const dank = new Dank();
+
+    dank.init();
+})()

@@ -1,58 +1,68 @@
 'use strict';
-var fs = require('fs');
 var logger = require('./logger.js');
-var file = require('./file.js');
 const config = require('../config.json');
 
-var playSound = function(authorVoiceChannel, command, sound) {
-    if (authorVoiceChannel) {
-        authorVoiceChannel.join().then(function(connection,
-            joinError) {
-            if (joinError) {
-                var joinErrorMessage =
-                    'Error joining voice channel: ';
-                logger.logError(joinError, joinErrorMessage);
-            }
-            connection.playFile(config.soundPath + sound).on('error', (err) => {
-                logger.logError(err,
-                    `There was an playing the sound ${config.soundPath + sound}`
+class Player {
+    playSound(authorVoiceChannel, command, sound) {
+        if (authorVoiceChannel) {
+            authorVoiceChannel.join().then((connection,
+                joinError) => {
+                if (joinError) {
+                    var joinErrorMessage =
+                        'Error joining voice channel: ';
+                    logger.logError(joinError, joinErrorMessage);
+                }
+                connection.playFile(config.soundPath + sound).on('error', (err) => {
+                    logger.logError(err,
+                        `There was an playing the sound ${config.soundPath + sound}`
+                    );
+                });;
+            }).catch((e) => {
+                logger.trace(
+                    `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
                 );
-            });;
-        }).catch(function(e) {
-            logger.trace(
-                `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
-            );
-            logger.logError(e);
+                logger.logError(e);
+            });
+        }
+    }
+
+    regExpToCommand(command) {
+        return command.toString().split('/')[1];
+    }
+
+    playRandomSound(message) {
+        var keys = [...commands.keys()];
+        var randomKey;
+        var randomValue = ['', ''];
+        while (randomValue[0] !== 'sound') {
+            randomKey = keys[Math.round(keys.length * Math.random())];
+            randomValue = commands.get(randomKey);
+        }
+        this.playSound(message.member.voiceChannel, this.regExpToCommand(
+            randomKey), randomValue[1]);
+    }
+
+    playRandomSound(message) {
+        var keys = [...commands.keys()];
+        var randomKey;
+        var randomValue = ['', ''];
+        while (randomValue[0] !== 'sound') {
+            randomKey = keys[Math.round(keys.length * Math.random())];
+            randomValue = commands.get(randomKey);
+        }
+        this.playSound(message.member.voiceChannel, regExpToCommand(
+            randomKey), randomValue[1]);
+    }
+
+    introSounds(newChannel, user, intro) {
+        intro.forEach((element, index, array) => {
+            if (user.user.username === element.user) {
+                let cmd = `!${element.sound}`;
+                let fileName = `${element.sound}.${element.ext}`;
+                playSound(newChannel, cmd, fileName);
+            }
         });
     }
 }
 
-var regExpToCommand = function(command) {
-    return command.toString().split('/')[1];
-}
-
-var playRandomSound = function(message) {
-    var keys = [...commands.keys()];
-    var randomKey;
-    var randomValue = ['', ''];
-    while (randomValue[0] !== 'sound') {
-        randomKey = keys[Math.round(keys.length * Math.random())];
-        randomValue = commands.get(randomKey);
-    }
-    playSound(message.member.voiceChannel, regExpToCommand(
-        randomKey), randomValue[1]);
-}
-
-var introSounds = function(newChannel, user, intro) {
-    intro.forEach(function(element, index, array) {
-        if (user.user.username === element.user) {
-            let cmd = `!${element.sound}`;
-            let fileName = `${element.sound}.${element.ext}`;
-            playSound(newChannel, cmd, fileName);
-        }
-    });
-}
-
-module.exports.introSounds = introSounds;
-module.exports.playSound = playSound;
-module.exports.playRandomSound = playRandomSound;
+module.exports = new Player;
