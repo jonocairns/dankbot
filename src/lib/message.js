@@ -64,7 +64,7 @@ class Message {
                                 botReply[1](message, commands, bot);
                                 break;
                             case 'sound':
-                                player.playSound(message.member.voiceChannel,
+                                this.player.playSound(message.member.voiceChannel,
                                     regexp.toString().split('/')[1], botReply[1]
                                 );
                                 break;
