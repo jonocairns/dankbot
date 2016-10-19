@@ -2,11 +2,11 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const config = require('./config.json');
-const logger = require('./lib/logger.js');
-const player = require('./lib/player.js');
-const file = require('./lib/file.js');
-const tts = require('./lib/tts.js');
-const msg = require('./lib/message.js');
+const Logger = require('./lib/logger.js');
+const Player = require('./lib/player.js');
+const File = require('./lib/file.js');
+const Tts = require('./lib/tts.js');
+const Message = require('./lib/message.js');
 
 class Dank {
     constructor() {
@@ -14,6 +14,12 @@ class Dank {
         this.savedTts = [];
         this.intro = [];
         this.commands = new Map();
+
+        this.logger = new Logger();
+        this.player = new Player();
+        this.file = new File();
+        this.tts = new Tts();
+        this.msg = new Message();
     }
 
     init() {
@@ -28,11 +34,11 @@ class Dank {
     }
 
     loadFiles() {
-        file.readSoundFiles((cmds) => {
+        this.file.readSoundFiles((cmds) => {
             this.commands = new Map([...cmds, ...this.commands]);
         });
     
-        file.loadFile(config.statsFileName, {}, (data) => {
+        this.file.loadFile(config.statsFileName, {}, (data) => {
             this.stats = data;
         });
         this.loadStatsFile();
@@ -42,38 +48,49 @@ class Dank {
 
     setEventHandlers() {
         this.bot.on('error', e => {
-            logger.logError(e);
+            this.logger.logError(e);
         });
         
         this.bot.on('message', (message) => {
             this.tryMe(() => {
-                msg.messageHandler(message, this.bot, this.commands)
+                this.msg.messageHandler(message, this.bot, this.commands)
             });
         });
 
         this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
             this.tryMe(() => {
-                player.introSounds(newUser.voiceChannel, newUser, this.intro);
+                this.player.introSounds(newUser.voiceChannel, newUser, this.intro);
             });
         });
     }
 
     setDefaultCommands() {
         this.commands.set(new RegExp(this.triggerPrefix + 'help', 'i'), ['function',
-            msg.displayCommands
+            this.msg.displayCommands
         ]);
         this.commands.set(new RegExp(this.triggerPrefix + 'random', 'i'), ['function',
-            player.playRandomSound
+            this.playRandomSound
         ]);
         this.commands.set(new RegExp(this.triggerPrefix + 'tts', 'i'), ['function',
-            tts.saveTts
+            this.tts.saveTts
         ]);
         this.commands.set(new RegExp(this.triggerPrefix + 'exit', 'i'), ['function',
             this.leaveVoiceChannel
         ]);
         this.commands.set(new RegExp(this.triggerPrefix + 'game', 'i'), ['function',
-            msg.letsPlay
+            this.msg.letsPlay
         ]);
+    }
+
+    playRandomSound(message, commands) {
+        var keys = [...commands.keys()];
+        var randomKey;
+        var randomValue = ['', ''];
+        while (randomValue[0] !== 'sound') {
+            randomKey = keys[Math.round(keys.length * Math.random())];
+            randomValue = commands.get(randomKey);
+        }
+        new Player().playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
     }
 
     tryMe(fn, msg) {
@@ -83,31 +100,29 @@ class Dank {
         try {
             fn();
         } catch (error) {
-            logger.logError(error, `an unhandled exception occured. ${msg}`);
+            this.logger.logError(error, `an unhandled exception occured. ${msg}`);
         }
     }
 
-    leaveVoiceChannel(message) {
-        if (this.bot.voiceConnections.get('server', message.server)) {
-            this.bot.voiceConnections.get('server', message.server).destroy();
-        }
+    leaveVoiceChannel(message, commands, bot) {
+        message.member.voiceChannel.leave();
     }
 
     loadStatsFile() {
-        file.loadFile(config.statsFileName, {}, (data) => {
+        this.file.loadFile(config.statsFileName, {}, (data) => {
             this.stats = data;
         });
     }
 
     loadIntros() {
-        file.loadFile(config.introFileName, [], (data) => {
+        this.file.loadFile(config.introFileName, [], (data) => {
             this.intro = data;
         });
     }
 
     loadTtsFile() {
         console.log(`Loading tts commands...`);
-        file.loadFile(config.ttsFileName, [], (data) => {
+        this.file.loadFile(config.ttsFileName, [], (data) => {
             this.savedTts = data;
             this.savedTts.forEach((element, index, array) => {
                 let reg = new RegExp(`!${element.cmd}`, 'i');

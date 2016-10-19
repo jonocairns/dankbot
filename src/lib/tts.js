@@ -1,9 +1,13 @@
 'use strict';
 const fs = require('fs');
 const config = require('../config.json');
-const logger = require('./logger.js');
+const Logger = require('./logger.js');
 
 class Tts {
+    constructor() {
+        this.logger = new Logger();
+    }
+
      saveTts(message, commands) {
         // cmd will be !bot tts "content" cmd
         try {
@@ -56,4 +60,4 @@ class Tts {
 }
 
 
-module.exports = new Tts();
+module.exports = Tts;

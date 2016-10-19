@@ -1,9 +1,11 @@
 'use strict';
 const fs = require('fs');
 const config = require('../config.json');
-const logger = require('./logger.js');
 
 class File {
+    constructor() {
+    }
+
     loadFile(fileName, defaultValue, callback) {
         fs.readFile(fileName, 'utf-8', (error, data) => {
             if (error) {
@@ -52,4 +54,4 @@ class File {
     }
 }
 
-module.exports = new File();
+module.exports = File;

@@ -1,8 +1,12 @@
 'use strict';
 const config = require('../config.json');
-const player = require('./player.js');
+const Player = require('./player.js');
 
 class Message {
+    constructor() {
+        this.player = new Player();
+    }
+
     isUserBanned(username) {
         var banlist = config.banList.split(',');
         var isBanned = false;
@@ -80,4 +84,4 @@ class Message {
     }
 }
 
-module.exports = new Message();
+module.exports = Message;
