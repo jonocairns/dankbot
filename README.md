@@ -27,8 +27,6 @@ Ban people from using the command by going in to the config.json file and adding
 
 - Reminders
 
-- PM command list instead of listing it in chat
-
 ## Getting Started
 1. Clone this repository
 2. After completing the prerequisites, run `npm install` on this project making sure nothing fails, particularly `node-opus`

@@ -13,7 +13,11 @@ var playSound = function(authorVoiceChannel, command, sound) {
                     'Error joining voice channel: ';
                 logger.logError(joinError, joinErrorMessage);
             }
-            connection.playFile(config.soundPath + sound);
+            connection.playFile(config.soundPath + sound).on('error', (err) => {
+                logger.logError(err,
+                    `There was an playing the sound ${config.soundPath + sound}`
+                );
+            });;
         }).catch(function(e) {
             logger.trace(
                 `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
