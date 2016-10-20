@@ -1,3 +1,5 @@
+'use strict';
+
 import test from 'ava';
 
 const Logger = require('../lib/logger.js');

@@ -4,10 +4,10 @@
   "description": "A dank discord bot",
   "main": "src/index.js",
   "scripts": {
-    "lint": "node_modules/.bin/eslint **/*.js",
+    "lint": "node_modules/.bin/eslint **/*.js !**/*-spec.js",
     "test": "ava **/*-spec.js --use_strict",
     "start": "node src/index.js",
-    "prep": "node_modules/.bin/eslint **/*.js && ava **/*-spec.js --use_strict"
+    "prep": "node_modules/.bin/eslint **/*.js !**/*-spec.js && ava **/*-spec.js --use_strict"
   },
   "repository": {
     "type": "git",
