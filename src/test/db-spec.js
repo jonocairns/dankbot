@@ -11,7 +11,7 @@ test.after.always(() => {
 });
 
 test('Can connect to db', (t) => {
-  MongoClient.connect(config.mongo, (err, db) => {
+  MongoClient.connect(process.env.DANK_MONGODB, (err, db) => {
       if (err) {
         throw err;
       }

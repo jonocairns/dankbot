@@ -2,7 +2,6 @@
   "autoLeaveVoice": false,
   "autoLoadSounds": false,
   "botPrefix": "bot",
-  "botToken": "MjM2MzE0MTc3Mjk4MzY2NDY5.CudrVg.T4sFVwGgSwb_i_I8PUvxdMsAMdk",
   "commandTrigger": "!",
   "demoMode": true,
   "soundPath": "./sounds/",
@@ -13,6 +12,5 @@
   "randomMin": 1,
   "randomMax": 60,
   "isLoggingEnabled": true,
-  "logToFile": false,
-  "mongo": "mongodb://anne:dank@ds061676.mlab.com:61676/dankdb"
+  "logToFile": false
 }

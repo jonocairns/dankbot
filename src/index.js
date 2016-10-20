@@ -23,7 +23,7 @@ class Dank {
 		this.bot = new Discord.Client({
 			autoReconnect: true,
 		});
-		this.bot.login(config.botToken);
+		this.bot.login(process.env.DISCORD_BOT_TOKEN);
 		this.triggerPrefix = `${config.commandTrigger + config.botPrefix} `;
 		this.setDefaultCommands();
 		this.setEventHandlers();
