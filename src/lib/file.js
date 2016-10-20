@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 class File {
-  readSoundFiles(callback) {
+  static readSoundFiles(callback) {
     console.log('Loading sounds...');
     fs.readdir('./sounds', {}, (err, files) => {
       const commands = new Map();

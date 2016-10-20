@@ -65,7 +65,7 @@ class Dank {
 
   setDefaultCommands() {
     this.commands.set(new RegExp(`${this.triggerPrefix}help`, 'i'), ['function',
-            this.msg.displayCommands,
+            Message.displayCommands,
         ]);
     this.commands.set(new RegExp(`${this.triggerPrefix}random`, 'i'), ['function',
             this.playRandomSound.bind(this),
@@ -74,10 +74,10 @@ class Dank {
             this.speech.bind(this),
         ]);
     this.commands.set(new RegExp(`${this.triggerPrefix}exit`, 'i'), ['function',
-            this.leaveVoiceChannel,
+            Dank.leaveVoiceChannel,
         ]);
     this.commands.set(new RegExp(`${this.triggerPrefix}game`, 'i'), ['function',
-            this.msg.letsPlay,
+            Message.letsPlay,
         ]);
   }
 

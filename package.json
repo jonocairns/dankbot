@@ -24,13 +24,13 @@
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
     "discord.js": "~9.3.0",
-    "mongodb": "~2.2.10"
+    "mongodb": "~2.2.10",
+    "ava": "^0.16.0"
   },
   "engines": {
     "node": "6.8.1"
   },
   "devDependencies": {
-    "ava": "^0.16.0",
     "eslint": "^3.8.1",
     "eslint-config-airbnb": "^12.0.0",
     "eslint-plugin-import": "^1.16.0"

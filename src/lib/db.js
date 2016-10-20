@@ -3,7 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 
 class Database {
 
-  run(func) {
+  static run(func) {
     MongoClient.connect(config.mongo, (err, db) => {
       if (err) {
         throw err;
@@ -12,8 +12,8 @@ class Database {
     });
   }
 
-  load(id, target, cb) {
-    this.run((db) => {
+  static load(id, target, cb) {
+    Database.run((db) => {
       const collection = db.collection(target);
       collection.aggregate([{ $match: id }]).toArray((err, items) => {
         cb(items);
@@ -21,8 +21,8 @@ class Database {
     });
   }
 
-  update(id, val, target, cb) {
-    this.run((db) => {
+  static update(id, val, target, cb) {
+    Database.run((db) => {
       const collection = db.collection(target);
       collection.updateOne(id, val, { upsert: true }, (err, items) => {
         cb(items);
@@ -30,16 +30,16 @@ class Database {
     });
   }
 
-  insert(item, target) {
-    this.run((db) => {
+  static insert(item, target) {
+    Database.run((db) => {
       db.collection(target).insert(item, () => {
         db.close();
       });
     });
   }
 
-  loadMany(target, cb) {
-    this.run((db) => {
+  static loadMany(target, cb) {
+    Database.run((db) => {
       const collection = db.collection(target);
       collection.find({}).toArray((err, items) => {
         cb(items);
@@ -47,8 +47,8 @@ class Database {
     });
   }
 
-  saveMany(items, target) {
-    this.run((db) => {
+  static saveMany(items, target) {
+    Database.run((db) => {
       db.collection(target).insertMany(items, () => {
         db.close();
       });
