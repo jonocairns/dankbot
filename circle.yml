@@ -3,3 +3,6 @@ deployment:
     branch: master
     heroku:
       appname: dankbot-69
+test:
+  pre:
+    - npm run lint
