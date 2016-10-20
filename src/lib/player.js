@@ -40,12 +40,12 @@ class Player {
     }
   }
 
-  introSounds(newChannel, user, intro) {
+  static introSounds(newChannel, user, intro) {
     intro.forEach((element) => {
       if (user.user.username === element.user) {
         const cmd = `!${element.sound}`;
         const fileName = `${element.sound}.${element.ext}`;
-        this.playSound(newChannel, cmd, fileName);
+        Player.playSound(newChannel, cmd, fileName);
       }
     });
   }

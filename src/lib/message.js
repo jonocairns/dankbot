@@ -50,7 +50,7 @@ class Message {
     message.channel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
   }
 
-  messageHandler(message, bot, commands) {
+  static messageHandler(message, bot, commands) {
     if (message.author.username !== bot.user.username && !Message.isUserBanned(
             message.author.username)) {
       commands.forEach((botReply, regexp) => {
@@ -61,7 +61,7 @@ class Message {
                 botReply[1](message, commands, bot);
                 break;
               case 'sound':
-                this.player.playSound(message.member.voiceChannel,
+                Player.playSound(message.member.voiceChannel,
                                     regexp.toString().split('/')[1], botReply[1]
                                 );
                 break;

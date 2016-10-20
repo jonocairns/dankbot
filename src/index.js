@@ -53,13 +53,13 @@ class Dank {
           message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
           this.newCommands = [];
         }
-        this.msg.messageHandler(message, this.bot, this.commands);
+        Message.messageHandler(message, this.bot, this.commands);
       });
     });
 
     this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
       Dank.tryMe(() => {
-        this.player.introSounds(newUser.voiceChannel, newUser, this.intro);
+        Player.introSounds(newUser.voiceChannel, newUser, this.intro);
       });
     });
   }
@@ -69,7 +69,7 @@ class Dank {
             Message.displayCommands,
         ]);
     this.commands.set(new RegExp(`${this.triggerPrefix}random`, 'i'), ['function',
-            this.playRandomSound.bind(this),
+            Dank.playRandomSound.bind(this),
         ]);
     this.commands.set(new RegExp(`${this.triggerPrefix}tts`, 'i'), ['function',
             this.speech.bind(this),
@@ -92,7 +92,7 @@ class Dank {
     }
   }
 
-  playRandomSound(message, commands) {
+  static playRandomSound(message, commands) {
     const keys = [...commands.keys()];
     let randomKey;
     let randomValue = ['', ''];
@@ -100,7 +100,7 @@ class Dank {
       randomKey = keys[Math.round(keys.length * Math.random())];
       randomValue = commands.get(randomKey);
     }
-    this.player.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
+    Player.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
   }
 
   static tryMe(fn, msg) {
