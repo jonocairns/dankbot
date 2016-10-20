@@ -85,7 +85,7 @@ class Dank {
 	speech(message) {
 		const obj = Tts.process(message, this.commands);
 		if (!obj.isEmpty) {
-			Database.insert('tts', obj);
+			Database.insert('tts', obj, () => {});
 			const reg = new RegExp(`!${obj.cmd}`, 'i');
 			this.commands.set(reg, ['text', obj.content]);
 		}
