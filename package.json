@@ -32,16 +32,18 @@
     "node": "6.8.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.16.0",
     "babel-register": "^6.16.3",
     "eslint": "^3.8.1",
     "eslint-config-airbnb": "^12.0.0",
     "eslint-plugin-import": "^1.16.0"
-  }, "ava": {
-         "babel": {
-             "presets": [
-                    "es2015",
-                    "stage-2"
-             ]
-         }
+  },
+  "ava": {
+    "babel": {
+      "presets": [
+        "es2015",
+        "stage-2"
+      ]
     }
+  }
 }
