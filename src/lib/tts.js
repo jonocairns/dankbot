@@ -1,9 +1,6 @@
 const Logger = require('./logger.js');
 
 class Tts {
-  constructor() {
-    this.logger = new Logger();
-  }
 
   static process(message, commands) {
     // cmd will be !bot tts "content" cmd

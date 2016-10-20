@@ -3,10 +3,6 @@ const config = require('../config.json');
 const Database = require('./db.js');
 
 class Player {
-  constructor() {
-    this.logger = new Logger();
-    this.db = new Database();
-  }
 
   playSound(authorVoiceChannel, command, sound) {
     if (authorVoiceChannel) {
@@ -25,14 +21,14 @@ class Player {
                     );
         });
         dispatcher.on('end', () => {
-          this.db.load({ command }, 'stats', (i) => {
+          Database.load({ command }, 'stats', (i) => {
             console.log(i);
             if (i.length === 0) {
-              this.db.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', (err) => {
+              Database.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', (err) => {
                 console.log(err);
               });
             } else {
-              this.db.update({ command }, { $inc: { count: 1 } }, 'stats', (err) => {
+              Database.update({ command }, { $inc: { count: 1 } }, 'stats', (err) => {
                 console.log(err);
               });
             }
