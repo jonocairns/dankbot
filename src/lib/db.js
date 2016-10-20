@@ -30,7 +30,7 @@ class Database {
     });
   }
 
-  static insert(item, target) {
+  static insert(target, item) {
     Database.run((db) => {
       db.collection(target).insert(item, () => {
         db.close();
@@ -47,7 +47,7 @@ class Database {
     });
   }
 
-  static saveMany(items, target) {
+  static saveMany(target, items) {
     Database.run((db) => {
       db.collection(target).insertMany(items, () => {
         db.close();
