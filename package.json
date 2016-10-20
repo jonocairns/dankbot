@@ -4,7 +4,7 @@
   "description": "A dank discord bot",
   "main": "src/index.js",
   "scripts": {
-    "lint": "node_modules/.bin/eslint **/*.js",
+    "lint": "node_modules/.bin/eslint **/*.js --fix",
     "test": "ava **/*-spec.js --verbose",
     "start": "node src/index.js",
     "prep": "node_modules/.bin/eslint **/*.js && ava **/*-spec.js --verbose"
