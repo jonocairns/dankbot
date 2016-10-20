@@ -30,10 +30,11 @@ class Database {
     });
   }
 
-  static insert(target, item) {
+  static insert(target, item, cb) {
     Database.run((db) => {
       db.collection(target).insert(item, () => {
         db.close();
+        cb();
       });
     });
   }
@@ -51,6 +52,20 @@ class Database {
     Database.run((db) => {
       db.collection(target).insertMany(items, () => {
         db.close();
+      });
+    });
+  }
+
+  static deleteAll(target) {
+    Database.run((db) => {
+      db.collection(target).remove();
+    });
+  }
+
+  static delete(id, target, cb) {
+    Database.run((db) => {
+      db.collection(target).remove(id, (err, numberOfRemoved) => {
+        cb(numberOfRemoved);
       });
     });
   }

@@ -1,16 +1,26 @@
 'use strict';
 
 import test from 'ava';
+import sinon from 'sinon';
 
 const Logger = require('../lib/logger.js');
 
-test('foo', (t) => {
-  Logger.trace('balls');
-  t.pass();
+test.beforeEach(() => {
+  sinon.stub(console, 'log');
 });
 
-test('bar', async (t) => {
-  const bar = Promise.resolve('bar');
+test.afterEach(() => {
+  console.log.restore();
+});
 
-  t.is(await bar, 'bar');
+test('Can trace', (t) => {
+  t.notThrows(() => {
+    Logger.trace('balls');
+  });
+});
+
+test('Can log exception', (t) => {
+  t.notThrows(() => {
+    Logger.logError({}, 'balls');
+  });
 });

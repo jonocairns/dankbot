@@ -4,10 +4,10 @@
   "description": "A dank discord bot",
   "main": "src/index.js",
   "scripts": {
-    "lint": "node_modules/.bin/eslint **/*.js !**/*-spec.js",
+    "lint": "node_modules/.bin/eslint **/*.js",
     "test": "ava **/*-spec.js --verbose",
     "start": "node src/index.js",
-    "prep": "node_modules/.bin/eslint **/*.js !**/*-spec.js && ava **/*-spec.js --verbose"
+    "prep": "node_modules/.bin/eslint **/*.js && ava **/*-spec.js --verbose"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,8 @@
   "dependencies": {
     "discord.js": "~9.3.0",
     "mongodb": "~2.2.10",
-    "ava": "^0.16.0"
+    "ava": "^0.16.0",
+    "sinon": "^1.17.6"
   },
   "engines": {
     "node": "6.8.1"
