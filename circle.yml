@@ -6,3 +6,6 @@ deployment:
 test:
   pre:
     - npm run lint
+machine:
+  node:
+    version: 6.8.1
