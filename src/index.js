@@ -36,7 +36,7 @@ class Dank {
   }
 
   loadFiles() {
-    this.file.readSoundFiles((cmds) => {
+    File.readSoundFiles((cmds) => {
       this.commands = new Map([...cmds, ...this.commands]);
     });
 
