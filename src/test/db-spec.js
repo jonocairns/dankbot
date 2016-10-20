@@ -26,7 +26,7 @@ test('Can save and load single', (t) => {
   }
 
   t.notThrows(() => {
-      Database.insert('test', testObj)
+      Database.insert('test', testObj);
   });
   Database.load(testObj, 'test', (item) => {
     t.is(testObj.id, item.id);

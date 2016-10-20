@@ -16,7 +16,7 @@ class Database {
 		Database.run((db) => {
 			const collection = db.collection(target);
 			collection.aggregate([{ $match: id }]).toArray((err, items) => {
-				cb(items);
+				if (cb) cb(items);
 			});
 		});
 	}
@@ -25,7 +25,7 @@ class Database {
 		Database.run((db) => {
 			const collection = db.collection(target);
 			collection.updateOne(id, val, { upsert: true }, (err, items) => {
-				cb(items);
+				if (cb) cb(items);
 			});
 		});
 	}
@@ -34,7 +34,7 @@ class Database {
 		Database.run((db) => {
 			db.collection(target).insert(item, () => {
 				db.close();
-				cb();
+				if (cb) cb();
 			});
 		});
 	}
@@ -43,15 +43,16 @@ class Database {
 		Database.run((db) => {
 			const collection = db.collection(target);
 			collection.find({}).toArray((err, items) => {
-				cb(items);
+				if (cb) cb(items);
 			});
 		});
 	}
 
-	static saveMany(target, items) {
+	static saveMany(target, items, cb) {
 		Database.run((db) => {
 			db.collection(target).insertMany(items, () => {
 				db.close();
+				if (cb) cb();
 			});
 		});
 	}
@@ -65,7 +66,7 @@ class Database {
 	static delete(id, target, cb) {
 		Database.run((db) => {
 			db.collection(target).remove(id, (err, numberOfRemoved) => {
-				cb(numberOfRemoved);
+				if (cb) cb(numberOfRemoved);
 			});
 		});
 	}
