@@ -22,7 +22,9 @@ class File {
             }
           }
         });
-        Database.saveMany('sounds', newCommands);
+        if(newCommands.length > 0) {
+          Database.saveMany('sounds', newCommands);
+        }
         console.log(`Completed loading ${files.length} files!`);
         callback({ commands, newCommands });
       });
