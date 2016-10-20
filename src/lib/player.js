@@ -22,14 +22,11 @@ class Player {
         });
         dispatcher.on('end', () => {
           Database.load({ command }, 'stats', (i) => {
-            console.log(i);
             if (i.length === 0) {
               Database.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', (err) => {
-                console.log(err);
               });
             } else {
               Database.update({ command }, { $inc: { count: 1 } }, 'stats', (err) => {
-                console.log(err);
               });
             }
           });
