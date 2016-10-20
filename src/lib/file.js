@@ -32,7 +32,7 @@ class File {
   static containsObject(obj, list) {
     let i;
     for (i = 0; i < list.length; i += 1) {
-      if (list[i] === obj) {
+      if (list[i].sound === obj.sound) {
         return true;
       }
     }
