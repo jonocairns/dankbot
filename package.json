@@ -5,8 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "node_modules/.bin/eslint **/*.js",
-    "test": "ava **/*-spec.js",
-    "start": "node src/index.js"
+    "test": "ava **/*-spec.js --use_strict",
+    "start": "node src/index.js",
+    "prep": "node_modules/.bin/eslint **/*.js && ava **/*-spec.js --use_strict"
   },
   "repository": {
     "type": "git",
