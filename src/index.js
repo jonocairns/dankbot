@@ -68,7 +68,7 @@ class Dank {
 		this.commands.set(new RegExp(`${this.triggerPrefix}help`, 'i'), ['function',
             Message.displayCommands,
         ]);
-		this.commands.set(new RegExp(`${this.triggerPrefix}random`, 'i'), ['function',
+		this.commands.set(new RegExp(`!meme`, 'i'), ['function',
             Dank.playRandomSound.bind(this),
         ]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}tts`, 'i'), ['function',
