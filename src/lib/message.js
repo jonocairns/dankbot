@@ -1,5 +1,3 @@
-
-
 const config = require('../config.json');
 const Player = require('./player.js');
 

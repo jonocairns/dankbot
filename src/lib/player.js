@@ -1,5 +1,3 @@
-
-
 const Logger = require('./logger.js');
 const config = require('../config.json');
 const Database = require('./db.js');

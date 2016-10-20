@@ -1,5 +1,3 @@
-
-
 const config = require('../config.json');
 const MongoClient = require('mongodb').MongoClient;
 
