@@ -3,7 +3,6 @@
 import test from 'ava';
 
 const Database = require('../lib/db.js');
-const config = require('../config.json');
 const MongoClient = require('mongodb').MongoClient;
 
 test.after.always(() => {
