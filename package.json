@@ -4,6 +4,7 @@
   "description": "A dank discord bot",
   "main": "src/index.js",
   "scripts": {
+    "lint": "node_modules/.bin/eslint **/*.js",
     "test": "echo \"Error: no test specified\"",
     "start": "node src/index.js"
   },
@@ -23,9 +24,16 @@
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
     "discord.js": "~9.3.0",
-    "mongodb": "^2.2.10"
+    "mongodb": "~2.2.10"
   },
   "engines": {
     "node": "6.8.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.8.1",
+    "eslint-config-airbnb": "^12.0.0",
+    "eslint-plugin-import": "^2.0.1",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.4.1"
   }
 }

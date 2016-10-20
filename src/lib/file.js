@@ -1,48 +1,43 @@
-'use strict';
 const fs = require('fs');
-const config = require('../config.json');
 
 class File {
-    constructor() {
-    }
 
-    loadFile(fileName, defaultValue, callback) {
-        fs.readFile(fileName, 'utf-8', (error, data) => {
-            if (error) {
-                if (error.code === 'ENOENT') {
-                    fs.writeFileSync(fileName, JSON.stringify(defaultValue));
-                    
-                } else {
-                    console.log('Error: ', error);
-                }
-                callback(defaultValue);
-            } else {
-                try {
-                    var payload = JSON.parse(data);
-                    callback(payload);
-                } catch (parsingError) {
-                    console.log('Error parsing JSON: ', parsingError);
-                    callback(defaultValue);
-                }
-            }
-        });
-    }
+  static loadFile(fileName, defaultValue, callback) {
+    fs.readFile(fileName, 'utf-8', (error, data) => {
+      if (error) {
+        if (error.code === 'ENOENT') {
+          fs.writeFileSync(fileName, JSON.stringify(defaultValue));
+        } else {
+          console.log('Error: ', error);
+        }
+        callback(defaultValue);
+      } else {
+        try {
+          const payload = JSON.parse(data);
+          callback(payload);
+        } catch (parsingError) {
+          console.log('Error parsing JSON: ', parsingError);
+          callback(defaultValue);
+        }
+      }
+    });
+  }
 
-    readSoundFiles(callback) {
-        console.log('Loading sounds...');
-        fs.readdir('./sounds', {}, (err, files) => {
-            var commands = new Map();
-            files.forEach((element, index, array) => {
-                var cmd = element.split('.')[0];
-                if (cmd) {
-                    var reg = new RegExp(`!${cmd}`, 'i');
-                    commands.set(reg, ['sound', element]);
-                }
-            });
-            console.log(`Completed loading ${files.length} files!`);
-            callback(commands);
-        });
-    }
+  static readSoundFiles(callback) {
+    console.log('Loading sounds...');
+    fs.readdir('./sounds', {}, (err, files) => {
+      const commands = new Map();
+      files.forEach((element) => {
+        const cmd = element.split('.')[0];
+        if (cmd) {
+          const reg = new RegExp(`!${cmd}`, 'i');
+          commands.set(reg, ['sound', element]);
+        }
+      });
+      console.log(`Completed loading ${files.length} files!`);
+      callback(commands);
+    });
+  }
 }
 
 module.exports = File;
