@@ -1,5 +1,3 @@
-
-
 const Discord = require('discord.js');
 const config = require('./config.json');
 const Logger = require('./lib/logger.js');
@@ -15,6 +13,7 @@ class Dank {
     this.savedTts = [];
     this.intro = [];
     this.commands = new Map();
+    this.newCommands = [];
 
     this.player = new Player();
     this.msg = new Message();
@@ -32,8 +31,10 @@ class Dank {
   }
 
   loadFiles() {
-    File.readSoundFiles((cmds) => {
-      this.commands = new Map([...cmds, ...this.commands]);
+    File.readSoundFiles((cmdObj) => {
+      this.commands = new Map([...cmdObj.commands, ...this.commands]);
+
+      this.newCommands = cmdObj.newCommands.map(a => a.sound);
     });
 
     this.loadStats();
@@ -48,6 +49,10 @@ class Dank {
 
     this.bot.on('message', (message) => {
       Dank.tryMe(() => {
+        if (this.newCommands.length > 0) {
+          message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
+          this.newCommands = [];
+        }
         this.msg.messageHandler(message, this.bot, this.commands);
       });
     });

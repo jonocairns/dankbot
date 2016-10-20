@@ -1,20 +1,42 @@
 const fs = require('fs');
+const Database = require('./db.js');
 
 class File {
   static readSoundFiles(callback) {
     console.log('Loading sounds...');
-    fs.readdir('./sounds', {}, (err, files) => {
-      const commands = new Map();
-      files.forEach((element) => {
-        const cmd = element.split('.')[0];
-        if (cmd) {
-          const reg = new RegExp(`!${cmd}`, 'i');
-          commands.set(reg, ['sound', element]);
-        }
+
+    Database.loadMany('sounds', (sounds) => {
+      const newCommands = [];
+      fs.readdir('./sounds', {}, (err, files) => {
+        const commands = new Map();
+        files.forEach((element) => {
+          const cmd = element.split('.')[0];
+          if (cmd) {
+            const reg = new RegExp(`!${cmd}`, 'i');
+            commands.set(reg, ['sound', element]);
+
+            const doesSoundExistsInStore = File.containsObject({ sound: cmd }, sounds);
+
+            if (!doesSoundExistsInStore) {
+              newCommands.push({ sound: cmd });
+            }
+          }
+        });
+        Database.saveMany('sounds', newCommands);
+        console.log(`Completed loading ${files.length} files!`);
+        callback({ commands, newCommands });
       });
-      console.log(`Completed loading ${files.length} files!`);
-      callback(commands);
     });
+  }
+
+  static containsObject(obj, list) {
+    let i;
+    for (i = 0; i < list.length; i += 1) {
+      if (list[i] === obj) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

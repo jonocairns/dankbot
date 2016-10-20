@@ -4,7 +4,7 @@ const Database = require('./db.js');
 
 class Player {
 
-  playSound(authorVoiceChannel, command, sound) {
+  static playSound(authorVoiceChannel, command, sound) {
     if (authorVoiceChannel) {
       authorVoiceChannel.join().then((connection,
                 joinError) => {
@@ -23,10 +23,10 @@ class Player {
         dispatcher.on('end', () => {
           Database.load({ command }, 'stats', (i) => {
             if (i.length === 0) {
-              Database.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', (err) => {
+              Database.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', () => {
               });
             } else {
-              Database.update({ command }, { $inc: { count: 1 } }, 'stats', (err) => {
+              Database.update({ command }, { $inc: { count: 1 } }, 'stats', () => {
               });
             }
           });
