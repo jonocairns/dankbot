@@ -6,7 +6,7 @@ class Message {
     this.player = new Player();
   }
 
-  static isUserBanned(username) {
+  isUserBanned(username) {
     const banlist = config.banList.split(',');
     let isBanned = false;
     banlist.forEach((bannedUsername) => {
@@ -17,7 +17,7 @@ class Message {
     return isBanned;
   }
 
-  static displayCommands(message, commands) {
+  displayCommands(message, commands) {
     let helpMessage = '';
     if (message.content.split(' ')[2]) {
       const helpFilter = new RegExp(message.content.split(' ')[2], 'i');
@@ -34,7 +34,7 @@ class Message {
     message.member.sendMessage(helpMessage);
   }
 
-  static letsPlay(message, commands, bot) {
+  letsPlay(message, commands, bot) {
     message.channel.sendTTSMessage('It\'s time for some cs boys. Chairs boys.');
 
     const usersNamesOnline = [];

@@ -5,7 +5,7 @@ class Tts {
     this.logger = new Logger();
   }
 
-  static process(message, commands) {
+  process(message, commands) {
     // cmd will be !bot tts "content" cmd
     const empty = {
       content: '',

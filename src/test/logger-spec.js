@@ -1,7 +1,9 @@
 import test from 'ava';
-import { Logger } from '../lib/logger'
+const Logger = require('../lib/logger.js');
 
 test('foo', t => {
+    let logger = new Logger();
+    logger.trace('balls');
     t.pass();
 });
 

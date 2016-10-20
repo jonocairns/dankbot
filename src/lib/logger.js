@@ -1,5 +1,5 @@
 class Logger {
-  static toJSONLocal(date) {
+  toJSONLocal(date) {
     const local = new Date(date);
     local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
     return local.toJSON();
