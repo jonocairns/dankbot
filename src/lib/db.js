@@ -15,10 +15,10 @@ class Database {
         });
     }
 
-    loadMany(target, cb) {
+    load(id, target, cb) {
         this.run((db) => {
             var collection = db.collection(target);
-            collection.find({}).toArray((err, items) => {
+            collection.aggregate([{$match: id}]).toArray((err, items) => {
                 cb(items);
             });
         });
@@ -33,10 +33,18 @@ class Database {
         });
     }
 
-    load(id, target, cb) {
+    insert(item, target) {
+        this.run((db) => {
+            db.collection(target).insert(item, () => {
+                db.close();
+            });
+        });
+    }
+
+    loadMany(target, cb) {
         this.run((db) => {
             var collection = db.collection(target);
-            collection.aggregate([{$match: id}]).toArray((err, items) => {
+            collection.find({}).toArray((err, items) => {
                 cb(items);
             });
         });
@@ -45,14 +53,6 @@ class Database {
     saveMany(items, target) {
         this.run((db) => {
             db.collection(target).insertMany(items, () => {
-                db.close();
-            });
-        });
-    }
-
-    save(item, target) {
-        this.run((db) => {
-            db.collection(target).insert(item, () => {
                 db.close();
             });
         });

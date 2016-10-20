@@ -126,7 +126,7 @@ class Dank {
     }
 
     loadIntros() {
-        this.db.loadMany('tts', (data) => {
+        this.db.loadMany('intros', (data) => {
             this.intro = data;
         });
     }
