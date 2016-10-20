@@ -4,7 +4,6 @@ import test from 'ava';
 import sinon from 'sinon';
 
 const Database = require('../lib/tts.js');
-const config = require('../config.json');
 const Tts = require('../lib/tts.js');
 const Logger = require('../lib/logger.js');
 let message, commands, sendMessageContent;

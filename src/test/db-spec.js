@@ -3,10 +3,17 @@
 import test from 'ava';
 
 const Database = require('../lib/db.js');
+const TestConfig = require('../../env.json');
 const MongoClient = require('mongodb').MongoClient;
 
 test.after.always(() => {
   Database.deleteAll('test');
+});
+
+test.before(() => {
+    if(!process.env.DANK_MONGODB) {
+        process.env.DANK_MONGODB = TestConfig.mongo;
+    }
 });
 
 test('Can connect to db', (t) => {
