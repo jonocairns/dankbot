@@ -16,12 +16,8 @@ class Dank {
     this.intro = [];
     this.commands = new Map();
 
-    this.logger = new Logger();
     this.player = new Player();
-    this.file = new File();
-    this.tts = new Tts();
     this.msg = new Message();
-    this.db = new Database();
   }
 
   init() {
@@ -47,17 +43,17 @@ class Dank {
 
   setEventHandlers() {
     this.bot.on('error', (e) => {
-      this.logger.logError(e);
+      Logger.logError(e);
     });
 
     this.bot.on('message', (message) => {
-      this.tryMe(() => {
+      Dank.tryMe(() => {
         this.msg.messageHandler(message, this.bot, this.commands);
       });
     });
 
     this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
-      this.tryMe(() => {
+      Dank.tryMe(() => {
         this.player.introSounds(newUser.voiceChannel, newUser, this.intro);
       });
     });
@@ -82,10 +78,10 @@ class Dank {
   }
 
   speech(message) {
-    const obj = this.tts.process(message, this.commands);
+    const obj = Tts.process(message, this.commands);
 
     if (!obj.isEmpty) {
-      this.db.save(obj, 'tts');
+      Database.save(obj, 'tts');
       const reg = new RegExp(`!${obj.cmd}`, 'i');
       this.commands.set(reg, ['text', obj.content]);
     }
@@ -102,7 +98,7 @@ class Dank {
     this.player.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
   }
 
-  tryMe(fn, msg) {
+  static tryMe(fn, msg) {
     let errorMessage = msg;
     if (!errorMessage) {
       errorMessage = '';
@@ -110,7 +106,7 @@ class Dank {
     try {
       fn();
     } catch (error) {
-      this.logger.logError(error, `an unhandled exception occured. ${errorMessage}`);
+      Logger.logError(error, `an unhandled exception occured. ${errorMessage}`);
     }
   }
 
@@ -121,13 +117,13 @@ class Dank {
   }
 
   loadStats() {
-    this.db.loadMany('stats', (data) => {
+    Database.loadMany('stats', (data) => {
       this.stats = data;
     });
   }
 
   loadIntros() {
-    this.db.loadMany('intros', (data) => {
+    Database.loadMany('intros', (data) => {
       this.intro = data;
     });
   }
@@ -135,7 +131,7 @@ class Dank {
   loadTts() {
     console.log('Loading tts commands...');
 
-    this.db.loadMany('tts', (data) => {
+    Database.loadMany('tts', (data) => {
       this.savedTts = data;
       this.savedTts.forEach((element) => {
         const reg = new RegExp(`!${element.cmd}`, 'i');

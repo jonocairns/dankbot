@@ -15,12 +15,12 @@ class Player {
         if (joinError) {
           const joinErrorMessage =
                         'Error joining voice channel: ';
-          this.logger.logError(joinError, joinErrorMessage);
+          Logger.logError(joinError, joinErrorMessage);
         }
         const dispatcher = connection.playFile(config.soundPath + sound);
 
         dispatcher.on('error', (err) => {
-          this.logger.logError(err,
+          Logger.logError(err,
                         `There was an playing the sound ${config.soundPath + sound}`
                     );
         });
@@ -39,10 +39,10 @@ class Player {
           });
         });
       }).catch((e) => {
-        this.logger.trace(
+        Logger.trace(
                     `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
                 );
-        this.logger.logError(e);
+        Logger.logError(e);
       });
     }
   }

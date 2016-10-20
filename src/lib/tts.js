@@ -5,7 +5,7 @@ class Tts {
     this.logger = new Logger();
   }
 
-  process(message, commands) {
+  static process(message, commands) {
     // cmd will be !bot tts "content" cmd
     const empty = {
       content: '',
@@ -53,7 +53,7 @@ class Tts {
 
       return empty;
     } catch (err) {
-      this.logger.logError(err, 'fail');
+      Logger.logError(err, 'fail');
       message.channel.sendMessage('Something bad happened. Try again niggah. use (exclamation)bot tts "some text" (exclamation)bind');
       return empty;
     }
