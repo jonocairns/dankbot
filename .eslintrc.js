@@ -6,7 +6,7 @@ module.exports = {
         "no-console":0,
         "linebreak-style": 0,
         "strict": 0,
-        "indent": ["error", "tab"],
+        "indent": [2, "tab"],
         "no-tabs": 0
     }
 };
