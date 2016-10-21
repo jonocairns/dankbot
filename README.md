@@ -3,14 +3,31 @@ A dank soundboard for discord. Check out the sounds folder for all the current l
 
 [![Circle CI](https://circleci.com/gh/jonocairns/dankbot.svg?style=svg)](https://circleci.com/gh/jonocairns/dankbot)
 
+Uses node, es6, ava (tests), sinon (stub/mock), eslint, mongodb, circle-ci (build) and heroku (deployment/environment)
+
 ## Mini Docs
 Add memes to the sounds folder. Whatever you name the file will be ready when you launch the app. Eg dank.mp3 can be run with !dank.
 
-If you know some basic coding, you can go in to the index.js file and alter the introSounds function. This can be used to play sounds when a particular user joins a voice channel. 
+Add intro sounds for specific members of your discord channel. In mongodb inside your intros store
+    {
+        "user": "Anne",
+        "sound": "cena",
+        "ext": "mp3"
+    }
 
-`autoLeaveVoice` - When set to `true`, the bot will leave after playing a sound. The sound of a bot joining/leaving a voice channel can be annoying, so by setting this to false, the bot will stay in the voice channel until told to leave by the `!bot exit` command.
+When the user Anne enters the channel or unmutes the John Cena sound will play. Note that the sound must exist in the sound folder.
 
-`autoLoadSounds` - When set to `true`, the bot will attempt to load in every file placed in the `sounds` directory. To generate the sound's command, `soundCommandTrigger` is prepended, the audio extension is stripped off, and hyphens are converted to spaces.
+Play a random meme with `!meme` 
+
+Typing `!bot game` will TTS the current chat channel saying its time to play CS. It will also DM every online user and ask them if they're keen to play.
+
+The names of sounds are stored in mongodb. If new sounds are added it will display them in the main chat after deployment + someone issuing a bot command.
+
+Typing `!bot help` with DM you all the available commands.
+
+Typing `!bot tts "This will be the tts text when triggered in the channel" !cmd` will store a tts binding for !cmd. This is stored in mongodb.
+
+Typing `!bot exit` will force the bot to leave the current users voice channel.
 
 `commands.set(<regexp>, array[type, reply])` - `regexp` is what your bot will match messages against, regular expressions are used here mainly to make things case-insensitive. `type` can currently be `function`, `sound`, or `text`, but can be extended further if your bot requires additional functionality.
 
@@ -21,18 +38,16 @@ Ban people from using the command by going in to the config.json file and adding
 
 - Ability to easily add new sounds (somehow). Maybe looking for mp3ish files in chat then downloading them to the sounds folder?
 
-- Image search
-
-- Wiki search
-
-- Reminders
-
 ## Getting Started
 1. Clone this repository
-2. After completing the prerequisites, run `npm install` on this project making sure nothing fails, particularly `node-opus`
-3. Open `config.json` and add your bot's `Token` where it says `APP_BOT_USER_TOKEN`
-4. Authorize your bot using this URL `https://discordapp.com/oauth2/authorize?client_id=APPLICATION_ID&scope=bot&permissions=0` where APPLICATION_ID is your `Application ID` and add it to a server you manage.
-5. Run `npm run start` from the project
+2. After completing the prerequisites (below, mainly ffmpeg), run `npm install` on this project making sure nothing fails, particularly `node-opus`
+3. Create a mongodb somewhere (MLab/local) then create a connection string for it (e.g mongodb://user:password@server:port/database)
+4. Open `env.json` and add your bot's `token`, then add your mongodb connection string for the `mongo` property.
+5. Authorize your bot using this URL `https://discordapp.com/oauth2/authorize?client_id=APPLICATION_ID&scope=bot&permissions=0` where APPLICATION_ID is your `Application ID` and add it to a server you manage.
+6. Run `npm run start` from the project
+
+## Development
+You can run 'npm run prep' locally and it will lint/test the app.
 
 ### Prerequisites
 1. Everything from the [discord.js documentation](http://discordjs.readthedocs.io/en/latest/installing.html), which generally includes

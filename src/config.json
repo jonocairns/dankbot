@@ -1,16 +1,6 @@
 {
-  "autoLeaveVoice": false,
-  "autoLoadSounds": false,
   "botPrefix": "bot",
   "commandTrigger": "!",
-  "demoMode": true,
   "soundPath": "./sounds/",
-  "statsFileName": "./src/store/stats.json",
-  "ttsFileName": "./src/store/tts.json",
-  "introFileName": "./src/store/intro.json",
-  "banList": "",
-  "randomMin": 1,
-  "randomMax": 60,
-  "isLoggingEnabled": true,
-  "logToFile": false
+  "banList": ""
 }

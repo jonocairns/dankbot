@@ -6,6 +6,7 @@ const File = require('./lib/file.js');
 const Tts = require('./lib/tts.js');
 const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
+const LocalDevConfig = require('../../env.json');
 
 class Dank {
 	constructor() {
@@ -23,6 +24,11 @@ class Dank {
 		this.bot = new Discord.Client({
 			autoReconnect: true,
 		});
+		
+		if(!process.env.DISCORD_BOT_TOKEN) {
+			process.env.DISCORD_BOT_TOKEN = LocalDevConfig.token;
+		}
+
 		this.bot.login(process.env.DISCORD_BOT_TOKEN);
 		this.triggerPrefix = `${config.commandTrigger + config.botPrefix} `;
 		this.setDefaultCommands();
