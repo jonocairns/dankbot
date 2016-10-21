@@ -20,7 +20,7 @@ When the user Anne enters the channel or unmutes the John Cena sound will play. 
 
 Play a random meme with `!meme` 
 
-Typing `!bot game` will TTS the current chat channel saying its time to play CS. It will also DM every online user and ask them if they're keen to play.
+Typing `!bot game` will TTS the current chat channel saying its time to play CS. It will also DM every online user and ask them if they're keen to play. It will then display the online users.
 
 The names of sounds are stored in mongodb. If new sounds are added it will display them in the main chat after deployment + someone issuing a bot command.
 
