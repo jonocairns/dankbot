@@ -1,7 +1,7 @@
 # dankbot
 A dank soundboard for discord. Check out the sounds folder for all the current lols.
 
-[![Circle CI](https://circleci.com/gh/jonocairns/dankbot.svg?style=svg)](https://circleci.com/gh/jonocairns/dankbot)
+[![Circle CI](https://circleci.com/gh/jonocairns/dankbot.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/jonocairns/dankbot) [![Code Climate](https://codeclimate.com/github/jonocairns/dankbot/badges/gpa.svg)](https://codeclimate.com/github/jonocairns/dankbot)
 
 Uses node, es6, ava (tests), sinon (stub/mock), eslint, mongodb, circle-ci (build) and heroku (deployment/environment)
 
