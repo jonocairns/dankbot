@@ -76,7 +76,7 @@ class Dank {
 		const streamOptions = { seek: time, volume: vol };
 		message.member.voiceChannel.join()
 		.then((connection) => {
-			const stream = ytdl(url, { filter: 'audioonly' });
+			const stream = ytdl(encodeURIComponent(url), { filter: 'audioonly' });
 			connection.playStream(stream, streamOptions);
 		}).catch(console.log);
 	}
