@@ -7,6 +7,7 @@ module.exports = {
         "linebreak-style": 0,
         "strict": 0,
         "indent": [2, "tab"],
-        "no-tabs": 0
+        "no-tabs": 0,
+        "max-len": 0,
     }
 };

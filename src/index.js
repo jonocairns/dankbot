@@ -49,9 +49,21 @@ class Dank {
 		this.loadIntros();
 	}
 
+	static validateYoutubeUrl(url) {
+		const p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+		return (url.match(p));
+	}
+
 	static playYt(message) {
 		const contents = message.content.split(' ');
 		const url = contents[2];
+
+		if (!Dank.validateYoutubeUrl(url)) {
+			message.member.channel.sendMessage('Oi, only use youtube urls you cuntface.');
+			message.delete();
+			return;
+		}
+
 		let time = 0;
 		let vol = 1;
 		if (contents.length >= 4) {
@@ -68,6 +80,7 @@ class Dank {
 			const stream = ytdl(url, { filter: 'audioonly' });
 			connection.playStream(stream, streamOptions);
 		}).catch(console.log);
+		message.delete();
 	}
 
 	setEventHandlers() {
@@ -77,10 +90,6 @@ class Dank {
 
 		this.bot.on('message', (message) => {
 			Dank.tryMe(() => {
-				if (message.content.startsWith('!bot stream')) {
-					Dank.playYt(message);
-				}
-
 				if (this.newCommands.length > 0) {
 					message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
 					this.newCommands = [];
@@ -114,6 +123,10 @@ class Dank {
         ]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
             Message.getInviteLink,
+        ]);
+
+		this.commands.set(new RegExp(`${this.triggerPrefix}stream`, 'i'), ['function',
+            Dank.playYt,
         ]);
 	}
 
