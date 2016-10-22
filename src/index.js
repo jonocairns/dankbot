@@ -31,7 +31,7 @@ class Dank {
 		}
 
 		this.bot.login(process.env.DISCORD_BOT_TOKEN);
-		this.triggerPrefix = `${config.commandTrigger + config.botPrefix} `;
+		this.triggerPrefix = `${config.commandTrigger} `;
 		this.setDefaultCommands();
 		this.setEventHandlers();
 		this.loadFiles();
@@ -96,7 +96,7 @@ class Dank {
 
 		this.bot.on('message', (message) => {
 			Dank.tryMe(() => {
-				if (message.content.startsWith('!bot yt')) {
+				if (message.content.startsWith('!yt')) {
 					Dank.playYt(message);
 				} else {
 					if (this.newCommands.length > 0) {
