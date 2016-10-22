@@ -21,15 +21,17 @@ class Player {
                     );
 				});
 				dispatcher.on('end', () => {
-					Database.load({ command }, 'stats', (i) => {
-						if (i.length === 0) {
-							Database.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', () => {
-							});
-						} else {
-							Database.update({ command }, { $inc: { count: 1 } }, 'stats', () => {
-							});
-						}
-					});
+					if (config.saveStats) {
+						Database.load({ command }, 'stats', (i) => {
+							if (i.length === 0) {
+								Database.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', () => {
+								});
+							} else {
+								Database.update({ command }, { $inc: { count: 1 } }, 'stats', () => {
+								});
+							}
+						});
+					}
 				});
 			}).catch((e) => {
 				Logger.trace(

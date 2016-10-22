@@ -7,6 +7,7 @@ const Tts = require('./lib/tts.js');
 const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
 const LocalDevConfig = require('../env.json');
+const ytdl = require('ytdl-core');
 
 class Dank {
 	constructor() {
@@ -48,6 +49,27 @@ class Dank {
 		this.loadIntros();
 	}
 
+	static playYt(message) {
+		const contents = message.content.split(' ');
+		const url = contents[2];
+		let time = 0;
+		let vol = 1;
+		if (contents.length >= 4) {
+			time = contents[3];
+		}
+
+		if (contents.length >= 5) {
+			vol = contents[4];
+		}
+
+		const streamOptions = { seek: time, volume: vol };
+		message.member.voiceChannel.join()
+		.then((connection) => {
+			const stream = ytdl(url, { filter: 'audioonly' });
+			connection.playStream(stream, streamOptions);
+		}).catch(console.log);
+	}
+
 	setEventHandlers() {
 		this.bot.on('error', (e) => {
 			Logger.logError(e);
@@ -55,6 +77,10 @@ class Dank {
 
 		this.bot.on('message', (message) => {
 			Dank.tryMe(() => {
+				if (message.content.startsWith('!bot stream')) {
+					Dank.playYt(message);
+				}
+
 				if (this.newCommands.length > 0) {
 					message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
 					this.newCommands = [];
@@ -86,11 +112,11 @@ class Dank {
 		this.commands.set(new RegExp(`${this.triggerPrefix}game`, 'i'), ['function',
             Message.letsPlay,
         ]);
-
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
             Message.getInviteLink,
         ]);
 	}
+
 
 	speech(message) {
 		const obj = Tts.process(message, this.commands);

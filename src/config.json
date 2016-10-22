@@ -3,5 +3,6 @@
   "commandTrigger": "!",
   "soundPath": "./sounds/",
   "banList": "",
-  "discordClientId": "236314177298366469"
+  "discordClientId": "236314177298366469",
+  "saveStats": false
 }
