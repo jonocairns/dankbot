@@ -82,8 +82,8 @@ class Dank {
 
 			const dispatcher = connection.playStream(stream, streamOptions);
 			dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
-			dispatcher.on('debug', console.log);
-			connection.player.on('debug', console.log);
+			// dispatcher.on('debug', console.log);
+			// connection.player.on('debug', console.log);
 			connection.player.on('error', err => console.log('Connection issue occured', err));
 		}).catch(console.log);
 		message.delete();
