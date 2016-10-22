@@ -1,6 +1,7 @@
 const Logger = require('./logger.js');
 const config = require('../config.json');
 const Database = require('./db.js');
+const ytdl = require('ytdl-core');
 
 class Player {
 
@@ -50,6 +51,46 @@ class Player {
 				Player.playSound(newChannel, cmd, fileName);
 			}
 		});
+	}
+
+	static validateYoutubeUrl(url) {
+		const p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+		return (url.match(p));
+	}
+
+	static playYt(message) {
+		const contents = message.content.split(' ');
+		const url = contents[1];
+
+		if (!Player.validateYoutubeUrl(url)) {
+			message.channel.sendMessage('Oi, only use youtube urls you cuntface.');
+			return;
+		}
+
+		let time = 0;
+		let vol = 1;
+		if (contents.length >= 4) {
+			time = contents[2];
+		}
+
+		if (contents.length >= 5) {
+			vol = contents[3];
+		}
+		console.log(`Triggered yt play on ${url} with start ${time} and volume ${vol}`);
+
+		const streamOptions = { seek: time, volume: vol };
+		message.member.voiceChannel.join()
+		.then((connection) => {
+			console.log('Connected to voice channel... Attempting to play video');
+			const stream = ytdl(url);
+
+			const dispatcher = connection.playStream(stream, streamOptions);
+			dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
+			// dispatcher.on('debug', console.log);
+			// connection.player.on('debug', console.log);
+			connection.player.on('error', err => console.log('Connection issue occured', err));
+		}).catch(console.log);
+		message.delete();
 	}
 }
 module.exports = Player;
