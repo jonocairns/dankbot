@@ -86,6 +86,10 @@ class Dank {
 		this.commands.set(new RegExp(`${this.triggerPrefix}game`, 'i'), ['function',
             Message.letsPlay,
         ]);
+
+		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
+            Message.getInviteLink,
+        ]);
 	}
 
 	speech(message) {

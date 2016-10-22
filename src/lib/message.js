@@ -56,6 +56,11 @@ class Message {
 		message.channel.sendMessage(`The number of fgts online is ${usersNamesOnline.length}. ${usersOnline}`);
 	}
 
+	static getInviteLink(message) {
+		message.member.sendMessage('Go to the following link and auth me to your dank server.');
+		message.member.sendMessage(`https://discordapp.com/oauth2/authorize?client_id=${config.discordClientId}&scope=bot&permissions=0`);
+	}
+
 	static messageHandler(message, bot, commands) {
 		if (message.author.username !== bot.user.username && !Message.isUserBanned(
             message.author.username)) {
