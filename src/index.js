@@ -78,9 +78,12 @@ class Dank {
 		message.member.voiceChannel.join()
 		.then((connection) => {
 			const stream = ytdl(url, { filter: 'audioonly' });
-			connection.playStream(stream, streamOptions);
+			connection.playStream(stream, streamOptions).then((dispatch) => {
+				dispatch.on('end', () => {
+					message.delete();
+				});
+			}).catch(console.log);
 		}).catch(console.log);
-		message.delete();
 	}
 
 	setEventHandlers() {

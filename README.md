@@ -30,6 +30,8 @@ Typing `!bot tts "This will be the tts text when triggered in the channel" !cmd`
 
 Typing `!bot exit` will force the bot to leave the current users voice channel.
 
+Typing `!bot stream https://www.youtube.com/watch?v=PGNiXGX2nLU 0 1` will stream the youtube audio to the current users voice channel. (0 and 1 are both optional)0 is the time you want to start from and 1 is the volume.
+
 `commands.set(<regexp>, array[type, reply])` - `regexp` is what your bot will match messages against, regular expressions are used here mainly to make things case-insensitive. `type` can currently be `function`, `sound`, or `text`, but can be extended further if your bot requires additional functionality.
 
 Ban people from using the command by going in to the config.json file and adding them in to a comma separated list. eg. "user1,user2" 
