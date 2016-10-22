@@ -31,7 +31,7 @@ class Dank {
 		}
 
 		this.bot.login(process.env.DISCORD_BOT_TOKEN);
-		this.triggerPrefix = `${config.commandTrigger} `;
+		this.triggerPrefix = `${config.commandTrigger}${config.botPrefix} `;
 		this.setDefaultCommands();
 		this.setEventHandlers();
 		this.loadFiles();
@@ -52,6 +52,19 @@ class Dank {
 	static validateYoutubeUrl(url) {
 		const p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
 		return (url.match(p));
+	}
+
+	static playRadio(message) {
+		const contents = message.content.split(' ');
+		const url = contents[1];
+
+		message.member.voiceChannel.join()
+		.then((connection) => {
+			console.log('Connected to voice channel... Attempting to play radio stream');
+			const dispatcher = connection.playFile(url);
+			dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
+			connection.player.on('error', err => console.log('Connection issue occured', err));
+		}).catch(console.log);
 	}
 
 	static playYt(message) {
@@ -133,6 +146,9 @@ class Dank {
         ]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
             Message.getInviteLink,
+        ]);
+		this.commands.set(new RegExp(`${this.triggerPrefix}radio`, 'i'), ['function',
+            Dank.playRadio,
         ]);
 	}
 
