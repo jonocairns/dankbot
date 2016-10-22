@@ -3,12 +3,17 @@ const MongoClient = require('mongodb').MongoClient;
 class Database {
 
 	static run(func) {
-		MongoClient.connect(process.env.DANK_MONGODB, (err, db) => {
-			if (err) {
-				throw err;
-			}
-			func(db);
-		});
+		try {
+			MongoClient.connect(process.env.DANK_MONGODB, (err, db) => {
+				if (err) {
+					throw err;
+				}
+				func(db);
+			});
+		} catch (err) {
+			console.log('There was db issue. See stack trace for details');
+			console.error(err);
+		}
 	}
 
 	static load(id, target, cb) {

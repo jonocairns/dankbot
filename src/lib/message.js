@@ -19,19 +19,25 @@ class Message {
 
 	static displayCommands(message, commands) {
 		let helpMessage = '';
-		if (message.content.split(' ')[2]) {
-			const helpFilter = new RegExp(message.content.split(' ')[2], 'i');
-			commands.forEach((fileName, command) => {
-				if (command.toString().match(helpFilter)) {
-					helpMessage += `${command.toString().split('/')[1]}\t`;
-				}
-			});
-		} else {
-			commands.forEach((fileName, command) => {
-				helpMessage += `${command.toString().split('/')[1]}\t`;
-			});
-		}
-		message.member.sendMessage(helpMessage);
+		const characterMessageLimit = 2000;
+		const chunks = [];
+
+		commands.forEach((fileName, command) => {
+			const mes = `${command.toString().split('/')[1]}\t`;
+
+			if ((helpMessage.length + mes.length) < characterMessageLimit) {
+				helpMessage += mes;
+			} else {
+				chunks.push(helpMessage);
+				helpMessage = mes;
+			}
+		});
+
+		chunks.push(helpMessage);
+
+		chunks.forEach((chunk) => {
+			message.member.sendMessage(chunk);
+		});
 	}
 
 	static letsPlay(message, commands, bot) {
