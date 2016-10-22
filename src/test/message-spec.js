@@ -92,8 +92,6 @@ test('X chunk test with random cmd lengths', (t) => {
 
     Message.displayCommands(msgStub, commands);
 
-    let expected = Math.ceil(charLengths / 2000);
-    t.is(sentMessages.length, expected);
     sentMessages.forEach((item) => {
         t.true(item.length < 2000);
     });
