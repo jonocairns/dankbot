@@ -78,7 +78,9 @@ class Dank {
 		message.member.voiceChannel.join()
 		.then((connection) => {
 			console.log('Connected to voice channel... Attempting to play video');
-			const stream = ytdl(url, { filter: 'audioonly' }, { passes: 4 });
+			// const stream = ytdl(url, { filter: 'audioonly' }, { passes: 4 });
+			const stream = ytdl(url);
+
 			const dispatcher = connection.playStream(stream, streamOptions);
 			dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
 			dispatcher.on('debug', console.log);

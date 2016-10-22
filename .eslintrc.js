@@ -9,5 +9,6 @@ module.exports = {
         "indent": [2, "tab"],
         "no-tabs": 0,
         "max-len": 0,
+        "arrow-body-style": 0
     }
 };
