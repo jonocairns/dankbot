@@ -56,7 +56,7 @@ class Dank {
 
 	static playRadio(message) {
 		const contents = message.content.split(' ');
-		const url = contents[1];
+		const url = contents[2];
 
 		message.member.voiceChannel.join()
 		.then((connection) => {
