@@ -72,12 +72,18 @@ class Dank {
 		if (contents.length >= 5) {
 			vol = contents[4];
 		}
+		console.log(`Triggered yt play on ${url} with start ${time} and volume ${vol}`);
 
 		const streamOptions = { seek: time, volume: vol };
 		message.member.voiceChannel.join()
 		.then((connection) => {
-			const stream = ytdl(url, { filter: 'audioonly' });
-			connection.playStream(stream, streamOptions);
+			console.log('Connected to voice channel... Attempting to play video');
+			const stream = ytdl(url, { filter: 'audioonly' }, { passes: 4 });
+			const dispatcher = connection.playStream(stream, streamOptions);
+			dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
+			dispatcher.on('debug', console.log);
+			connection.player.on('debug', console.log);
+			connection.player.on('error', err => console.log('Connection issue occured', err));
 		}).catch(console.log);
 	}
 
