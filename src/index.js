@@ -54,19 +54,6 @@ class Dank {
 		return (url.match(p));
 	}
 
-	static playRadio(message) {
-		const contents = message.content.split(' ');
-		const url = contents[2];
-
-		message.member.voiceChannel.join()
-		.then((connection) => {
-			console.log('Connected to voice channel... Attempting to play radio stream');
-			const dispatcher = connection.playFile(url);
-			dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
-			connection.player.on('error', err => console.log('Connection issue occured', err));
-		}).catch(console.log);
-	}
-
 	static playYt(message) {
 		const contents = message.content.split(' ');
 		const url = contents[2];
@@ -146,9 +133,6 @@ class Dank {
         ]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
             Message.getInviteLink,
-        ]);
-		this.commands.set(new RegExp(`${this.triggerPrefix}radio`, 'i'), ['function',
-            Dank.playRadio,
         ]);
 	}
 
