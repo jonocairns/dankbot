@@ -59,8 +59,7 @@ class Dank {
 		const url = contents[2];
 
 		if (!Dank.validateYoutubeUrl(url)) {
-			message.member.channel.sendMessage('Oi, only use youtube urls you cuntface.');
-			message.delete();
+			message.channel.sendMessage('Oi, only use youtube urls you cuntface.');
 			return;
 		}
 
@@ -89,11 +88,15 @@ class Dank {
 
 		this.bot.on('message', (message) => {
 			Dank.tryMe(() => {
-				if (this.newCommands.length > 0) {
-					message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
-					this.newCommands = [];
+				if (message.content.startsWith('!bot yt')) {
+					Dank.playYt(message);
+				} else {
+					if (this.newCommands.length > 0) {
+						message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
+						this.newCommands = [];
+					}
+					Message.messageHandler(message, this.bot, this.commands);
 				}
-				Message.messageHandler(message, this.bot, this.commands);
 			});
 		});
 
@@ -122,10 +125,6 @@ class Dank {
         ]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
             Message.getInviteLink,
-        ]);
-
-		this.commands.set(new RegExp(`${this.triggerPrefix}stream`, 'i'), ['function',
-            Dank.playYt,
         ]);
 	}
 
