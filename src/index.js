@@ -90,6 +90,9 @@ class Dank {
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
             Message.getInviteLink,
         ]);
+		this.commands.set(new RegExp(`${this.triggerPrefix}ud`, 'i'), ['function',
+            Message.urbanDictionary,
+        ]);
 	}
 
 

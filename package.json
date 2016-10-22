@@ -29,6 +29,7 @@
     "mongodb": "~2.2.10",
     "sinon": "^1.17.6",
     "soundcloudr": "^1.1.0",
+    "urban": "^0.3.1",
     "ytdl-core": "^0.7.18"
   },
   "engines": {

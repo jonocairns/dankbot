@@ -1,5 +1,6 @@
 const config = require('../config.json');
 const Player = require('./player.js');
+const urban = require('urban');
 
 class Message {
 	constructor() {
@@ -59,6 +60,32 @@ class Message {
 	static getInviteLink(message) {
 		message.member.sendMessage('Go to the following link and auth me to your dank server.');
 		message.member.sendMessage(`https://discordapp.com/oauth2/authorize?client_id=${config.discordClientId}&scope=bot&permissions=0`);
+	}
+
+	static urbanDictionary(message) {
+		const contents = message.content.split(' ');
+		const udSearchQuery = contents[1];
+
+		const res = urban(udSearchQuery);
+
+		res.first((payload) => {
+			payload.definition.split(' ');
+			const charLimit = 2000;
+			let mes = '';
+			const chunks = [];
+			payload.forEach((item) => {
+				if ((mes.length + item.length) < charLimit) {
+					mes += `${mes} `;
+				} else {
+					chunks.push(mes);
+					mes = '';
+				}
+			});
+			chunks.push(mes);
+			chunks.forEach((chunk) => {
+				message.channel.sendTTSMessage(chunk);
+			});
+		});
 	}
 
 	static messageHandler(message, bot, commands) {
