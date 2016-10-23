@@ -135,8 +135,8 @@ class Message {
 			giphy.random({ limit: 1, rating: 'r' })
 			.then((results) => {
 				if (results && results.data) {
-					console.log(results);
-					message.channel.sendFile(results.data.url);
+					const url = `https://media.giphy.com/media/${results.data.id}/giphy.mp4`;
+					message.channel.sendFile(url);
 				} else {
 					message.channel.sendMessage('Fuck.');
 				}
@@ -146,8 +146,8 @@ class Message {
 			giphy.translate({ s: keywords, limit: 1, rating: 'r' })
 			.then((results) => {
 				if (results && results.data) {
-					console.log(results);
-					message.channel.sendFile(results.data.url);
+					const url = `https://media.giphy.com/media/${results.data.id}/giphy.mp4`;
+					message.channel.sendFile(url);
 				} else {
 					message.channel.sendMessage('I don\'t know what you searched but it was fucking retarded and therefore had zero results.');
 				}
