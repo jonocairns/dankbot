@@ -3,7 +3,7 @@ const Player = require('./player.js');
 const urban = require('urban');
 const omdb = require('omdb');
 const random = require('random-js')();
-const giphy = require('giphy-api')(process.env.GIPHY_KEY || 'dc6zaTOxFJmzC')
+const giphy = require('giphy-api')(process.env.GIPHY_KEY || 'dc6zaTOxFJmzC');
 
 class Message {
 	constructor() {
@@ -129,17 +129,27 @@ class Message {
 	static giphy(message) {
 		const contents = message.content.split(' ');
 		const keywords = contents.slice(1).join();
+		console.log(`Attempting to get gif for ${keywords}...`);
 
-		let giphyType = 'translate';
-		if (contents.length === 1) giphyType = 'random';
-		giphy[giphyType]({ s: keywords, limit: 1 })
-		.then((results) => {
-			if (results && results.data) {
-				message.channel.sendFile(results.data.url);
-			} else {
-				message.channel.sendMessage('I don\'t know what you searched but it was fucking retarded and therefore had zero results.');
-			}
-		}).catch(console.log);
+		if (contents.length === 1) {
+			giphy.random({ limit: 1, rating: 'r' })
+			.then((results) => {
+				if (results && results.data) {
+					message.channel.sendFile(results.data.url);
+				} else {
+					message.channel.sendMessage('Fuck.');
+				}
+			}).catch(console.log);
+		} else {
+			giphy.translate({ s: keywords, limit: 1, rating: 'r' })
+			.then((results) => {
+				if (results && results.data) {
+					message.channel.sendFile(results.data.url);
+				} else {
+					message.channel.sendMessage('I don\'t know what you searched but it was fucking retarded and therefore had zero results.');
+				}
+			}).catch(console.log);
+		}
 	}
 
 	static coin(message) {
