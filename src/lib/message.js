@@ -79,19 +79,18 @@ class Message {
 				const movie = movies[0];
 				const tomato = movie.tomato ? movie.tomato : { rating: 'not found' };
 				message.channel.sendMessage(`${movie.title} (${movie.year})\r\nimdb: (${movie.imdb.rating ? movie.imdb.rating : 'not found'})\r\ntomato: ${tomato.rating}`);
-				Message.chunkSend(movie.plot, message.channel);
+				Message.chunkSend(movie.plot.split(' '), message.channel);
 			}
 		});
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split('"');
-		const udSearchQuery = contents[1];
+		const contents = message.content.split(' ').splice(1).join();
 
-		const res = urban(udSearchQuery);
+		const res = urban(contents);
 
 		res.first((payload) => {
-			Message.chunkSend(payload, message.channel);
+			Message.chunkSend(payload.definition.split(' '), message.channel);
 		});
 	}
 
@@ -102,11 +101,10 @@ class Message {
 	}
 
 	static chunkSend(payload, channel) {
-		const splitz = payload.definition.split(' ');
 		const charLimit = 2000;
 		let mes = '';
 		const chunks = [];
-		splitz.forEach((item) => {
+		payload.forEach((item) => {
 			if ((mes.length + item.length) < charLimit) {
 				mes += `${mes} `;
 			} else {
