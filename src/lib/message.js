@@ -111,7 +111,6 @@ class Message {
 		jsdom.env('http://www.hltv.org/matches/', ['http://code.jquery.com/jquery.js'],
          (err, w) => {
 	const numberOfGames = w.$('.centerFade .matchTimeCellLive').length;
-	message.channel.sendMessage(`There are currently ${numberOfGames} live csgo matches`);
 	let games = '';
 	if (numberOfGames > 0) {
 		w.$('.centerFade .matchTimeCellLive').each(function as() {
@@ -122,7 +121,10 @@ class Message {
 			const link = `http://www.hltv.org${locator}`;
 			games += (`**${team1}** is playing **${team2}** -> ${link}.\r\n\r\n`);
 		});
-		message.channel.sendMessage(games);
+
+		message.channel.sendMessage(`:middle_finger: There are currently **${numberOfGames}** live csgo matches :middle_finger:\r\n\r\n${games}`);
+	} else {
+		message.channel.sendMessage(':middle_finger: There are no live csgo matches atm :middle_finger:');
 	}
 }
         );

@@ -5,7 +5,8 @@ import sinon from 'sinon';
 
 var jsdom = require("jsdom");
 
-test.cb('Can get csgo feedasdd', (t) => {
+test.cb('Can get csgo feed', (t) => {
+    let end = 0;
     jsdom.env(
         'http://www.hltv.org/matches/',
         ['http://code.jquery.com/jquery.js'],
@@ -16,8 +17,10 @@ test.cb('Can get csgo feedasdd', (t) => {
                 console.log('vs');
                 console.log(w.$(this).parent().children('.matchTeam2Cell').find('a').text().trim());
                 console.log(w.$(this).parent().children('.matchActionCell').find('a').attr('href').trim());
+               
             });
             t.end();
+            
         }
         );
 });
