@@ -118,7 +118,8 @@ class Message {
 			const parent = w.$(this).parent();
 			const team1 = parent.children('.matchTeam1Cell').find('a').text().trim();
 			const team2 = parent.children('.matchTeam2Cell').find('a').text().trim();
-			const link = `http://www.hltv.org/${parent.children('.matchActionCell').find('a').attr('href').trim()}`;
+			const locator = parent.children('.matchActionCell').find('a').attr('href').trim();
+			const link = `http://www.hltv.org${locator}`;
 			games += (`${team1} is playing ${team2} -> ${link}. `);
 		});
 		message.channel.sendMessage(games);
