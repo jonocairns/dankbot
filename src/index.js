@@ -90,13 +90,13 @@ class Dank {
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
             Message.getInviteLink,
         ]);
-		this.commands.set(new RegExp(`${this.triggerPrefix}ud`, 'i'), ['function',
+		this.commands.set(new RegExp('!ud', 'i'), ['function',
             Message.urbanDictionary,
         ]);
-		this.commands.set(new RegExp(`${this.triggerPrefix}movie`, 'i'), ['function',
+		this.commands.set(new RegExp('!imdb', 'i'), ['function',
             Message.omdb,
         ]);
-		this.commands.set(new RegExp(`${this.triggerPrefix}coin`, 'i'), ['function',
+		this.commands.set(new RegExp('!coin', 'i'), ['function',
             Message.coin,
         ]);
 	}

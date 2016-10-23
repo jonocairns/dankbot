@@ -65,8 +65,7 @@ class Message {
 	}
 
 	static omdb(message) {
-		const contents = message.content.split('"');
-		const query = contents[1];
+		const query = message.content.split(' ').slice(1).join();
 
 		omdb.search(query, (err, movies) => {
 			if (err) {
@@ -103,7 +102,7 @@ class Message {
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split('"')[1];
+		const contents = message.content.split(' ').slice(1).join();
 
 		const res = urban(contents);
 
@@ -116,7 +115,7 @@ class Message {
 					const chunky = def.split(' ');
 					Message.chunkSend(chunky, message.channel);
 				} else {
-					message.channel.sendMessage(`${contents}: ${payload.definition}`);
+					message.channel.sendTTSMessage(`${contents}: ${payload.definition}`);
 				}
 			} else {
 				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}'. Maybe try getting good?`);
