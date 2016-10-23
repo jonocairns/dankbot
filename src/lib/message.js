@@ -96,7 +96,8 @@ class Message {
 					const genres = movie.genres.join(', ');
 					const movieMsg = `:movie_camera:${nl}${nl}**${movie.title}** (${movie.year}) ${stars}${nl}${movie.imdb.rating ? imdbString : ''}${nl}**Link**: http://www.imdb.com/title/${movie.imdb.id}/${nl}**Director**: ${movie.director}${nl}**Actors**: ${actors}${nl}**Genres**: ${genres}${nl}${nl}**Plot**: ${movie.plot}`;
 					if (movie.poster) {
-						message.channel.sendFile(movie.poster, 'poster.jpg', movieMsg);
+						message.channel.sendMessage(movieMsg);
+						// message.channel.sendFile(movie.poster, 'poster.jpg', movieMsg);
 					} else {
 						message.channel.sendMessage(movieMsg);
 					}
