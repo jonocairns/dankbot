@@ -4,7 +4,7 @@ const urban = require('urban');
 const omdb = require('omdb');
 const random = require('random-js')();
 const giphy = require('giphy-api')(process.env.GIPHY_KEY || 'dc6zaTOxFJmzC');
-const wikipedia = require("wikipedia-js");
+const wikipedia = require('wikipedia-js');
 
 class Message {
 	constructor() {
@@ -121,8 +121,7 @@ class Message {
 				console.log(payload.definition);
 				if (payload.definition.length > 2000) {
 					const def = `${contents}: ${payload.definition}`;
-					const chunky = def.split(' ');
-					Message.chunkSend(chunky, message.channel);
+					Message.chunkSend(def, message.channel);
 				} else {
 					message.channel.sendMessage(`${contents}: ${payload.definition}`);
 				}
@@ -174,8 +173,7 @@ class Message {
 				return;
 			}
 			if (text.length > 2000) {
-				const splittie = text.split(' ');
-				Message.chunkSend(splittie, message.channel);
+				Message.chunkSend(text, message.channel);
 			} else {
 				message.channel.sendMessage(text);
 			}
@@ -190,21 +188,17 @@ class Message {
 
 	static chunkSend(payload, channel) {
 		console.log('chunking payload...');
-		const charLimit = 2000;
-		let mes = '';
-		const chunks = [];
-		payload.forEach((item) => {
-			if ((mes.length + item.length) < charLimit) {
-				mes += `${mes} `;
-			} else {
-				chunks.push(mes);
-				mes = '';
-			}
-		});
-		chunks.push(mes);
-		chunks.forEach((chunk) => {
-			console.log(`chunk: ${chunk}`);
-			channel.sendMessage(chunk);
+
+		if (payload.length === 0) {
+			return;
+		}
+		let chunks;
+		const chunk = 1999;
+		for (let i = 0; i < payload.length; i += chunk) {
+			chunks.push(payload.slice(i, i + chunk));
+		}
+		chunks.forEach((item) => {
+			channel.sendMessage(item);
 		});
 	}
 
