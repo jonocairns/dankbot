@@ -175,7 +175,7 @@ class Message {
 			}
 			if (text.length > 2000) {
 				const splittie = text.split(' ');
-				Message.chunkSend(splittie);
+				Message.chunkSend(splittie, message.channel);
 			} else {
 				message.channel.sendMessage(text);
 			}
