@@ -90,7 +90,9 @@ class Message {
 
 					const imdbString = `**imdb**: (${movie.imdb.rating}/10)`;
 					const nl = '\r\n';
-					const movieMsg = `${nl}:movie_camera: **${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''}${nl}${movie.imdburl}${nl}**Director**: ${movie.director}${nl}**Actors**: ${movie.actors.split(',').join(', ')}${nl}**Genres**: ${movie.genres.split(',').join(', ')}${nl}${nl}**Plot**: ${movie.plot}`;
+					const actors = movie.actors.split(',').join(', ');
+					const genres = movie.genres.split(',').join(', ');
+					const movieMsg = `${nl}:movie_camera: **${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''}${nl}${movie.imdburl}${nl}**Director**: ${movie.director}${nl}**Actors**: ${actors}${nl}**Genres**: ${genres}${nl}${nl}**Plot**: ${movie.plot}`;
 					if (movie.poster) {
 						message.channel.sendFile(movie.poster, 'poster.jpg', movieMsg);
 					} else {
