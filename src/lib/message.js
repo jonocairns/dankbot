@@ -164,7 +164,7 @@ class Message {
 	}
 
 	static wiki(message) {
-		const term = message.split(' ').splice(1).join();
+		const term = message.content.split(' ').splice(1).join();
 
 		const options = { query: term, format: 'json', summaryOnly: true };
 		wikipedia.searchArticle(options, (err, text) => {
