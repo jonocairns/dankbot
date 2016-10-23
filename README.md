@@ -30,7 +30,13 @@ Typing `!bot tts "This will be the tts text when triggered in the channel" !cmd`
 
 Typing `!bot exit` will force the bot to leave the current users voice channel.
 
-Typing `!bot stream https://www.youtube.com/watch?v=PGNiXGX2nLU 0 1` will stream the youtube audio to the current users voice channel. (0 and 1 are both optional)0 is the time you want to start from and 1 is the volume.
+Typing `!yt https://www.youtube.com/watch?v=PGNiXGX2nLU 0 1` will stream the youtube audio to the current users voice channel. (0 and 1 are both optional)0 is the time you want to start from and 1 is the volume.
+
+Typing `!giphy dank` will try and a giphy relating to the text 'dank' you can just type `!giphy` itself, this will find a random gif!
+
+Typing `!imdb some movie here` will find the best match for the movie/tv 'some movie here' and display it in chat.
+
+Typing `!ud meme` will attempt to search for the urban dictionary definition for the word 'meme'. using just `!ud` will find a random definition.
 
 `commands.set(<regexp>, array[type, reply])` - `regexp` is what your bot will match messages against, regular expressions are used here mainly to make things case-insensitive. `type` can currently be `function`, `sound`, or `text`, but can be extended further if your bot requires additional functionality.
 

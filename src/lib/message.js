@@ -123,7 +123,7 @@ class Message {
 					const chunky = def.split(' ');
 					Message.chunkSend(chunky, message.channel);
 				} else {
-					message.channel.sendTTSMessage(`${contents}: ${payload.definition}`);
+					message.channel.sendMessage(`${contents}: ${payload.definition}`);
 				}
 			} else {
 				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}'. Maybe try getting good?`);
@@ -184,7 +184,7 @@ class Message {
 		chunks.push(mes);
 		chunks.forEach((chunk) => {
 			console.log(`chunk: ${chunk}`);
-			channel.sendTTSMessage(chunk);
+			channel.sendMessage(chunk);
 		});
 	}
 
