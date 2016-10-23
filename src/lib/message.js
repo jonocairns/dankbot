@@ -95,7 +95,7 @@ class Message {
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split(' ').splice(1).join();
+		const contents = message.content.split(' ').splice(2).join();
 
 		const res = urban(contents);
 
