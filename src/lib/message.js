@@ -4,6 +4,7 @@ const urban = require('urban');
 const omdb = require('omdb');
 const random = require('random-js')();
 const giphy = require('giphy-api')(process.env.GIPHY_KEY || 'dc6zaTOxFJmzC');
+const wikipedia = require("wikipedia-js");
 
 class Message {
 	constructor() {
@@ -160,6 +161,25 @@ class Message {
 				}
 			}).catch(console.log);
 		}
+	}
+
+	static wiki(message) {
+		const term = message.split(' ').splice(1).join();
+
+		const options = { query: term, format: 'json', summaryOnly: true };
+		wikipedia.searchArticle(options, (err, text) => {
+			if (err) {
+				console.log('An error occurred[query=%s, error=%s]', term, err);
+				message.channel.sendMessage('You done fucked something.');
+				return;
+			}
+			if (text.length > 2000) {
+				const splittie = text.split(' ');
+				Message.chunkSend(splittie);
+			} else {
+				message.channel.sendMessage(text);
+			}
+		});
 	}
 
 	static coin(message) {
