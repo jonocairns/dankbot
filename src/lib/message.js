@@ -82,27 +82,20 @@ class Message {
 						console.error(e);
 						return;
 					}
-					const tomato = movie.tomato;
-					const tomatoString = `tomato: (${tomato})`;
+					const tomatoString = `**tomato**: (${movie.tomato})`;
 					const imdbRatingStars = parseInt(movie.imdb.rating, 10);
 					let stars = '';
-					for (let i = 1; i < imdbRatingStars; i += 1) {
+					for (let i = 0; i < imdbRatingStars; i += 1) {
 						stars += ':star:';
 					}
 
-					const imdbString = `imdb: (${movie.imdb.rating}/10)`;
-					message.channel.sendMessage(`:movie_camera:${movie.title} (${movie.year}):movie_camera: ${stars}\r\n${movie.imdb.rating ? imdbString : ''} ${tomato ? tomatoString : ''}\r\n${movie.imdburl}`);
+					const imdbString = `**imdb**: (${movie.imdb.rating}/10)`;
+					const nl = '\r\n';
+					const movieMsg = `:movie_camera:**${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''} ${movie.tomato ? tomatoString : ''}${nl}${movie.imdburl}${nl}**director**:${movie.director}${nl}**actors**: ${movie.actors}${nl}**genres**: ${movie.genres}${nl}${nl}**plot**: ${movie.plot}`;
 					if (movie.poster) {
-						message.channel.sendMessage(movie.poster);
-					}
-					if (movie.plot) {
-						console.log(movie.plot);
-						if (movie.plot.length > 2000) {
-							const plot = movie.plot.split(' ');
-							Message.chunkSend(plot, message.channel);
-						} else {
-							message.channel.sendTTSMessage(movie.plot);
-						}
+						message.channel.sendFile(movie.poster, 'poster.jpg', movieMsg);
+					} else {
+						message.channel.sendMessage(movieMsg);
 					}
 				});
 			}
@@ -123,7 +116,7 @@ class Message {
 					const chunky = def.split(' ');
 					Message.chunkSend(chunky, message.channel);
 				} else {
-					message.channel.sendTTSMessage(`${contents}: ${payload.definition}`);
+					message.channel.sendMessage(`${contents}: ${payload.definition}`);
 				}
 			} else {
 				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}'. Maybe try getting good?`);
