@@ -96,7 +96,12 @@ class Message {
 		const res = urban(contents);
 
 		res.first((payload) => {
-			Message.chunkSend(payload.definition.split(' '), message.channel);
+			if (payload && payload.definition) {
+				const chunky = payload.definition.split(' ');
+				Message.chunkSend(chunky, message.channel);
+			} else {
+				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}. Maybe try getting good?'`);
+			}
 		});
 	}
 
