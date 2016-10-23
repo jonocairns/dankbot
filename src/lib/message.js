@@ -105,9 +105,14 @@ class Message {
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split(' ').slice(1).join(' ');
-
-		const res = urban(contents);
+		const mer = message.content.split(' ');
+		const contents = mer.slice(1).join(' ');
+		let res;
+		if (mer.length === 1) {
+			res = urban.random();
+		} else {
+			res = urban(contents);
+		}
 
 		res.first((payload) => {
 			console.log(`urban dictionary query returned for ${contents}. Payload: ${payload}`);
