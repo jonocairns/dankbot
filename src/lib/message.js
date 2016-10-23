@@ -66,7 +66,7 @@ class Message {
 	}
 
 	static omdb(message) {
-		const query = message.content.split(' ').slice(1).join();
+		const query = message.content.split(' ').slice(1).join(' ');
 
 		omdb.search(query, (err, movies) => {
 			if (err) {
@@ -105,7 +105,7 @@ class Message {
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split(' ').slice(1).join();
+		const contents = message.content.split(' ').slice(1).join(' ');
 
 		const res = urban(contents);
 
@@ -128,7 +128,7 @@ class Message {
 
 	static giphy(message) {
 		const contents = message.content.split(' ');
-		const keywords = contents.slice(1).join();
+		const keywords = contents.slice(1).join(' ');
 		console.log(`Attempting to get gif for ${keywords}...`);
 
 		if (contents.length === 1) {
