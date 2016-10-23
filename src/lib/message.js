@@ -65,7 +65,7 @@ class Message {
 	}
 
 	static omdb(message) {
-		const contents = message.content.split(' ');
+		const contents = message.content.split('"');
 		const query = contents[1];
 
 		omdb.search(query, (err, movies) => {
@@ -76,17 +76,16 @@ class Message {
 			if (movies.length < 1) {
 				message.channel.sendMessage('No movies were found!');
 			} else {
-				movies.first((movie) => {
-					const tomato = movie.tomato ? movie.tomato : { rating: 'not found' };
-					message.channel.sendMessage(`${movie.title} (${movie.year})\r\nimdb: (${movie.imdb.rating ? movie.imdb.rating : 'not found'})\r\ntomato: ${tomato.rating}`);
-					Message.chunkSend(movie.plot, message.channel);
-				});
+				const movie = movies[0];
+				const tomato = movie.tomato ? movie.tomato : { rating: 'not found' };
+				message.channel.sendMessage(`${movie.title} (${movie.year})\r\nimdb: (${movie.imdb.rating ? movie.imdb.rating : 'not found'})\r\ntomato: ${tomato.rating}`);
+				Message.chunkSend(movie.plot, message.channel);
 			}
 		});
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split(' ');
+		const contents = message.content.split('"');
 		const udSearchQuery = contents[1];
 
 		const res = urban(udSearchQuery);
