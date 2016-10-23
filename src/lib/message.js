@@ -129,21 +129,24 @@ class Message {
 	static giphy(message) {
 		const contents = message.content.split(' ');
 		const keywords = contents.slice(1).join(' ');
-		console.log(`Attempting to get gif for ${keywords}...`);
 
 		if (contents.length === 1) {
+			console.log('Attempting random giphy search');
 			giphy.random({ limit: 1, rating: 'r' })
 			.then((results) => {
 				if (results && results.data) {
+					console.log(results);
 					message.channel.sendFile(results.data.url);
 				} else {
 					message.channel.sendMessage('Fuck.');
 				}
 			}).catch(console.log);
 		} else {
+			console.log(`Attempting to get gif for ${keywords}...`);
 			giphy.translate({ s: keywords, limit: 1, rating: 'r' })
 			.then((results) => {
 				if (results && results.data) {
+					console.log(results);
 					message.channel.sendFile(results.data.url);
 				} else {
 					message.channel.sendMessage('I don\'t know what you searched but it was fucking retarded and therefore had zero results.');
