@@ -192,7 +192,7 @@ class Message {
 		if (payload.length === 0) {
 			return;
 		}
-		let chunks;
+		const chunks = [];
 		const chunk = 1999;
 		for (let i = 0; i < payload.length; i += chunk) {
 			chunks.push(payload.slice(i, i + chunk));
