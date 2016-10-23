@@ -139,7 +139,7 @@ class Message {
 			console.log('Attempting random giphy search');
 			giphy.random({ limit: 1, rating: 'r' })
 			.then((results) => {
-				if (results && results.data) {
+				if (results && results.data && results.data.id) {
 					const url = `https://media.giphy.com/media/${results.data.id}/giphy.gif`;
 					console.log(`Got url from giphy ${url}`);
 					message.channel.sendFile(url);
@@ -151,7 +151,7 @@ class Message {
 			console.log(`Attempting to get gif for ${keywords}...`);
 			giphy.translate({ s: keywords, limit: 1, rating: 'r' })
 			.then((results) => {
-				if (results && results.data) {
+				if (results && results.data && results.data.id) {
 					const url = `https://media.giphy.com/media/${results.data.id}/giphy.gif`;
 					console.log(`Got url from giphy ${url}`);
 					message.channel.sendFile(url);
