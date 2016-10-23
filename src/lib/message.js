@@ -101,7 +101,7 @@ class Message {
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split('"').splice(1).join();
+		const contents = message.content.split('"')[1];
 
 		const res = urban(contents);
 
@@ -116,7 +116,7 @@ class Message {
 					message.channel.sendTTSMessage(payload.definition);
 				}
 			} else {
-				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}. Maybe try getting good?'`);
+				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}'. Maybe try getting good?`);
 			}
 		});
 	}
