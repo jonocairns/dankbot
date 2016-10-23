@@ -73,19 +73,23 @@ class Message {
 				console.error(err);
 				return;
 			}
-			console.log(movies);
 			if (movies.length < 1) {
-				message.channel.sendMessage('No movies were found!');
+				message.channel.sendMessage('No movies were fucking found. Try maybe not searching for something retarded?');
 			} else {
-				console.log(movies[0]);
-				const movie = movies[0];
-				const tomato = movie.tomato ? movie.tomato : { rating: 'not found' };
-				message.channel.sendMessage(`${movie.title} (${movie.year})\r\nimdb: (${movie.imdb.rating ? movie.imdb.rating : 'not found'}/10)\r\ntomato: (${tomato.rating})`);
-				if (movie.plot) {
-					console.log(movie.plot);
-					const plot = movie.plot.split(' ');
-					Message.chunkSend(plot, message.channel);
-				}
+				const mv = movies[0];
+				omdb.get({ title: mv.title, year: mv.year }, true, (e, movie) => {
+					if (e) {
+						console.error(e);
+						return;
+					}
+					const tomato = movie.tomato ? movie.tomato : { rating: 'not found' };
+					message.channel.sendMessage(`${movie.title} (${movie.year})\r\nimdb: (${movie.imdb.rating ? movie.imdb.rating : 'not found'}/10)\r\ntomato: (${tomato.rating})`);
+					if (movie.plot) {
+						console.log(movie.plot);
+						const plot = movie.plot.split(' ');
+						Message.chunkSend(plot, message.channel);
+					}
+				});
 			}
 		});
 	}
