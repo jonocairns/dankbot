@@ -120,7 +120,7 @@ class Message {
 			const team2 = parent.children('.matchTeam2Cell').find('a').text().trim();
 			const locator = parent.children('.matchActionCell').find('a').attr('href').trim();
 			const link = `http://www.hltv.org${locator}`;
-			games += (`${team1} is playing ${team2} -> ${link}. `);
+			games += (`**${team1}** is playing **${team2}** -> ${link}.\r\n\r\n`);
 		});
 		message.channel.sendMessage(games);
 	}
