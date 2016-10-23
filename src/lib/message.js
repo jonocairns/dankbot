@@ -93,7 +93,7 @@ class Message {
 					const nl = '\r\n';
 					const actors = movie.actors.join(', ');
 					const genres = movie.genres.join(', ');
-					const movieMsg = `${nl}:movie_camera: **${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''}${nl}${movie.imdburl}${nl}**Director**: ${movie.director}${nl}**Actors**: ${actors}${nl}**Genres**: ${genres}${nl}${nl}**Plot**: ${movie.plot}`;
+					const movieMsg = `${nl}:movie_camera: **${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''}${nl}**Link**: http://www.imdb.com/title/${movie.imdb.id}/${nl}**Director**: ${movie.director}${nl}**Actors**: ${actors}${nl}**Genres**: ${genres}${nl}${nl}**Plot**: ${movie.plot}`;
 					if (movie.poster) {
 						message.channel.sendFile(movie.poster, 'poster.jpg', movieMsg);
 					} else {
