@@ -83,7 +83,7 @@ class Message {
 						return;
 					}
 					const tomato = movie.tomato;
-					const tomatoString = `\r\n\r\ntomato: (${tomato.rating})`;
+					const tomatoString = `\r\n\r\ntomato: (${tomato})`;
 					const imdbString = `\r\n\r\nimdb: (${movie.imdb.rating}/10)`;
 					message.channel.sendMessage(`:movie_camera:${movie.title} (${movie.year})${movie.imdb.rating ? imdbString : ''}${tomato ? tomatoString : ''}`);
 					if (movie.plot) {
