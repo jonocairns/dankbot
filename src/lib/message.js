@@ -1,6 +1,8 @@
 const config = require('../config.json');
 const Player = require('./player.js');
 const urban = require('urban');
+const omdb = require('omdb');
+const random = require('random-js')();
 
 class Message {
 	constructor() {
@@ -62,6 +64,27 @@ class Message {
 		message.member.sendMessage(`https://discordapp.com/oauth2/authorize?client_id=${config.discordClientId}&scope=bot&permissions=0`);
 	}
 
+	static omdb(message) {
+		const contents = message.content.split(' ');
+		const query = contents[1];
+
+		omdb.search(query, (err, movies) => {
+			if (err) {
+				console.error(err);
+				return;
+			}
+			if (movies.length < 1) {
+				message.channel.sendMessage('No movies were found!');
+			} else {
+				movies.first((movie) => {
+					const tomato = movie.tomato ? movie.tomato : { rating: 'not found' };
+					message.channel.sendMessage(`${movie.title} (${movie.year})\r\nimdb: (${movie.imdb.rating ? movie.imdb.rating : 'not found'})\r\ntomato: ${tomato.rating}`);
+					Message.chunkSend(movie.plot, message.channel);
+				});
+			}
+		});
+	}
+
 	static urbanDictionary(message) {
 		const contents = message.content.split(' ');
 		const udSearchQuery = contents[1];
@@ -69,22 +92,32 @@ class Message {
 		const res = urban(udSearchQuery);
 
 		res.first((payload) => {
-			payload.definition.split(' ');
-			const charLimit = 2000;
-			let mes = '';
-			const chunks = [];
-			payload.forEach((item) => {
-				if ((mes.length + item.length) < charLimit) {
-					mes += `${mes} `;
-				} else {
-					chunks.push(mes);
-					mes = '';
-				}
-			});
-			chunks.push(mes);
-			chunks.forEach((chunk) => {
-				message.channel.sendTTSMessage(chunk);
-			});
+			Message.chunkSend(payload, message.channel);
+		});
+	}
+
+	static coin(message) {
+		const coinFlip = ['Heads', 'Tails'];
+		const coinFlipResponse = random.pick(coinFlip);
+		message.channel.sendMessage(coinFlipResponse);
+	}
+
+	static chunkSend(payload, channel) {
+		const splitz = payload.definition.split(' ');
+		const charLimit = 2000;
+		let mes = '';
+		const chunks = [];
+		splitz.forEach((item) => {
+			if ((mes.length + item.length) < charLimit) {
+				mes += `${mes} `;
+			} else {
+				chunks.push(mes);
+				mes = '';
+			}
+		});
+		chunks.push(mes);
+		chunks.forEach((chunk) => {
+			channel.sendTTSMessage(chunk);
 		});
 	}
 

@@ -27,6 +27,8 @@
     "ava": "^0.16.0",
     "discord.js": "~9.3.0",
     "mongodb": "~2.2.10",
+    "omdb": "^0.7.0",
+    "random-js": "^1.0.8",
     "sinon": "^1.17.6",
     "soundcloudr": "^1.1.0",
     "urban": "^0.3.1",

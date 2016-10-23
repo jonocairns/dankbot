@@ -93,6 +93,12 @@ class Dank {
 		this.commands.set(new RegExp(`${this.triggerPrefix}ud`, 'i'), ['function',
             Message.urbanDictionary,
         ]);
+		this.commands.set(new RegExp(`${this.triggerPrefix}movie`, 'i'), ['function',
+            Message.omdb,
+        ]);
+		this.commands.set(new RegExp(`${this.triggerPrefix}coin`, 'i'), ['function',
+            Message.coin,
+        ]);
 	}
 
 
