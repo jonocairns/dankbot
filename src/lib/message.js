@@ -74,7 +74,7 @@ class Message {
 				return;
 			}
 			if (movies.length < 1) {
-				message.channel.sendMessage('No movies were fucking found. Try maybe not searching for something retarded?');
+				message.channel.sendMessage('No movies were fucking found. Try not searching for something retarded maybe?');
 			} else {
 				const mv = movies[0];
 				omdb.get({ title: mv.title, year: mv.year }, true, (e, movie) => {
@@ -82,12 +82,18 @@ class Message {
 						console.error(e);
 						return;
 					}
-					const tomato = movie.tomato ? movie.tomato : { rating: 'not found' };
-					message.channel.sendMessage(`${movie.title} (${movie.year})\r\nimdb: (${movie.imdb.rating ? movie.imdb.rating : 'not found'}/10)\r\ntomato: (${tomato.rating})`);
+					const tomato = movie.tomato;
+					const tomatoString = `\r\n\r\ntomato: (${tomato.rating})`;
+					const imdbString = `\r\n\r\nimdb: (${movie.imdb.rating}/10)`;
+					message.channel.sendMessage(`:movie_camera:${movie.title} (${movie.year})${movie.imdb.rating ? imdbString : ''}${tomato ? tomatoString : ''}`);
 					if (movie.plot) {
 						console.log(movie.plot);
-						const plot = movie.plot.split(' ');
-						Message.chunkSend(plot, message.channel);
+						if (movie.plot.length > 2000) {
+							const plot = movie.plot.split(' ');
+							Message.chunkSend(plot, message.channel);
+						} else {
+							message.channel.sendTTSMessage(movie.plot);
+						}
 					}
 				});
 			}
@@ -95,14 +101,20 @@ class Message {
 	}
 
 	static urbanDictionary(message) {
-		const contents = message.content.split(' ').splice(2).join();
+		const contents = message.content.split('"').splice(1).join();
 
 		const res = urban(contents);
 
 		res.first((payload) => {
+			console.log(`urban dictionary query returned for ${contents}. Payload: ${payload}`);
 			if (payload && payload.definition) {
-				const chunky = payload.definition.split(' ');
-				Message.chunkSend(chunky, message.channel);
+				console.log(payload.definition);
+				if (payload.definition.length > 2000) {
+					const chunky = payload.definition.split(' ');
+					Message.chunkSend(chunky, message.channel);
+				} else {
+					message.channel.sendTTSMessage(payload.definition);
+				}
 			} else {
 				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}. Maybe try getting good?'`);
 			}
@@ -116,6 +128,8 @@ class Message {
 	}
 
 	static chunkSend(payload, channel) {
+		console.log('chunking payload...');
+		console.log(payload);
 		const charLimit = 2000;
 		let mes = '';
 		const chunks = [];
@@ -129,6 +143,7 @@ class Message {
 		});
 		chunks.push(mes);
 		chunks.forEach((chunk) => {
+			console.log(`chunk: ${chunk}`);
 			channel.sendTTSMessage(chunk);
 		});
 	}
