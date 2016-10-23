@@ -105,6 +105,9 @@ class Dank {
 		this.commands.set(new RegExp('!mama', 'i'), ['function',
             Message.yomama,
         ]);
+		this.commands.set(new RegExp('!hltv', 'i'), ['function',
+            Message.currentGames,
+        ]);
 	}
 
 
