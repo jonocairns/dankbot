@@ -83,9 +83,18 @@ class Message {
 						return;
 					}
 					const tomato = movie.tomato;
-					const tomatoString = `\r\n\r\ntomato: (${tomato})`;
-					const imdbString = `\r\n\r\nimdb: (${movie.imdb.rating}/10)`;
-					message.channel.sendMessage(`:movie_camera:${movie.title} (${movie.year})${movie.imdb.rating ? imdbString : ''}${tomato ? tomatoString : ''}`);
+					const tomatoString = `tomato: (${tomato})`;
+					const imdbRatingStars = parseInt(movie.imdb.rating, 10);
+					let stars = '';
+					for (let i = 1; i < imdbRatingStars; i += 1) {
+						stars += ':star:';
+					}
+
+					const imdbString = `imdb: (${movie.imdb.rating}/10)`;
+					message.channel.sendMessage(`:movie_camera:${movie.title} (${movie.year}):movie_camera: ${stars}\r\n${movie.imdb.rating ? imdbString : ''} ${tomato ? tomatoString : ''}\r\n${movie.imdburl}`);
+					if (movie.poster) {
+						message.channel.sendMessage(movie.poster);
+					}
 					if (movie.plot) {
 						console.log(movie.plot);
 						if (movie.plot.length > 2000) {
@@ -110,10 +119,11 @@ class Message {
 			if (payload && payload.definition) {
 				console.log(payload.definition);
 				if (payload.definition.length > 2000) {
-					const chunky = payload.definition.split(' ');
+					const def = `${contents}: ${payload.definition}`;
+					const chunky = def.split(' ');
 					Message.chunkSend(chunky, message.channel);
 				} else {
-					message.channel.sendTTSMessage(payload.definition);
+					message.channel.sendTTSMessage(`${contents}: ${payload.definition}`);
 				}
 			} else {
 				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}'. Maybe try getting good?`);
@@ -129,7 +139,6 @@ class Message {
 
 	static chunkSend(payload, channel) {
 		console.log('chunking payload...');
-		console.log(payload);
 		const charLimit = 2000;
 		let mes = '';
 		const chunks = [];
