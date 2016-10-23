@@ -108,18 +108,21 @@ class Message {
 	}
 
 	static currentGames(message) {
-		jsdom.env('http://www.hltv.org/matches/', ['http://code.jquery.com/jquery.js;'],
+		jsdom.env('http://www.hltv.org/matches/', ['http://code.jquery.com/jquery.js'],
          (err, w) => {
-	message.channel.sendMessage(`There are currently ${w.$('.centerFade .matchTimeCellLive').length} live csgo matches`);
+	const numberOfGames = w.$('.centerFade .matchTimeCellLive').length;
+	message.channel.sendMessage(`There are currently ${numberOfGames} live csgo matches`);
 	let games = '';
-	w.$('.centerFade .matchTimeCellLive').each(function as() {
-		const parent = w.$(this).parent();
-		const team1 = parent.children('.matchTeam1Cell').find('a').text().trim();
-		const team2 = parent.children('.matchTeam2Cell').find('a').text().trim();
-		const link = `http://www.hltv.org/${parent.children('.matchActionCell').find('a').attr('href').trim()}`;
-		games += (`${team1} is playing ${team2} -> ${link}. `);
-	});
-	message.channel.sendMessage(games);
+	if (numberOfGames > 0) {
+		w.$('.centerFade .matchTimeCellLive').each(function as() {
+			const parent = w.$(this).parent();
+			const team1 = parent.children('.matchTeam1Cell').find('a').text().trim();
+			const team2 = parent.children('.matchTeam2Cell').find('a').text().trim();
+			const link = `http://www.hltv.org/${parent.children('.matchActionCell').find('a').attr('href').trim()}`;
+			games += (`${team1} is playing ${team2} -> ${link}. `);
+		});
+		message.channel.sendMessage(games);
+	}
 }
         );
 	}
