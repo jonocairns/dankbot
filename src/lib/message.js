@@ -82,7 +82,7 @@ class Message {
 						console.error(e);
 						return;
 					}
-					const tomatoString = `**tomato**: (${movie.tomato})`;
+
 					const imdbRatingStars = parseInt(movie.imdb.rating, 10);
 					let stars = '';
 					for (let i = 0; i < imdbRatingStars; i += 1) {
@@ -91,7 +91,7 @@ class Message {
 
 					const imdbString = `**imdb**: (${movie.imdb.rating}/10)`;
 					const nl = '\r\n';
-					const movieMsg = `:movie_camera:**${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''} ${movie.tomato ? tomatoString : ''}${nl}${movie.imdburl}${nl}**director**:${movie.director}${nl}**actors**: ${movie.actors}${nl}**genres**: ${movie.genres}${nl}${nl}**plot**: ${movie.plot}`;
+					const movieMsg = `${nl}:movie_camera: **${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''}${nl}${movie.imdburl}${nl}**Director**: ${movie.director}${nl}**Actors**: ${movie.actors.split(',').join(', ')}${nl}**Genres**: ${movie.genres.split(',').join(', ')}${nl}${nl}**Plot**: ${movie.plot}`;
 					if (movie.poster) {
 						message.channel.sendFile(movie.poster, 'poster.jpg', movieMsg);
 					} else {
