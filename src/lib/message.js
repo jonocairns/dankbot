@@ -88,7 +88,7 @@ class Message {
 						stars += ':star:';
 					}
 
-					const imdbString = `**imdb**: (${movie.imdb.rating}/10)`;
+					const imdbString = `**IMDB**: (${movie.imdb.rating}/10)`;
 					const nl = '\r\n';
 					const actors = movie.actors.split(',').join(', ');
 					const genres = movie.genres.split(',').join(', ');

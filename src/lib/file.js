@@ -13,7 +13,7 @@ class File {
 					const cmd = element.split('.')[0];
 					if (cmd) {
 						const reg = new RegExp(`!${cmd}`, 'i');
-						File.doesAlreadyExists(`!${cmd}`);
+						File.doesAlreadyExists(`!${cmd}`, commands);
 
 						commands.set(reg, ['sound', element]);
 
