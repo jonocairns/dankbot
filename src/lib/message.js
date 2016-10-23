@@ -3,6 +3,7 @@ const Player = require('./player.js');
 const urban = require('urban');
 const omdb = require('omdb');
 const random = require('random-js')();
+const giphy = require('giphy-api')(process.env.GIPHY_KEY || 'dc6zaTOxFJmzC')
 
 class Message {
 	constructor() {
@@ -90,8 +91,8 @@ class Message {
 
 					const imdbString = `**IMDB**: (${movie.imdb.rating}/10)`;
 					const nl = '\r\n';
-					const actors = movie.actors.split(',').join(', ');
-					const genres = movie.genres.split(',').join(', ');
+					const actors = movie.actors.join(', ');
+					const genres = movie.genres.join(', ');
 					const movieMsg = `${nl}:movie_camera: **${movie.title}** (${movie.year}):movie_camera: ${stars}${nl}${movie.imdb.rating ? imdbString : ''}${nl}${movie.imdburl}${nl}**Director**: ${movie.director}${nl}**Actors**: ${actors}${nl}**Genres**: ${genres}${nl}${nl}**Plot**: ${movie.plot}`;
 					if (movie.poster) {
 						message.channel.sendFile(movie.poster, 'poster.jpg', movieMsg);
@@ -123,6 +124,22 @@ class Message {
 				message.channel.sendMessage(`I couldn't fucking find any results for '${contents}'. Maybe try getting good?`);
 			}
 		});
+	}
+
+	static giphy(message) {
+		const contents = message.content.split(' ');
+		const keywords = contents.slice(1).join();
+
+		let giphyType = 'translate';
+		if (contents.length === 1) giphyType = 'random';
+		giphy[giphyType]({ s: keywords, limit: 1 })
+		.then((results) => {
+			if (results && results.data) {
+				message.channel.sendFile(results.data.url);
+			} else {
+				message.channel.sendMessage('I don\'t know what you searched but it was fucking retarded and therefore had zero results.');
+			}
+		}).catch(console.log);
 	}
 
 	static coin(message) {

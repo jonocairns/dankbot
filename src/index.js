@@ -99,6 +99,9 @@ class Dank {
 		this.commands.set(new RegExp('!coin', 'i'), ['function',
             Message.coin,
         ]);
+		this.commands.set(new RegExp('!giphy', 'i'), ['function',
+            Message.giphy,
+        ]);
 	}
 
 
