@@ -4,7 +4,7 @@ const urban = require('urban');
 const omdb = require('omdb');
 const random = require('random-js')();
 const giphy = require('giphy-api')(process.env.GIPHY_KEY || 'dc6zaTOxFJmzC');
-const wikipedia = require('wikipedia-js');
+const request = require('request');
 
 class Message {
 	constructor() {
@@ -162,21 +162,10 @@ class Message {
 		}
 	}
 
-	static wiki(message) {
-		const term = message.content.split(' ').splice(1).join();
-
-		const options = { query: term, format: 'json', summaryOnly: true };
-		wikipedia.searchArticle(options, (err, text) => {
-			if (err) {
-				console.log('An error occurred[query=%s, error=%s]', term, err);
-				message.channel.sendMessage('You done fucked something.');
-				return;
-			}
-			if (text.length > 2000) {
-				Message.chunkSend(text, message.channel);
-			} else {
-				message.channel.sendMessage(text);
-			}
+	static yomama(message) {
+		request('http://api.yomomma.info/', (msg, response, body) => {
+			const joke = JSON.parse(body).joke;
+			message.channel.sendTTSMessage(joke);
 		});
 	}
 

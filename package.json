@@ -30,10 +30,10 @@
     "mongodb": "~2.2.10",
     "omdb": "^0.7.0",
     "random-js": "^1.0.8",
+    "request": "^2.75.0",
     "sinon": "^1.17.6",
     "soundcloudr": "^1.1.0",
     "urban": "^0.3.1",
-    "wikipedia-js": "0.0.6",
     "ytdl-core": "^0.7.18"
   },
   "engines": {

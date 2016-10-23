@@ -102,8 +102,8 @@ class Dank {
 		this.commands.set(new RegExp('!gif', 'i'), ['function',
             Message.giphy,
         ]);
-		this.commands.set(new RegExp('!wiki', 'i'), ['function',
-            Message.wiki,
+		this.commands.set(new RegExp('!mama', 'i'), ['function',
+            Message.yomama,
         ]);
 	}
 
