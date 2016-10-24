@@ -7,6 +7,7 @@ const Tts = require('./lib/tts.js');
 const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
 const Speller = require('./lib/spellchecker.js');
+const Dota = require('./lib/dota.js');
 const LocalDevConfig = require('../env.json');
 const Promise = require('promise');
 
@@ -118,6 +119,13 @@ class Dank {
         ]);
 		this.commands.set(new RegExp('!yt', 'i'), ['function',
             Player.playYt,
+        ]);
+		this.commands.set(new RegExp('!dota', 'i'), ['function',
+			(message) => {
+				Dota.currentGames((msg) => {
+					message.channel.sendMessage(msg);
+				});
+			},
         ]);
 	}
 
