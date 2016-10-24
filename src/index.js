@@ -6,6 +6,7 @@ const File = require('./lib/file.js');
 const Tts = require('./lib/tts.js');
 const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
+const Speller = require('./lib/spellchecker.js');
 const LocalDevConfig = require('../env.json');
 
 class Dank {
@@ -107,6 +108,13 @@ class Dank {
         ]);
 		this.commands.set(new RegExp('!hltv', 'i'), ['function',
             Message.currentGames,
+        ]);
+		this.commands.set(new RegExp('!spell', 'i'), ['function',
+			(message) => {
+				const spellerMessage = Speller.analyze(message.content);
+
+				message.channel.sendMessage(spellerMessage);
+			},
         ]);
 	}
 
