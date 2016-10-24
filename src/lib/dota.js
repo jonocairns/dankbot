@@ -30,7 +30,7 @@ class Dota {
 								const dire = g.dire_team.team_name !== '' ? g.dire_team.team_name : 'some other fgts';
 								msg += `**${radient}** (${g.radiant_score}) vs **${dire}** (${g.dire_score})\r\n`;
 								if (g.duration) {
-									msg += `Game started areound ${Math.ceil(g.duration / 60)} minutes ago`;
+									msg += `Game started areound ${Math.ceil(g.duration / 60)} minutes ago with ${g.spectators} people watching.`;
 								}
 								msg += `http://www.trackdota.com/matches/${g.id}\r\n\r\n`;
 								count += 1;
