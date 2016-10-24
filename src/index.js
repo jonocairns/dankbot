@@ -140,12 +140,9 @@ class Dank {
 		}
 
 		message.channel.sendMessage('Cleanup on aisle five').then((ms) => {
-			ms.delete(2000).then(() => {
+			ms.delete(1000).then(() => {
 				message.channel.fetchMessages({ limit: numberToPurge }).then((messagesToDelete) => {
 					messagesToDelete.deleteAll().then(() => {
-						message.channel.sendMessage('RIP in peace').then((fin) => {
-							fin.delete(2000);
-						});
 					}).catch((e) => {
 						message.channel.sendMessage(':face_palm: I might not have the right permissions to do that m8ty.');
 						console.log(e);
