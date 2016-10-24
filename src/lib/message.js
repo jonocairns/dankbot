@@ -131,7 +131,7 @@ class Message {
 			games += (`**${team1}** is playing **${team2}** -> ${link}.\r\n\r\n`);
 		});
 
-		message.channel.sendMessage(`:middle_finger: There are currently **${numberOfGames}** live csgo matches :middle_finger:\r\n\r\n${games}`);
+		message.channel.sendMessage(`:middle_finger: There ${numberOfGames === 1 ? 'is currently one' : `are currently **${numberOfGames}**`} live csgo match${numberOfGames === 1 ? '' : 'es'} :middle_finger:\r\n\r\n${games}`);
 	} else {
 		message.channel.sendMessage(':middle_finger: There are no live csgo matches atm :middle_finger:');
 	}
