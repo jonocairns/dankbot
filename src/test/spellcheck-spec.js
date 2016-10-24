@@ -25,7 +25,7 @@ test('Can offer suggestions for misspelt word', (t) => {
 test('Can use spellchecker will return expected corrections', (t) => {
     var message = Speller.analyze('!spell erbin to spel');
 
-    t.true(message.startsWith('You fucked up'));
+    t.true(message.startsWith(':poop: You fucked up'));
 });
 
 test('Can use spellchecker will return no corrections', (t) => {
