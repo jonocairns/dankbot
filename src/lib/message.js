@@ -29,6 +29,7 @@ class Message {
 		const chunks = [];
 		const functionality = [];
 		const tts = [];
+
 		commands.forEach((type, command) => {
 			const a = command.toString().split('/')[1];
 			const mes = `${a}, `;
@@ -40,12 +41,11 @@ class Message {
 					helpMessage += mes;
 				} else {
 					chunks.push(helpMessage);
-					helpMessage = mes;
+					helpMessage = '';
 				}
 			} else if (type[0] === 'text') {
 				tts.push(a);
 			}
-			helpMessage += mes;
 		});
 
 		chunks.push(helpMessage);
