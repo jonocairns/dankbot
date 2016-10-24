@@ -134,9 +134,9 @@ class Dank {
 			numberToPurge = parseInt(numberToPurge, 10);
 		}
 
-		const messagesToDelete = message.channel.fetchMessages({ limit: numberToPurge });
-
-		messagesToDelete.deleteAll();
+		message.channel.fetchMessages({ limit: numberToPurge }).then((messagesToDelete) => {
+			messagesToDelete.deleteAll();
+		});
 	}
 
 
