@@ -126,6 +126,12 @@ class Dank {
 		let numberToPurge = 10;
 		if (splitty.length > 1) {
 			numberToPurge = message.content.split(' ')[1];
+			const isNumber = !isNaN(parseFloat(numberToPurge)) && isFinite(numberToPurge);
+			if (!isNumber) {
+				message.channel.sendMessage('Supply a fucking proper number you fuck.');
+				return;
+			}
+			numberToPurge = parseInt(numberToPurge, 10);
 		}
 
 		const messagesToDelete = message.channel.fetchMessages({ limit: numberToPurge });
