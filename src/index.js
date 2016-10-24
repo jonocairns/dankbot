@@ -116,6 +116,21 @@ class Dank {
 				message.channel.sendMessage(spellerMessage);
 			},
         ]);
+		this.commands.set(new RegExp('!clear', 'i'), ['function',
+            Dank.clear,
+        ]);
+	}
+
+	static clear(message) {
+		const splitty = message.content.split(' ');
+		let numberToPurge = 10;
+		if (splitty.length > 1) {
+			numberToPurge = message.content.split(' ')[1];
+		}
+
+		const messagesToDelete = message.channel.fetchMessages({ limit: numberToPurge });
+
+		messagesToDelete.deleteAll();
 	}
 
 
