@@ -21,16 +21,16 @@ class Dota {
 				if (body.enhanced_matches.length === 0) {
 					msg += 'There are live dota games to display.';
 				} else {
-					msg = `:japanese_goblin: There are ${body.enhanced_matches.length} dota game(s) live :japanese_goblin: \r\n\r\n`;
+					msg = `:japanese_goblin: ***There ${body.enhanced_matches.length === 1 ? 'is' : 'are'} ${body.enhanced_matches.length} tournament${body.enhanced_matches.length === 1 ? '' : 's'} with live games*** :japanese_goblin: \r\n\r\n`;
 					body.enhanced_matches.forEach((item) => {
-						msg += `${item.name}\r\n\r\n`;
+						msg += `__**${item.name}**__\r\n\r\n`;
 						item.games.forEach((g) => {
 							if (count < limit) {
 								const radient = g.radiant_team.team_name !== '' ? g.radiant_team.team_name : 'Some fgts';
 								const dire = g.dire_team.team_name !== '' ? g.dire_team.team_name : 'some other fgts';
 								msg += `**${radient}** (${g.radiant_score}) vs **${dire}** (${g.dire_score})\r\n`;
 								if (g.duration) {
-									msg += `Game started around ${Math.ceil(g.duration / 60)} minutes ago with ${g.spectators} people watching.\r\n`;
+									msg += `This game started around ${Math.ceil(g.duration / 60)} minutes ago and currently has ${g.spectators} people watching.\r\n`;
 								}
 								msg += `http://www.trackdota.com/matches/${g.id}\r\n\r\n`;
 								count += 1;
