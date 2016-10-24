@@ -8,6 +8,7 @@ const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
 const Speller = require('./lib/spellchecker.js');
 const LocalDevConfig = require('../env.json');
+const Promise = require('promise');
 
 class Dank {
 	constructor(player, message, bot) {
@@ -139,10 +140,14 @@ class Dank {
 			numberToPurge = parseInt(numberToPurge, 10);
 		}
 
-		message.channel.sendMessage('Cleanup on aisle five').then((ms) => {
+		message.channel.sendMessage('Cleanup on aisle five...').then((ms) => {
 			ms.delete(1000).then(() => {
 				message.channel.fetchMessages({ limit: numberToPurge }).then((messagesToDelete) => {
-					messagesToDelete.deleteAll().then(() => {
+					const messagePromises = messagesToDelete.deleteAll();
+					Promise.all(messagePromises).then(() => {
+						message.channel.sendMessage('RIP in peace sweet prince.').then((s) => {
+							s.delete(1000);
+						});
 					}).catch((e) => {
 						message.channel.sendMessage(':face_palm: I might not have the right permissions to do that m8ty.');
 						console.log(e);
