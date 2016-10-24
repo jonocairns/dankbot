@@ -20,14 +20,14 @@ class Spell {
 		});
 		let msg = '';
 		if (corrections.length > 0) {
-			msg += `You fucked up ${corrections.length === 1 ? 'a word' : `${corrections.length} words`} you fucking idiot. `;
+			msg += `:poop: You fucked up ${corrections.length === 1 ? 'a word' : `${corrections.length} words`} you fucking idiot. :thumbsdown: `;
 			corrections.forEach((correction, index) => {
 				const poss = correction.corrections.join(', ');
 				msg += `"${correction.word}" was ${index > 1 ? 'also' : 'just'} fucking wrong. Maybe it was ${poss}?\r\n`;
 			});
-			msg += 'Maybe read a fucking book or something?';
+			msg += '\r\nMaybe read a fucking book or something? :book: ';
 		} else {
-			msg = 'Congratulations, you aren\'t currently retarded.';
+			msg = 'Congratulations, you aren\'t currently retarded. :unicorn: :thumbsup: :gay_pride_flag: ';
 		}
 
 		return msg;
