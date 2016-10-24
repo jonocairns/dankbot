@@ -54,15 +54,11 @@ class Dank {
 
 		this.bot.on('message', (message) => {
 			Dank.tryMe(() => {
-				if (message.content.startsWith('!yt')) {
-					Player.playYt(message);
-				} else {
-					if (this.newCommands.length > 0) {
-						message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
-						this.newCommands = [];
-					}
-					Message.messageHandler(message, this.bot, this.commands);
+				if (this.newCommands.length > 0) {
+					message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
+					this.newCommands = [];
 				}
+				Message.messageHandler(message, this.bot, this.commands);
 			});
 		});
 
@@ -119,6 +115,9 @@ class Dank {
         ]);
 		this.commands.set(new RegExp('!clear', 'i'), ['function',
             Dank.clear,
+        ]);
+		this.commands.set(new RegExp('!yt', 'i'), ['function',
+            Player.playYt,
         ]);
 	}
 

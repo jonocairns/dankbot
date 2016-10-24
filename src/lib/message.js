@@ -24,15 +24,21 @@ class Message {
 	}
 
 	static displayCommands(message, commands) {
-		let helpMessage = '';
+		let helpMessage = '**Dank memes**\r\n\r\n';
 		const characterMessageLimit = 2000;
 		const chunks = [];
+		const functionality = [];
+		const tts = [];
+		commands.forEach((type, command) => {
+			const a = command.toString().split('/')[1];
+			const mes = `${a}, `;
 
-		commands.forEach((fileName, command) => {
-			const mes = `${command.toString().split('/')[1]}\t`;
-
-			if ((helpMessage.length + mes.length) < characterMessageLimit) {
+			if (type === 'function') {
+				functionality.push(a);
+			} else if ((helpMessage.length + mes.length) < characterMessageLimit) {
 				helpMessage += mes;
+			} else if (type === 'text') {
+				tts.push(a);
 			} else {
 				chunks.push(helpMessage);
 				helpMessage = mes;
@@ -40,7 +46,10 @@ class Message {
 		});
 
 		chunks.push(helpMessage);
-
+		const funcString = functionality.join(', ');
+		const ttsString = tts.join(', ');
+		message.member.sendMessage(`**Functions**\r\n\r\n${funcString}`);
+		message.member.sendMessage(`**Text-to-speech**\r\n\r\n${ttsString}`);
 		chunks.forEach((chunk) => {
 			message.member.sendMessage(chunk);
 		});
