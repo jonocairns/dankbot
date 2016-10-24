@@ -21,7 +21,7 @@ class Dota {
 				if (body.enhanced_matches.length === 0) {
 					msg += 'There are live dota games to display.';
 				} else {
-					msg = `:japanese_goblin: **There ${body.enhanced_matches.length === 1 ? 'is' : 'are'} ${body.enhanced_matches.length} tournament${body.enhanced_matches.length === 1 ? '' : 's'} with live games** :japanese_goblin: \r\n\r\n`;
+					msg = `:japanese_goblin: **There ${body.enhanced_matches.length === 1 ? 'is' : 'are'} ${body.enhanced_matches.length} dota tournament${body.enhanced_matches.length === 1 ? '' : 's'} with live games** :japanese_goblin: \r\n\r\n`;
 					body.enhanced_matches.forEach((item) => {
 						msg += `__**${item.name}**__\r\n\r\n`;
 						item.games.forEach((g) => {
