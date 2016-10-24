@@ -64,7 +64,7 @@ class Message {
 
 	static getInviteLink(message) {
 		message.member.sendMessage('Go to the following link and auth me to your dank server.');
-		message.member.sendMessage(`https://discordapp.com/oauth2/authorize?client_id=${config.discordClientId}&scope=bot&permissions=0`);
+		message.member.sendMessage(`https://discordapp.com/oauth2/authorize?client_id=${config.discordClientId}&scope=bot&permissions=3668992`);
 	}
 
 	static omdb(message) {

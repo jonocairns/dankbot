@@ -136,6 +136,9 @@ class Dank {
 
 		message.channel.fetchMessages({ limit: numberToPurge }).then((messagesToDelete) => {
 			messagesToDelete.deleteAll();
+		}).catch((e) => {
+			message.channel.sendMessage(':face_palm: I might not have the right permissions to do that m8ty.');
+			console.log(e);
 		});
 	}
 
