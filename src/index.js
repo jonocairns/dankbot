@@ -140,11 +140,20 @@ class Dank {
 			numberToPurge = parseInt(numberToPurge, 10);
 		}
 
-		message.channel.fetchMessages({ limit: numberToPurge }).then((messagesToDelete) => {
-			messagesToDelete.deleteAll();
-		}).catch((e) => {
-			message.channel.sendMessage(':face_palm: I might not have the right permissions to do that m8ty.');
-			console.log(e);
+		message.channel.sendMessage('Cleanup on aisle five...').then((ms) => {
+			ms.delete(1000).then(() => {
+				message.channel.fetchMessages({ limit: numberToPurge }).then((messagesToDelete) => {
+					const messagePromises = messagesToDelete.deleteAll();
+					Promise.all(messagePromises).then(() => {
+						message.channel.sendMessage('RIP in peace sweet prince...').then((s) => {
+							s.delete(1000);
+						});
+					}).catch((e) => {
+						message.channel.sendMessage(':face_palm: I might not have the right permissions to do that m8ty.');
+						console.log(e);
+					});
+				});
+			});
 		});
 	}
 
