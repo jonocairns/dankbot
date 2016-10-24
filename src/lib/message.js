@@ -35,14 +35,17 @@ class Message {
 
 			if (type[0] === 'function') {
 				functionality.push(a);
-			} else if ((helpMessage.length + mes.length) < characterMessageLimit) {
-				helpMessage += mes;
+			} else if (type[0] === 'sound') {
+				if ((helpMessage.length + mes.length) < characterMessageLimit) {
+					helpMessage += mes;
+				} else {
+					chunks.push(helpMessage);
+					helpMessage = mes;
+				}
 			} else if (type[0] === 'text') {
 				tts.push(a);
-			} else {
-				chunks.push(helpMessage);
-				helpMessage = mes;
 			}
+			helpMessage += mes;
 		});
 
 		chunks.push(helpMessage);
