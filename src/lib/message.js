@@ -33,11 +33,11 @@ class Message {
 			const a = command.toString().split('/')[1];
 			const mes = `${a}, `;
 
-			if (type === 'function') {
+			if (type[0] === 'function') {
 				functionality.push(a);
 			} else if ((helpMessage.length + mes.length) < characterMessageLimit) {
 				helpMessage += mes;
-			} else if (type === 'text') {
+			} else if (type[0] === 'text') {
 				tts.push(a);
 			} else {
 				chunks.push(helpMessage);
