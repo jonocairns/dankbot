@@ -32,11 +32,30 @@ Typing `!bot exit` will force the bot to leave the current users voice channel.
 
 Typing `!yt https://www.youtube.com/watch?v=PGNiXGX2nLU 0 1` will stream the youtube audio to the current users voice channel. (0 and 1 are both optional)0 is the time you want to start from and 1 is the volume.
 
-Typing `!giphy dank` will try and a giphy relating to the text 'dank' you can just type `!giphy` itself, this will find a random gif!
+Typing `!gif dank` will try and a giphy relating to the text 'dank' you can just type `!giphy` itself, this will find a random gif!
 
 Typing `!imdb some movie here` will find the best match for the movie/tv 'some movie here' and display it in chat.
 
 Typing `!ud meme` will attempt to search for the urban dictionary definition for the word 'meme'. using just `!ud` will find a random definition.
+
+Typing `!ud coin` will flip a coin.
+
+Typing `!mama` will generate a random yo momma joke
+
+Typing `!hltv` will get the current live pro csgo games from hltv.org
+
+Typing `!spell denk maemae` will try and verify the spelling of each parameter after !spell
+
+Typing `!clear 3` or `!clear` will clear the last N chat messages, defaulted to 10.
+
+Typing `!dota` will get the current live pro dota matches
+
+Typing `!fml` will grab a random fml quote
+
+Typing `!chuck` will grab a random chuck norris danker quote
+
+Typing `!auth` will send you the invite code required to get some dank up in your server
+
 
 `commands.set(<regexp>, array[type, reply])` - `regexp` is what your bot will match messages against, regular expressions are used here mainly to make things case-insensitive. `type` can currently be `function`, `sound`, or `text`, but can be extended further if your bot requires additional functionality.
 
