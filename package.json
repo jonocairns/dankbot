@@ -25,6 +25,7 @@
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
     "ava": "^0.16.0",
+    "chuck-norris-api": "^1.0.8",
     "discord.js": "~9.3.0",
     "giphy-api": "^1.2.1",
     "jsdom": "^9.8.0",
@@ -32,6 +33,7 @@
     "omdb": "^0.7.0",
     "promise": "^7.1.1",
     "random-js": "^1.0.8",
+    "random_fml": "^1.0.3",
     "request": "^2.75.0",
     "sinon": "^1.17.6",
     "soundcloudr": "^1.1.0",

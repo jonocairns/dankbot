@@ -10,6 +10,8 @@ const Speller = require('./lib/spellchecker.js');
 const Dota = require('./lib/dota.js');
 const LocalDevConfig = require('../env.json');
 const Promise = require('promise');
+const fml = require('random_fml');
+const chuck = require('chuck-norris-api');
 
 class Dank {
 	constructor(player, message, bot) {
@@ -125,6 +127,16 @@ class Dank {
 				Dota.currentGames((msg) => {
 					message.channel.sendMessage(msg);
 				});
+			},
+        ]);
+		this.commands.set(new RegExp('!fml', 'i'), ['function',
+			(message) => {
+				fml().then(f => message.channel.sendMessage(f));
+			},
+        ]);
+		this.commands.set(new RegExp('!chuck', 'i'), ['function',
+			(message) => {
+				chuck.getRandom().then(f => message.channel.sendMessage(f.value.joke));
 			},
         ]);
 	}
