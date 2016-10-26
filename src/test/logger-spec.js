@@ -5,11 +5,11 @@ import sinon from 'sinon';
 
 const Logger = require('../lib/logger.js');
 
-test.beforeEach(() => {
+test.beforeEach((t) => {
   sinon.stub(console, 'log');
 });
 
-test.afterEach(() => {
+test.afterEach((t) => {
   console.log.restore();
 });
 
