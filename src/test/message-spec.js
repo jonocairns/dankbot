@@ -11,7 +11,7 @@ var addCommand = (cmd) => {
     commands.set(reg, ['sound', cmd]);
 }
 
-test.beforeEach(() => {
+test.beforeEach((t) => {
 
   commands = new Map();
   sentMessages = [];
