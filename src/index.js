@@ -9,6 +9,10 @@ const Database = require('./lib/db.js');
 const Speller = require('./lib/spellchecker.js');
 const Dota = require('./lib/dota.js');
 const Clear = require('./lib/clear.js');
+const Imdb = require('./lib/imdb.js');
+const Urban = require('./lib/urban.js');
+const Giphy = require('./lib/giphy.js');
+const Hltv = require('./lib/hltv.js');
 const LocalDevConfig = require('../env.json');
 const fml = require('random_fml');
 const chuck = require('chuck-norris-api');
@@ -92,22 +96,22 @@ class Dank {
             Message.getInviteLink,
         ]);
 		this.commands.set(new RegExp('!ud', 'i'), ['function',
-            Message.urbanDictionary,
+            Urban.query,
         ]);
 		this.commands.set(new RegExp('!imdb', 'i'), ['function',
-            Message.omdb,
+            Imdb.query,
         ]);
 		this.commands.set(new RegExp('!coin', 'i'), ['function',
             Message.coin,
         ]);
 		this.commands.set(new RegExp('!gif', 'i'), ['function',
-            Message.giphy,
+            Giphy.giphy,
         ]);
 		this.commands.set(new RegExp('!mama', 'i'), ['function',
             Message.yomama,
         ]);
 		this.commands.set(new RegExp('!hltv', 'i'), ['function',
-            Message.currentGames,
+            Hltv.currentGames,
         ]);
 		this.commands.set(new RegExp('!spell', 'i'), ['function',
 			(message) => {
