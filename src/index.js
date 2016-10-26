@@ -13,6 +13,7 @@ const Imdb = require('./lib/imdb.js');
 const Urban = require('./lib/urban.js');
 const Giphy = require('./lib/giphy.js');
 const Hltv = require('./lib/hltv.js');
+const Help = require('./lib/help.js');
 const LocalDevConfig = require('../env.json');
 const fml = require('random_fml');
 const chuck = require('chuck-norris-api');
@@ -78,7 +79,7 @@ class Dank {
 
 	setDefaultCommands() {
 		this.commands.set(new RegExp(`${this.triggerPrefix}help`, 'i'), ['function',
-            Message.displayCommands,
+            Help.displayCommands,
         ]);
 		this.commands.set(new RegExp('!meme', 'i'), ['function',
             Player.playRandomSound.bind(this),

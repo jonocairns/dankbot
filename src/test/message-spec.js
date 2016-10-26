@@ -3,7 +3,7 @@
 import test from 'ava';
 import sinon from 'sinon';
 
-const Message = require('../lib/message.js');
+const Help = require('../lib/help.js');
 let msgStub, commands, sentMessages;
 
 var addCommand = (cmd) => {
@@ -27,7 +27,7 @@ test.beforeEach(() => {
 test('Can display chunked commands with one command active', (t) => {
     addCommand('!420');
 
-    Message.displayCommands(msgStub, commands);
+    Help.displayCommands(msgStub, commands);
 
     t.is(sentMessages.length, 3);
 });
@@ -38,7 +38,7 @@ test('Can display chunked commands just under 2000 char limit', (t) => {
         addCommand(cmd);
     }
 
-    Message.displayCommands(msgStub, commands);
+    Help.displayCommands(msgStub, commands);
 
     t.is(sentMessages.length, 4);
 });
@@ -49,7 +49,7 @@ test('Can display chunked commands exactly on 2000 char limit', (t) => {
         addCommand(cmd);
     }
 
-    Message.displayCommands(msgStub, commands);
+    Help.displayCommands(msgStub, commands);
 
     t.is(sentMessages.length, 4);
 });
@@ -60,7 +60,7 @@ test('Ensure last cmd is kept when chunking over 2000 limit', (t) => {
         addCommand(cmd);
     }
 
-    Message.displayCommands(msgStub, commands);
+    Help.displayCommands(msgStub, commands);
 
     t.is(sentMessages.length, 4);
 });
@@ -91,7 +91,7 @@ test('X chunk test with random cmd lengths', (t) => {
         charLengths += (cmd.length + 2); // the 2 is for the /t at the end of the string for the message.
     }
 
-    Message.displayCommands(msgStub, commands);
+    Help.displayCommands(msgStub, commands);
 
     sentMessages.forEach((item) => {
         t.true(item.length < 2000);
