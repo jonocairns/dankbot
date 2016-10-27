@@ -13,7 +13,7 @@ var addCommand = (cmd) => {
     commands.set(reg, ['sound', cmd]);
 }
 
-test.beforeEach(() => {
+test.beforeEach((t) => {
     sinon.stub(console, 'log');
     message = {
         content: '!bot tts "Hi there" !tester',
@@ -26,7 +26,7 @@ test.beforeEach(() => {
     commands = new Map();
 });
 
-test.afterEach(() => {
+test.afterEach((t) => {
   console.log.restore();
 });
 

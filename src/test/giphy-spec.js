@@ -3,32 +3,56 @@
 import test from 'ava';
 import sinon from 'sinon';
 
-const giphy = require('giphy-api')(process.env.GIPHY_KEY || 'dc6zaTOxFJmzC');
+const Giphy = require('../lib/giphy.js');
+
+var store = function(ms, f) {
+	return {
+		member: {
+			sendMessage: (m) => {
+				ms.push(m);
+			}
+		},
+		channel: {
+			sendMessage: (m) => {
+				ms.push(m);
+			},
+			sendFile: (url) => {
+				f.push(url);
+			}
+		}
+	}
+}
 
 test('Can get random giphy', async t => {
-    const bar = giphy.random({ limit: 1, rating: 'r' })
-			.then((results) => {
-				if (results && results.data) {
-					//console.log(results.data.url);
-                    //return results.data.url;
-                    t.true(results.data.url.length > 0);
-				} else {
-                    console.log(error);
-				}
-			}).catch(console.log);
-    await bar;
+	let sent = [];
+	let fl = [];
+	let stb = store(sent, fl);
+	stb.content = '!gif';
+	
+	const bar = await Giphy.giphy(stb)
+	
+	t.true(fl.length > 0);
 });
 
 test('Can get giphy', async t => {
-    const bar = giphy.random({ s: 'dank 420', limit: 1, rating: 'r' })
-			.then((results) => {
-				if (results && results.data) {
-					//console.log(results.data.url);
-                    //return results.data.url;
-                    t.true(results.data.url.length > 0);
-				} else {
-                    console.log(error);
-				}
-			}).catch(console.log);
-    await bar;
+	let sent = [];
+	let fl = [];
+	let stb = store(sent, fl);
+	stb.content = '!gif dank 420';
+	
+	const bar = await Giphy.giphy(stb)
+	
+	t.true(fl.length > 0);
+});
+
+test('Try get giphy with unmatchable string sends text message', async t => {
+	let sent = [];
+	let fl = [];
+	let stb = store(sent, fl);
+	stb.content = '!gif nothingwillmatchthishaha123098';
+	
+	const bar = await Giphy.giphy(stb)
+	
+	t.true(fl.length === 0);
+	t.true(sent.length > 0);
 });

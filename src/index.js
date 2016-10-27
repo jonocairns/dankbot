@@ -8,8 +8,13 @@ const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
 const Speller = require('./lib/spellchecker.js');
 const Dota = require('./lib/dota.js');
+const Clear = require('./lib/clear.js');
+const Imdb = require('./lib/imdb.js');
+const Urban = require('./lib/urban.js');
+const Giphy = require('./lib/giphy.js');
+const Hltv = require('./lib/hltv.js');
+const Help = require('./lib/help.js');
 const LocalDevConfig = require('../env.json');
-const Promise = require('promise');
 const fml = require('random_fml');
 const chuck = require('chuck-norris-api');
 
@@ -74,10 +79,10 @@ class Dank {
 
 	setDefaultCommands() {
 		this.commands.set(new RegExp(`${this.triggerPrefix}help`, 'i'), ['function',
-            Message.displayCommands,
+            Help.displayCommands,
         ]);
 		this.commands.set(new RegExp('!meme', 'i'), ['function',
-            Dank.playRandomSound.bind(this),
+            Player.playRandomSound.bind(this),
         ]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}tts`, 'i'), ['function',
             this.speech.bind(this),
@@ -92,22 +97,22 @@ class Dank {
             Message.getInviteLink,
         ]);
 		this.commands.set(new RegExp('!ud', 'i'), ['function',
-            Message.urbanDictionary,
+            Urban.query,
         ]);
 		this.commands.set(new RegExp('!imdb', 'i'), ['function',
-            Message.omdb,
+            Imdb.query,
         ]);
 		this.commands.set(new RegExp('!coin', 'i'), ['function',
             Message.coin,
         ]);
 		this.commands.set(new RegExp('!gif', 'i'), ['function',
-            Message.giphy,
+            Giphy.giphy,
         ]);
 		this.commands.set(new RegExp('!mama', 'i'), ['function',
             Message.yomama,
         ]);
 		this.commands.set(new RegExp('!hltv', 'i'), ['function',
-            Message.currentGames,
+            Hltv.currentGames,
         ]);
 		this.commands.set(new RegExp('!spell', 'i'), ['function',
 			(message) => {
@@ -117,7 +122,7 @@ class Dank {
 			},
         ]);
 		this.commands.set(new RegExp('!clear', 'i'), ['function',
-            Dank.clear,
+            Clear.purge,
         ]);
 		this.commands.set(new RegExp('!yt', 'i'), ['function',
             Player.playYt,
@@ -141,41 +146,6 @@ class Dank {
         ]);
 	}
 
-	static clear(message) {
-		const splitty = message.content.split(' ');
-		let numberToPurge = 10;
-
-		if (!message.member.hasPermission('MANAGE_MESSAGES')) {
-			message.channel.sendMessage('Fuck off and check your privilege.');
-			return;
-		}
-		if (splitty.length > 1) {
-			numberToPurge = message.content.split(' ')[1];
-			const isNumber = !isNaN(parseFloat(numberToPurge)) && isFinite(numberToPurge);
-			if (!isNumber) {
-				message.channel.sendMessage('Supply a fucking proper number you fuck.');
-				return;
-			}
-			numberToPurge = parseInt(numberToPurge, 10);
-		}
-
-		message.channel.sendMessage('Cleanup on aisle five...').then((ms) => {
-			ms.delete(1000).then(() => {
-				message.channel.fetchMessages({ limit: numberToPurge }).then((messagesToDelete) => {
-					const messagePromises = messagesToDelete.deleteAll();
-					Promise.all(messagePromises).then(() => {
-						message.channel.sendMessage('RIP in peace sweet prince...').then((s) => {
-							s.delete(1000);
-						});
-					}).catch((e) => {
-						message.channel.sendMessage(':face_palm: I might not have the right permissions to do that m8ty.');
-						console.log(e);
-					});
-				});
-			});
-		});
-	}
-
 	speech(message) {
 		const obj = Tts.process(message, this.commands);
 		if (!obj.isEmpty) {
@@ -183,17 +153,6 @@ class Dank {
 			const reg = new RegExp(`!${obj.cmd}`, 'i');
 			this.commands.set(reg, ['text', obj.content]);
 		}
-	}
-
-	static playRandomSound(message, commands) {
-		const keys = [...commands.keys()];
-		let randomKey;
-		let randomValue = ['', ''];
-		while (randomValue[0] !== 'sound') {
-			randomKey = keys[Math.round(keys.length * Math.random())];
-			randomValue = commands.get(randomKey);
-		}
-		Player.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
 	}
 
 	static tryMe(fn, msg) {

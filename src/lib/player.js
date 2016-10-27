@@ -53,6 +53,17 @@ class Player {
 		});
 	}
 
+	static playRandomSound(message, commands) {
+		const keys = [...commands.keys()];
+		let randomKey;
+		let randomValue = ['', ''];
+		while (randomValue[0] !== 'sound') {
+			randomKey = keys[Math.round(keys.length * Math.random())];
+			randomValue = commands.get(randomKey);
+		}
+		Player.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
+	}
+
 	static validateYoutubeUrl(url) {
 		const p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
 		return (url.match(p));
