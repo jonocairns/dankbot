@@ -25,6 +25,7 @@
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
     "ava": "^0.16.0",
+    "aws-sdk": "^2.6.12",
     "chuck-norris-api": "^1.0.8",
     "discord.js": "~9.3.0",
     "giphy-api": "^1.2.1",
