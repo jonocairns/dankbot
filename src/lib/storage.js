@@ -2,6 +2,7 @@ const AWS = require('aws-sdk');
 const fs = require('fs');
 const TestConfig = require('../../env.json');
 const Promise = require('promise');
+const request = require('request');
 
 AWS.config.region = 'us-west-2';
 
@@ -12,9 +13,15 @@ if (!process.env.AWS_ACCESS_KEY_ID && !process.env.AWS_SECRET_ACCESS_KEY) {
 
 class Storage {
 
-	static upload(filePath, cb) {
-		const body = fs.createReadStream(filePath);
-		const name = filePath.split('/').pop();
+	static upload(url, fileName, cb) {
+		// downloading file to active instance
+		const location = `sounds/${fileName}`;
+		console.log(`downloading ${url} to ${location}`);
+		request(url).pipe(fs.createWriteStream(location));
+
+		const body = fs.createReadStream(location);
+		const name = location.split('/').pop();
+		console.log(`uploading ${name} to AWS.`);
 		const s3obj = new AWS.S3({ params: { Bucket: 'dankbot', Key: name } });
 		s3obj.upload({ Body: body })
         .on('httpUploadProgress', (evt) => { console.log(evt); })

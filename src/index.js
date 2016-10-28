@@ -14,6 +14,7 @@ const Urban = require('./lib/urban.js');
 const Giphy = require('./lib/giphy.js');
 const Hltv = require('./lib/hltv.js');
 const Help = require('./lib/help.js');
+const Storage = require('./lib/storage.js');
 const LocalDevConfig = require('../env.json');
 const fml = require('random_fml');
 const chuck = require('chuck-norris-api');
@@ -142,6 +143,16 @@ class Dank {
 		this.commands.set(new RegExp('!chuck', 'i'), ['function',
 			(message) => {
 				chuck.getRandom().then(f => message.channel.sendMessage(f.value.joke));
+			},
+        ]);
+		this.commands.set(new RegExp('!addmeme', 'i'), ['function',
+			(message) => {
+				const attachment = message.attachment;
+				const cmd = attachment.filename.split('.')[0];
+				Storage.upload(attachment.url, attachment.filename, () => {
+					const reg = new RegExp(`!${cmd}`, 'i');
+					this.commands.set(reg, ['sound', cmd]);
+				});
 			},
         ]);
 	}
