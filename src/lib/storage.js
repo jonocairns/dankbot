@@ -30,6 +30,10 @@ class Storage {
 
 	static downloadMany(downloadLocation) {
         // download location could be something like ../sounds/
+		if (!fs.existsSync(downloadLocation)) {
+			fs.mkdirSync(downloadLocation);
+		}
+
 		return new Promise((resolve, reject) => {
 			Storage.listContentsOfBucket((err, data) => {
 				if (err) { reject(err); }
