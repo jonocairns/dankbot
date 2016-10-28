@@ -146,30 +146,32 @@ class Dank {
 			},
         ]);
 		this.commands.set(new RegExp('!addmeme', 'i'), ['function',
-			(message) => {
-				if (message.attachments.array().length === 0) {
-					message.channel.sendMessage('Add a fucking attachment you idiot.');
-					return;
-				}
-				const attachment = message.attachments.array()[0];
-				const cmd = attachment.fileName.split('.')[0];
-				if (attachment.fileName.split('.')[1] !== 'wav' || attachment.fileName.split('.')[1] !== 'mp3') {
-					message.channel.sendMessage('Not the right fucking file type m8. mp3 or wav only.');
-					return;
-				}
-
-				const doesAlreadyExist = File.doesAlreadyExists(cmd, this.commands);
-				if (doesAlreadyExist) {
-					message.channel.sendMessage(`The command ${cmd} already fuckin exists. Change the filename of your fucking attachment to something less retarded.`);
-				}
-
-				Storage.upload(attachment.url, attachment.filename, () => {
-					console.log(`Adding ${cmd} command...`);
-					const reg = new RegExp(`!${cmd}`, 'i');
-					this.commands.set(reg, ['sound', cmd]);
-				});
-			},
+			this.add().bind(this),
         ]);
+	}
+
+	add(message) {
+		if (message.attachments.array().length === 0) {
+			message.channel.sendMessage('Add a fucking attachment you idiot.');
+			return;
+		}
+		const attachment = message.attachments.array()[0];
+		const cmd = attachment.fileName.split('.')[0];
+		if (attachment.fileName.split('.')[1] !== 'wav' || attachment.fileName.split('.')[1] !== 'mp3') {
+			message.channel.sendMessage('Not the right fucking file type m8. mp3 or wav only.');
+			return;
+		}
+
+		const doesAlreadyExist = File.doesAlreadyExists(cmd, this.commands);
+		if (doesAlreadyExist) {
+			message.channel.sendMessage(`The command ${cmd} already fuckin exists. Change the filename of your fucking attachment to something less retarded.`);
+		}
+
+		Storage.upload(attachment.url, attachment.filename, () => {
+			console.log(`Adding ${cmd} command...`);
+			const reg = new RegExp(`!${cmd}`, 'i');
+			this.commands.set(reg, ['sound', cmd]);
+		});
 	}
 
 	speech(message) {
