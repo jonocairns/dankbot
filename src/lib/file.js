@@ -8,7 +8,7 @@ class File {
 
 		Database.loadMany('sounds', (sounds) => {
 			const newCommands = [];
-			Storage.downloadMany('./sounds/').then(() => {
+			Storage.downloadMany('sounds/').then(() => {
 				fs.readdir('./sounds', {}, (err, files) => {
 					const commands = new Map();
 					files.forEach((element) => {
