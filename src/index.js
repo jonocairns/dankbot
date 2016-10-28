@@ -151,13 +151,15 @@ class Dank {
 	}
 
 	add(message) {
-		if (message.attachments.array().length === 0) {
-			message.channel.sendMessage('Add a fucking attachment you idiot.');
+		const parts = message.content.split(' ');
+		const url = parts[2];
+		if (parts.length !== 3) {
+			message.channel.sendMessage('It should be (!)addmeme memeCommand urlToFile');
 			return;
 		}
-		const attachment = message.attachments.array()[0];
-		const cmd = attachment.fileName.split('.')[0];
-		if (attachment.fileName.split('.')[1] !== 'wav' || attachment.fileName.split('.')[1] !== 'mp3') {
+
+		const cmd = parts[1];
+		if (url.split('.')[1] !== 'wav' || url.fileName.split('.')[1] !== 'mp3') {
 			message.channel.sendMessage('Not the right fucking file type m8. mp3 or wav only.');
 			return;
 		}
@@ -167,7 +169,7 @@ class Dank {
 			message.channel.sendMessage(`The command ${cmd} already fuckin exists. Change the filename of your fucking attachment to something less retarded.`);
 		}
 
-		Storage.upload(attachment.url, attachment.filename, () => {
+		Storage.upload(url, `${cmd}.${url.split('.')[1]}`, () => {
 			console.log(`Adding ${cmd} command...`);
 			const reg = new RegExp(`!${cmd}`, 'i');
 			this.commands.set(reg, ['sound', cmd]);
