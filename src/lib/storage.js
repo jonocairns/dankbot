@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const TestConfig = require('../../env.json');
+const Promise = require('promise');
 
 AWS.config.region = 'us-west-2';
 
@@ -23,29 +24,41 @@ class Storage {
 	static listContentsOfBucket(cb) {
 		const s3obj = new AWS.S3();
 		s3obj.listObjects({ Bucket: 'dankbot' }, (err, data) => {
-			if (data.IsTruncated) {
-				console.log('trunkated');
-			} else {
-				cb(err, data.Contents);
-			}
+			cb(err, data.Contents);
 		});
 	}
 
-	static download(file, filePath, cb) {
+	static downloadMany(downloadLocation) {
+        // download location could be something like ../sounds/
+		return new Promise((resolve, reject) => {
+			Storage.listContentsOfBucket((err, data) => {
+				if (err) { reject(err); }
+
+				const fileDownloadPromises = [];
+				data.forEach((item) => {
+					fileDownloadPromises.push(Storage.download(item.Key, downloadLocation + item.Key, () => { }));
+				});
+				Promise.all(fileDownloadPromises).then(() => { resolve(); });
+			});
+		});
+	}
+
+	static download(file, filePath) {
 		const s3 = new AWS.S3();
 		const params = { Bucket: 'dankbot', Key: file };
 		const f = fs.createWriteStream(filePath);
 
-		f.on('close', () => {
-			console.log('done');
-			cb();
+		return new Promise((resolve, reject) => {
+			f.on('close', () => { resolve(); });
+			s3.getObject(params).createReadStream().on('error', (err) => {
+				console.log(err);
+				reject(err);
+			}).pipe(f);
 		});
-		s3.getObject(params).createReadStream().on('error', (err) => {
-			console.log(err);
-		}).pipe(f);
 	}
 
 	static store() {
+        // look in to this to replace mongo
 		const s3 = new AWS.S3();
 		s3.createBucket(() => {
 			const params = { Key: 'myKey', Body: 'Hello!' };

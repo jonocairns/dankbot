@@ -26,10 +26,8 @@ test.cb('Can upload file to aws', t => {
 test.cb('Can get file list from aws', t => {
     storage.listContentsOfBucket((err, data) => {
         let d = data;
-        console.log(data.length);
-        d.forEach((item) => {
-            // console.log(item.Key);
-        });
+        t.not(data, undefined);
+        t.not(data, null);
         t.end();
     });
 });
@@ -37,9 +35,16 @@ test.cb('Can get file list from aws', t => {
 test.cb('Can download file list from aws', t => {
     storage.listContentsOfBucket((err, data) => {
         let d = data.slice(data.length - 1);
-        console.log(data.length);
+        let promises = [];
         d.forEach((item) => {
-            storage.download(item.Key, 'dump/' + item.Key, () => { t.end();  });
+            promises.push(storage.download(item.Key, 'dump/' + item.Key, () => { t.end();  }));
+        });
+        Promise.all(promises).then(() => {
+            t.end();
         });
     });
+});
+
+test('Can download many from aws', async t => {
+    await storage.downloadMany('./dump/');
 });
