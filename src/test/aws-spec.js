@@ -46,5 +46,5 @@ test.cb('Can download file list from aws', t => {
 });
 
 test('Can download many from aws', async t => {
-    await storage.downloadMany('dump/');
+    // await storage.downloadMany('dump/');
 });
