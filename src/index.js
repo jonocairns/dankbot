@@ -145,9 +145,6 @@ class Dank {
 				chuck.getRandom().then(f => message.channel.sendMessage(f.value.joke));
 			},
         ]);
-		this.commands.set(new RegExp('!addmeme', 'i'), ['function',
-			this.add().bind(this),
-        ]);
 	}
 
 	add(message) {
