@@ -17,15 +17,17 @@ class Storage {
 		// downloading file to active instance
 		const location = `sounds/${fileName}`;
 		console.log(`downloading ${url} to ${location}`);
-		request(url).pipe(fs.createWriteStream(location));
-
-		const body = fs.createReadStream(location);
-		const name = location.split('/').pop();
-		console.log(`uploading ${name} to AWS.`);
-		const s3obj = new AWS.S3({ params: { Bucket: 'dankbot', Key: name } });
-		s3obj.upload({ Body: body })
-        .on('httpUploadProgress', (evt) => { console.log(evt); })
-        .send((err, data) => { console.log(err, data); cb(err, data); });
+		const stream = request(url).pipe(fs.createWriteStream(location));
+		stream.on('finish', () => {
+			console.log('Completed sound download to server...');
+			const body = fs.createReadStream(location);
+			const name = location.split('/').pop();
+			console.log(`uploading ${name} to AWS.`);
+			const s3obj = new AWS.S3({ params: { Bucket: 'dankbot', Key: name } });
+			s3obj.upload({ Body: body })
+			.on('httpUploadProgress', (evt) => { console.log(evt); })
+			.send((err, data) => { console.log(err, data); cb(err, data); });
+		});
 	}
 
 	static listContentsOfBucket(cb) {
