@@ -11,7 +11,7 @@ class Hltv {
 					const team1 = parent.children('.matchTeam1Cell').find('a').text().trim();
 					const team2 = parent.children('.matchTeam2Cell').find('a').text().trim();
 					const locator = parent.children('.matchActionCell').find('a').attr('href').trim();
-					const link = `http://www.hltv.org${locator}`;
+					const link = `<http://www.hltv.org${locator}>`;
 					games += (`**${team1}** is playing **${team2}** -> ${link}.\r\n\r\n`);
 				});
 
