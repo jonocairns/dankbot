@@ -27,6 +27,7 @@
     "ava": "^0.16.0",
     "aws-sdk": "^2.6.12",
     "chuck-norris-api": "^1.0.8",
+    "cleverbot-node": "^0.2.2",
     "discord.js": "~9.3.0",
     "giphy-api": "^1.2.1",
     "jsdom": "^9.8.0",

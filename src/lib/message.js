@@ -2,6 +2,9 @@ const config = require('../config.json');
 const Player = require('./player.js');
 const random = require('random-js')();
 const request = require('request');
+const Cleverbot = require('cleverbot-node');
+
+const clever = new Cleverbot();
 
 class Message {
 	constructor() {
@@ -94,6 +97,15 @@ class Message {
 						message.delete();
 					}
 				}
+			});
+		}
+		if (message.isMentioned(bot.user)) {
+			const words = message.content.split(' ').slice(1).join(' ');
+
+			Cleverbot.prepare(() => {
+				clever.write(words, (response) => {
+					message.channel.sendMessage(`<@${message.author.id}> ${response.message}`);
+				});
 			});
 		}
 	}
