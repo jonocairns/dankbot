@@ -39,7 +39,7 @@ class File {
 	static doesAlreadyExists(cmd, list) {
 		list.forEach((item, regexp) => {
 			if (cmd.match(regexp)) {
-				console.log(`${cmd} already exists. Change the name for it.`);
+				console.log(`${cmd} already exists and conflicts with the regex ${regexp}. Change the name for it.`);
 			}
 		});
 	}
