@@ -32,7 +32,7 @@ class Dota {
 								if (g.duration) {
 									msg += `This game started around ${Math.ceil(g.duration / 60)} minutes ago and currently has ${g.spectators} people watching.\r\n`;
 								}
-								msg += `http://www.trackdota.com/matches/${g.id}\r\n\r\n`;
+								msg += `<http://www.trackdota.com/matches/${g.id}>\r\n\r\n`;
 								count += 1;
 							}
 						});
