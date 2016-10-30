@@ -3,36 +3,44 @@ const Database = require('./db.js');
 const Storage = require('./storage.js');
 
 class File {
+	static readFs(callback, sounds) {
+		const newCommands = [];
+		fs.readdir('./sounds', {}, (err, files) => {
+			const commands = new Map();
+			files.forEach((element) => {
+				const cmd = element.split('.')[0];
+				if (cmd) {
+					const reg = new RegExp(`!${cmd}`, 'i');
+					File.doesAlreadyExists(`!${cmd}`, commands);
+
+					commands.set(reg, ['sound', element]);
+
+					const doesSoundExistsInStore = File.containsObject({ sound: cmd }, sounds);
+
+					if (!doesSoundExistsInStore) {
+						newCommands.push({ sound: cmd });
+					}
+				}
+			});
+			if (newCommands.length > 0) {
+				Database.saveMany('sounds', newCommands);
+			}
+			console.log(`Completed loading ${files.length} files!`);
+			callback({ commands, newCommands });
+		});
+	}
+
 	static readSoundFiles(callback) {
 		console.log('Loading sounds...');
 
 		Database.loadMany('sounds', (sounds) => {
-			const newCommands = [];
-			Storage.downloadMany('sounds/').then(() => {
-				fs.readdir('./sounds', {}, (err, files) => {
-					const commands = new Map();
-					files.forEach((element) => {
-						const cmd = element.split('.')[0];
-						if (cmd) {
-							const reg = new RegExp(`!${cmd}`, 'i');
-							File.doesAlreadyExists(`!${cmd}`, commands);
-
-							commands.set(reg, ['sound', element]);
-
-							const doesSoundExistsInStore = File.containsObject({ sound: cmd }, sounds);
-
-							if (!doesSoundExistsInStore) {
-								newCommands.push({ sound: cmd });
-							}
-						}
-					});
-					if (newCommands.length > 0) {
-						Database.saveMany('sounds', newCommands);
-					}
-					console.log(`Completed loading ${files.length} files!`);
-					callback({ commands, newCommands });
+			if (fs.existsSync('sounds/')) {
+				File.readFs(callback, sounds);
+			} else {
+				Storage.downloadMany('sounds/').then(() => {
+					File.readFs(callback, sounds);
 				});
-			});
+			}
 		});
 	}
 

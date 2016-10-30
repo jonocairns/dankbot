@@ -15,6 +15,7 @@ const Giphy = require('./lib/giphy.js');
 const Hltv = require('./lib/hltv.js');
 const Help = require('./lib/help.js');
 const Storage = require('./lib/storage.js');
+const Twitch = require('./lib/twitch.js');
 const LocalDevConfig = require('../env.json');
 const fml = require('random_fml');
 const chuck = require('chuck-norris-api');
@@ -131,6 +132,9 @@ class Dank {
         ]);
 		this.commands.set(new RegExp('!yt', 'i'), ['function',
             Player.playYt,
+        ]);
+		this.commands.set(new RegExp('!twitch', 'i'), ['function',
+            Twitch.isCurrentlyStreaming,
         ]);
 		this.commands.set(new RegExp('!dota', 'i'), ['function',
 			(message) => {
