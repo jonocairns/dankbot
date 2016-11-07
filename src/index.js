@@ -243,3 +243,10 @@ class Dank {
 
 	dank.init();
 })();
+
+process.on('uncaughtException', (err) => {
+	console.log(err.stack);
+	console.error(err);
+	process.exit(1);
+	return true;
+});
