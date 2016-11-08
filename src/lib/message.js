@@ -84,7 +84,7 @@ class Message {
 							break;
 						case 'sound':
 							Player.playSound(message.member.voiceChannel,
-                                    regexp.toString().split('/')[1], botReply[1]
+                                    regexp.toString().split('/')[1], botReply[1],
                                 );
 							break;
 						case 'text':

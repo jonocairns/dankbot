@@ -85,74 +85,74 @@ class Dank {
 
 	setDefaultCommands() {
 		this.commands.set(new RegExp(`${this.triggerPrefix}help`, 'i'), ['function',
-            Help.displayCommands,
-        ]);
+			Help.displayCommands,
+		]);
 		this.commands.set(new RegExp('!meme', 'i'), ['function',
-            Player.playRandomSound.bind(this),
-        ]);
+			Player.playRandomSound.bind(this),
+		]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}tts`, 'i'), ['function',
-            this.speech.bind(this),
-        ]);
+			this.speech.bind(this),
+		]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}exit`, 'i'), ['function',
-            Dank.leaveVoiceChannel,
-        ]);
+			Dank.leaveVoiceChannel,
+		]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}game`, 'i'), ['function',
-            Message.letsPlay,
-        ]);
+			Message.letsPlay,
+		]);
 		this.commands.set(new RegExp(`${this.triggerPrefix}auth`, 'i'), ['function',
-            Message.getInviteLink,
-        ]);
+			Message.getInviteLink,
+		]);
 		this.commands.set(new RegExp('!ud', 'i'), ['function',
-            Urban.query,
-        ]);
+			Urban.query,
+		]);
 		this.commands.set(new RegExp('!imdb', 'i'), ['function',
-            Imdb.query,
-        ]);
+			Imdb.query,
+		]);
 		this.commands.set(new RegExp('!coin', 'i'), ['function',
-            Message.coin,
-        ]);
+			Message.coin,
+		]);
 		this.commands.set(new RegExp('!gif', 'i'), ['function',
-            Giphy.giphy,
-        ]);
+			Giphy.giphy,
+		]);
 		this.commands.set(new RegExp('!mama', 'i'), ['function',
-            Message.yomama,
-        ]);
+			Message.yomama,
+		]);
 		this.commands.set(new RegExp('!hltv', 'i'), ['function',
-            Hltv.currentGames,
-        ]);
+			Hltv.currentGames,
+		]);
 		this.commands.set(new RegExp('!spell', 'i'), ['function',
 			(message) => {
 				const spellerMessage = Speller.analyze(message.content);
 
 				message.channel.sendMessage(spellerMessage);
 			},
-        ]);
+		]);
 		this.commands.set(new RegExp('!clear', 'i'), ['function',
-            Clear.purge,
-        ]);
+			Clear.purge,
+		]);
 		this.commands.set(new RegExp('!yt', 'i'), ['function',
-            Player.playYt,
-        ]);
+			Player.playYt,
+		]);
 		this.commands.set(new RegExp('!twitch', 'i'), ['function',
-            Twitch.isCurrentlyStreaming,
-        ]);
+			Twitch.isCurrentlyStreaming,
+		]);
 		this.commands.set(new RegExp('!dota', 'i'), ['function',
 			(message) => {
 				Dota.currentGames((msg) => {
 					message.channel.sendMessage(msg);
 				});
 			},
-        ]);
+		]);
 		this.commands.set(new RegExp('!fml', 'i'), ['function',
 			(message) => {
 				fml().then(f => message.channel.sendMessage(f));
 			},
-        ]);
+		]);
 		this.commands.set(new RegExp('!chuck', 'i'), ['function',
 			(message) => {
 				chuck.getRandom().then(f => message.channel.sendMessage(f.value.joke));
 			},
-        ]);
+		]);
 	}
 
 	add(message) {

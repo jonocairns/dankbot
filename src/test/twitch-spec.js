@@ -4,6 +4,7 @@ import test from 'ava';
 import sinon from 'sinon';
 
 const request = require('request')
+const LocalDevConfig = require('../../env.json');
 
 test.cb('Can get twitch stream status', (t) => {
     if(!process.env.TWITCH) {

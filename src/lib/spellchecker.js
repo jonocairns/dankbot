@@ -4,7 +4,7 @@ class Spell {
 
 	static analyze(text) {
 		let words = text.split(' ').slice(1).join(' ');
-
+		// eslint-disable-next-line
 		words = words.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
 		words = words.replace(/\s{2,}/g, ' ');
 		words = words.split(' ');

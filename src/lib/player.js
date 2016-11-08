@@ -18,7 +18,7 @@ class Player {
 
 				dispatcher.on('error', (err) => {
 					Logger.logError(err,
-                        `There was an playing the sound ${config.soundPath + sound}`
+                        `There was an playing the sound ${config.soundPath + sound}`,
                     );
 				});
 				dispatcher.on('end', () => {
@@ -36,7 +36,7 @@ class Player {
 				});
 			}).catch((e) => {
 				Logger.trace(
-                    `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`
+                    `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`,
                 );
 				Logger.logError(e);
 			});
