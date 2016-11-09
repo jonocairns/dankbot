@@ -42,7 +42,7 @@ class Dank {
 			process.env.DANK_MONGODB = LocalDevConfig.mongo;
 		}
 
-		this.bot.login(process.env.DISCORD_BOT_TOKEN);
+		this.bot.login(process.env.DISCORD_BOT_TOKEN).catch((e) => console.log(e));
 		this.triggerPrefix = `${config.commandTrigger}${config.botPrefix} `;
 		this.setDefaultCommands();
 		this.setEventHandlers();
@@ -243,10 +243,3 @@ class Dank {
 
 	dank.init();
 })();
-
-process.on('uncaughtException', (err) => {
-	console.log(err.stack);
-	console.error(err);
-	process.exit(1);
-	return true;
-});
