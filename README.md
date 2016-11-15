@@ -6,7 +6,6 @@ A dank soundboard for discord. Check out the sounds folder for all the current l
 Uses node, es6, ava (tests), sinon (stub/mock), eslint, mongodb, circle-ci (build) and heroku (deployment/environment)
 
 ## Mini Docs
-Add memes to the sounds folder. Whatever you name the file will be ready when you launch the app. Eg dank.mp3 can be run with !dank.
 
 Add intro sounds for specific members of your discord channel. In mongodb inside your intros store
     
