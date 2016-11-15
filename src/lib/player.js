@@ -17,9 +17,7 @@ class Player {
 				const dispatcher = connection.playFile(config.soundPath + sound);
 
 				dispatcher.on('error', (err) => {
-					Logger.logError(err,
-                        `There was an playing the sound ${config.soundPath + sound}`,
-                    );
+					Logger.logError(err, `There was an playing the sound ${config.soundPath + sound}`);
 				});
 				dispatcher.on('end', () => {
 					if (config.saveStats) {
