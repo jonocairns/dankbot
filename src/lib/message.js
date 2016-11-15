@@ -22,6 +22,17 @@ class Message {
 		return isBanned;
 	}
 
+	static isUserAdmin(username) {
+		const admins = config.admins.split(',');
+		let isAdmin = false;
+		admins.forEach((bannedUsername) => {
+			if (bannedUsername === username) {
+				isAdmin = true;
+			}
+		});
+		return isAdmin;
+	}
+
 	static letsPlay(message, commands, bot) {
 		message.channel.sendTTSMessage('It\'s time for some cs boys. Chairs boys.');
 
@@ -73,6 +84,16 @@ class Message {
 	}
 
 	static messageHandler(message, bot, commands) {
+		if (Message.isUserAdmin(message.author.username) && message.content === '!restart') {
+			message.channel.sendMessage('brb fgts...').then((ms) => {
+				ms.delete(2000).then(() => {
+					console.log(`restarting bot. issued by ${message.author.username}`);
+					message.delete();
+					process.exit();
+				});
+			});
+		}
+
 		if (message.author.username !== bot.user.username && !Message.isUserBanned(
             message.author.username)) {
 			commands.forEach((botReply, regexp) => {
@@ -84,7 +105,7 @@ class Message {
 							break;
 						case 'sound':
 							Player.playSound(message.member.voiceChannel,
-                                    regexp.toString().split('/')[1], botReply[1]
+                                    regexp.toString().split('/')[1], botReply[1],
                                 );
 							break;
 						case 'text':
