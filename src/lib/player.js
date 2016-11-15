@@ -33,9 +33,7 @@ class Player {
 					}
 				});
 			}).catch((e) => {
-				Logger.trace(
-                    `There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`,
-                );
+				Logger.trace(`There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`);
 				Logger.logError(e);
 			});
 		}
