@@ -104,9 +104,7 @@ class Message {
 							botReply[1](message, commands, bot);
 							break;
 						case 'sound':
-							Player.playSound(message.member.voiceChannel,
-                                    regexp.toString().split('/')[1], botReply[1],
-                                );
+							Player.playSound(message.member.voiceChannel, regexp.toString().split('/')[1], botReply[1]);
 							break;
 						case 'text':
 							message.channel.sendTTSMessage(botReply[1]);
