@@ -44,7 +44,7 @@
     "ytdl-core": "^0.7.18"
   },
   "engines": {
-    "node": "6.11.1"
+    "node": "6.8.1"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
