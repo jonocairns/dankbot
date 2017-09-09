@@ -67,7 +67,7 @@ class Dank {
 			console.log(`Bot has started, with ${this.bot.users.size} users, in ${this.bot.channels.size} channels of ${this.bot.guilds.size} guilds.`);
 			// Example of changing the bot's playing game to something useful. `client.user` is what the
 			// docs refer to as the "ClientUser".
-			this.bot.user.setGame(`on ${this.bot.guilds.size} servers`);
+			this.bot.guilds.array().forEach(g => console.log(g));
 		});
 
 
