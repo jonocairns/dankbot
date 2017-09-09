@@ -62,6 +62,15 @@ class Dank {
 	}
 
 	setEventHandlers() {
+		this.bot.on("ready", () => {
+			// This event will run if the bot starts, and logs in, successfully.
+			console.log(`Bot has started, with ${this.bot.users.size} users, in ${this.bot.channels.size} channels of ${this.bot.guilds.size} guilds.`);
+			// Example of changing the bot's playing game to something useful. `client.user` is what the
+			// docs refer to as the "ClientUser".
+			this.bot.user.setGame(`on ${this.bot.guilds.size} servers`);
+		});
+
+
 		this.bot.on('error', (e) => {
 			Logger.logError(e);
 		});
@@ -184,7 +193,7 @@ class Dank {
 	speech(message) {
 		const obj = Tts.process(message, this.commands);
 		if (!obj.isEmpty) {
-			Database.insert('tts', obj, () => {});
+			Database.insert('tts', obj, () => { });
 			const reg = new RegExp(`!${obj.cmd}`, 'i');
 			this.commands.set(reg, ['text', obj.content]);
 		}
