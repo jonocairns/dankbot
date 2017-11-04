@@ -89,7 +89,7 @@ class Dank {
 
 		this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
 			Dank.tryMe(() => {
-				Player.introSounds(newUser.voiceChannel, newUser, this.intro);
+				// Player.introSounds(newUser.voiceChannel, newUser, this.intro);
 			});
 		});
 	}
