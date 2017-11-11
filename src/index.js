@@ -6,7 +6,7 @@ const File = require('./lib/file.js');
 const Tts = require('./lib/tts.js');
 const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
-const Speller = require('./lib/spellchecker.js');
+// const Speller = require('./lib/spellchecker.js');
 const Dota = require('./lib/dota.js');
 const Clear = require('./lib/clear.js');
 const Imdb = require('./lib/imdb.js');
@@ -58,7 +58,7 @@ class Dank {
 
 		this.loadStats();
 		this.loadTts();
-		this.loadIntros();
+		// this.loadIntros();
 	}
 
 	setEventHandlers() {
@@ -87,11 +87,11 @@ class Dank {
 			});
 		});
 
-		this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
-			Dank.tryMe(() => {
-				// Player.introSounds(newUser.voiceChannel, newUser, this.intro);
-			});
-		});
+		// this.bot.on('voiceStateUpdate', (oldUser, newUser) => {
+		// 	Dank.tryMe(() => {
+		// 		Player.introSounds(newUser.voiceChannel, newUser, this.intro);
+		// 	});
+		// });
 	}
 
 	setDefaultCommands() {
@@ -131,13 +131,13 @@ class Dank {
 		this.commands.set(new RegExp('!hltv', 'i'), ['function',
 			Hltv.currentGames,
 		]);
-		this.commands.set(new RegExp('!spell', 'i'), ['function',
-			(message) => {
-				const spellerMessage = Speller.analyze(message.content);
+		// this.commands.set(new RegExp('!spell', 'i'), ['function',
+		// 	(message) => {
+		// 		const spellerMessage = Speller.analyze(message.content);
 
-				message.channel.sendMessage(spellerMessage);
-			},
-		]);
+		// 		message.channel.sendMessage(spellerMessage);
+		// 	},
+		// ]);
 		this.commands.set(new RegExp('!clear', 'i'), ['function',
 			Clear.purge,
 		]);
