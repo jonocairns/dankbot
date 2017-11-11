@@ -1,7 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
 
 class Database {
-
 	static run(func) {
 		try {
 			MongoClient.connect(process.env.DANK_MONGODB, (err, db) => {

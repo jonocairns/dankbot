@@ -6,7 +6,6 @@ const File = require('./lib/file.js');
 const Tts = require('./lib/tts.js');
 const Message = require('./lib/message.js');
 const Database = require('./lib/db.js');
-// const Speller = require('./lib/spellchecker.js');
 const Dota = require('./lib/dota.js');
 const Clear = require('./lib/clear.js');
 const Imdb = require('./lib/imdb.js');
@@ -62,14 +61,14 @@ class Dank {
 	}
 
 	setEventHandlers() {
-		this.bot.on("ready", () => {
+		this.bot.on('ready', () => {
 			// This event will run if the bot starts, and logs in, successfully.
 			console.log(`Bot has started, with ${this.bot.users.size} users, in ${this.bot.channels.size} channels of ${this.bot.guilds.size} guilds.`);
 			// Example of changing the bot's playing game to something useful. `client.user` is what the
 			// docs refer to as the "ClientUser".
 			console.log('Listing guilds...');
 			this.bot.guilds.array().forEach(g => console.log(g.name));
-			console.log('End of guild list.');			
+			console.log('End of guild list.');
 		});
 
 
@@ -131,13 +130,6 @@ class Dank {
 		this.commands.set(new RegExp('!hltv', 'i'), ['function',
 			Hltv.currentGames,
 		]);
-		// this.commands.set(new RegExp('!spell', 'i'), ['function',
-		// 	(message) => {
-		// 		const spellerMessage = Speller.analyze(message.content);
-
-		// 		message.channel.sendMessage(spellerMessage);
-		// 	},
-		// ]);
 		this.commands.set(new RegExp('!clear', 'i'), ['function',
 			Clear.purge,
 		]);

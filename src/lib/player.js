@@ -4,11 +4,12 @@ const Database = require('./db.js');
 const ytdl = require('ytdl-core');
 
 class Player {
-
 	static playSound(authorVoiceChannel, command, sound) {
 		if (authorVoiceChannel) {
-			authorVoiceChannel.join().then((connection,
-                joinError) => {
+			authorVoiceChannel.join().then((
+				connection,
+				joinError,
+			) => {
 				if (joinError) {
 					const joinErrorMessage =
                         'Error joining voice channel: ';
@@ -87,30 +88,30 @@ class Player {
 
 		const streamOptions = { seek: time, volume: vol };
 		message.member.voiceChannel.join()
-		.then((connection) => {
-			console.log('Connected to voice channel... Attempting to play video');
-			const stream = ytdl(url);
-			stream.on('error', (error) => {
-				message.channel.sendMessage('Some bad shit went down. Probs some shit with yo shitty youtube video. RIP');
-				console.log(error);
-				error.destroy();
-			});
+			.then((connection) => {
+				console.log('Connected to voice channel... Attempting to play video');
+				const stream = ytdl(url);
+				stream.on('error', (error) => {
+					message.channel.sendMessage('Some bad shit went down. Probs some shit with yo shitty youtube video. RIP');
+					console.log(error);
+					error.destroy();
+				});
 
-			stream.on('response', (res) => {
-				if (res.statusCode === 403) {
-					message.channel.sendMessage('Can\'t play that shitty video..');
-					console.log(`code:${res.statusCode} message:${res.statusMessage}`);
-					console.log(res);
-					res.destroy();
-				}
-			});
+				stream.on('response', (res) => {
+					if (res.statusCode === 403) {
+						message.channel.sendMessage('Can\'t play that shitty video..');
+						console.log(`code:${res.statusCode} message:${res.statusMessage}`);
+						console.log(res);
+						res.destroy();
+					}
+				});
 
-			const dispatcher = connection.playStream(stream, streamOptions);
-			dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
-			// dispatcher.on('debug', console.log);
-			// connection.player.on('debug', console.log);
-			connection.player.on('error', err => console.log('Connection issue occured', err));
-		}).catch(console.log);
+				const dispatcher = connection.playStream(stream, streamOptions);
+				dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
+				// dispatcher.on('debug', console.log);
+				// connection.player.on('debug', console.log);
+				connection.player.on('error', err => console.log('Connection issue occured', err));
+			}).catch(console.log);
 		message.delete();
 	}
 }

@@ -8,27 +8,27 @@ class Giphy {
 		if (contents.length === 1) {
 			// console.log('Attempting random giphy search');
 			return giphy.random({ limit: 1, rating: 'r' })
+				.then((results) => {
+					if (results && results.data && results.data.id) {
+						const url = `https://media.giphy.com/media/${results.data.id}/giphy.gif`;
+						// console.log(`Got url from giphy ${url}`);
+						message.channel.sendFile(url);
+					} else {
+						message.channel.sendMessage('Fuck.');
+					}
+				}).catch(console.log);
+		}
+		// console.log(`Attempting to get gif for ${keywords}...`);
+		return giphy.translate({ s: keywords, limit: 1, rating: 'r' })
 			.then((results) => {
 				if (results && results.data && results.data.id) {
 					const url = `https://media.giphy.com/media/${results.data.id}/giphy.gif`;
 					// console.log(`Got url from giphy ${url}`);
 					message.channel.sendFile(url);
 				} else {
-					message.channel.sendMessage('Fuck.');
+					message.channel.sendMessage('I don\'t know what you searched but it was fucking retarded and therefore had zero results.');
 				}
 			}).catch(console.log);
-		}
-		// console.log(`Attempting to get gif for ${keywords}...`);
-		return giphy.translate({ s: keywords, limit: 1, rating: 'r' })
-		.then((results) => {
-			if (results && results.data && results.data.id) {
-				const url = `https://media.giphy.com/media/${results.data.id}/giphy.gif`;
-				// console.log(`Got url from giphy ${url}`);
-				message.channel.sendFile(url);
-			} else {
-				message.channel.sendMessage('I don\'t know what you searched but it was fucking retarded and therefore had zero results.');
-			}
-		}).catch(console.log);
 	}
 }
 

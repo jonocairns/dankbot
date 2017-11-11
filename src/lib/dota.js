@@ -1,7 +1,6 @@
 const request = require('request');
 
 class Dota {
-
 	static currentGames(cb) {
 		const options = {
 			url: 'http://www.trackdota.com/data/games_v2.json',

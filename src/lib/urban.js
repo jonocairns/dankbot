@@ -2,7 +2,6 @@ const urban = require('urban');
 const Message = require('./message.js');
 
 class Urban {
-
 	static query(message) {
 		const mer = message.content.split(' ');
 		const contents = mer.slice(1).join(' ');

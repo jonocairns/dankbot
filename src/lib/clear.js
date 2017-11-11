@@ -1,7 +1,6 @@
 const Promise = require('promise');
 
 class Clear {
-
 	static purge(message) {
 		const splitty = message.content.split(' ');
 		let numberToPurge = 10;

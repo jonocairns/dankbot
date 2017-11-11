@@ -4,7 +4,7 @@
   "description": "A dank discord bot",
   "main": "src/index.js",
   "scripts": {
-    "lint": "node_modules/.bin/eslint **/*.js",
+    "lint": "eslint **/*.js",
     "test": "ava **/*-spec.js --verbose",
     "start": "node src/index.js",
     "prep": "node_modules/.bin/eslint **/*.js --fix && ava **/*-spec.js --verbose"
@@ -45,17 +45,18 @@
   },
   "engines": {
     "node": "8.6.0",
-    "npm" : "5.3.0"
+    "npm": "5.3.0"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
     "babel-preset-es2015": "^6.16.0",
     "babel-preset-stage-2": "^6.17.0",
     "babel-register": "^6.16.3",
-    "eslint": "^3.8.1",
-    "eslint-config-airbnb": "^12.0.0",
-    "eslint-plugin-import": "^1.16.0",
-    "eslint-plugin-jsx-a11y": "^1.0.0"
+    "eslint": "^4.11.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0"
   },
   "ava": {
     "babel": {

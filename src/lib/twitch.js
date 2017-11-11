@@ -2,7 +2,6 @@ const request = require('request');
 const LocalDevConfig = require('../../env.json');
 
 class Twitch {
-
 	static timeSince(date) {
 		const seconds = Math.floor((new Date() - date) / 1000);
 

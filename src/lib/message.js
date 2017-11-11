@@ -94,8 +94,7 @@ class Message {
 			});
 		}
 
-		if (message.author.username !== bot.user.username && !Message.isUserBanned(
-            message.author.username)) {
+		if (message.author.username !== bot.user.username && !Message.isUserBanned(message.author.username)) {
 			commands.forEach((botReply, regexp) => {
 				if (message.content.match(regexp)) {
 					try {
