@@ -8,4 +8,4 @@ test:
     - npm run lint
 machine:
   node:
-    version: 6.8.1
+    version: 8.6.0
