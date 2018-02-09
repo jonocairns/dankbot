@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Discord = require('discord.js');
 const config = require('./config.json');
 const Logger = require('./lib/logger.js');

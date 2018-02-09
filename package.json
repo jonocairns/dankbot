@@ -41,16 +41,17 @@
     "random_fml": "^1.0.3",
     "request": "^2.75.0",
     "sinon": "^1.17.6",
-    "sodium": "^2.0.1",
+    "sodium": "2.0.1",
     "soundcloudr": "^1.1.0",
     "spellchecker": "^3.3.1",
     "urban": "^0.3.1",
     "uws": "^8.14.1",
-    "ytdl-core": "^0.7.18"
+    "ytdl-core": "^0.20.1",
+    "dotenv": "^5.0.0"
   },
   "engines": {
-    "node": "8.6.0",
-    "npm": "5.3.0"
+    "node": "8.9.0",
+    "npm": "5.5.1"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
