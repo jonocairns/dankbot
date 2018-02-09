@@ -1,27 +1,11 @@
 'use strict';
+require('dotenv').config({path: '../../.env'});
 
 import test from 'ava';
 import sinon from 'sinon';
 
 const storage = require('../lib/storage.js');
 const fs = require('fs');
-
-test.cb('Can upload file to aws', t => {
-    // fs.readdir('../../sounds', {}, (err, files) => {
-    //     let c = 0;
-    //     const commands = new Map();
-    //     files.forEach((element) => {
-    //         storage.upload('../../sounds/' + element, (err, data) => {
-    //             c += 1;
-    //             console.log('File: ' + c);
-    //             if(c === files.length) {
-    //                 t.end();
-    //             }
-    //         });
-    //     });
-    // });    
-    t.end();
-});
 
 test.cb('Can get file list from aws', t => {
     storage.listContentsOfBucket((err, data) => {

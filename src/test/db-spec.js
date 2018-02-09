@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config({path: '../../.env'});
 
 import test from 'ava';
 

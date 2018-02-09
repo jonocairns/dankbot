@@ -12,7 +12,6 @@ const Clear = require('./lib/clear.js');
 const Imdb = require('./lib/imdb.js');
 const Urban = require('./lib/urban.js');
 const Giphy = require('./lib/giphy.js');
-const Hltv = require('./lib/hltv.js');
 const Help = require('./lib/help.js');
 const Storage = require('./lib/storage.js');
 const Twitch = require('./lib/twitch.js');
@@ -127,9 +126,6 @@ class Dank {
 		]);
 		this.commands.set(new RegExp('!mama', 'i'), ['function',
 			Message.yomama,
-		]);
-		this.commands.set(new RegExp('!hltv', 'i'), ['function',
-			Hltv.currentGames,
 		]);
 		this.commands.set(new RegExp('!clear', 'i'), ['function',
 			Clear.purge,
