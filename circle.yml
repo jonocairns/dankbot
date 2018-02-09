@@ -1,3 +1,13 @@
+machine:
+  node:
+    version: 8.9.0
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+dependencies:
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
 deployment:
   production:
     branch: master
@@ -6,6 +16,3 @@ deployment:
 test:
   pre:
     - yarn run lint
-machine:
-  node:
-    version: 8.9.0
