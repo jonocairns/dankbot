@@ -14,5 +14,7 @@ deployment:
     heroku:
       appname: dankbot-69
 test:
+  override:
+    - yarn test
   pre:
     - yarn run lint
