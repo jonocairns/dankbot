@@ -5,7 +5,7 @@ deployment:
       appname: dankbot-69
 test:
   pre:
-    - npm run lint
+    - yarn run lint
 machine:
   node:
-    version: 8.6.0
+    version: 8.9.0
