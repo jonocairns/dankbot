@@ -24,7 +24,7 @@ class Storage {
 			const body = fs.createReadStream(location);
 			const name = location.split('/').pop();
 			console.log(`uploading ${name} to AWS.`);
-			const s3obj = new AWS.S3({ params: { Bucket: 'dankbot', Key: name } });
+			const s3obj = new AWS.S3({ params: { Bucket: 'dankbot-auseast', Key: name } });
 			s3obj.upload({ Body: body })
 				.on('httpUploadProgress', (evt) => { console.log(evt); })
 				.send((err, data) => { console.log(err, data); cb(err, data); });
@@ -33,7 +33,7 @@ class Storage {
 
 	static listContentsOfBucket(cb) {
 		const s3obj = new AWS.S3();
-		s3obj.listObjects({ Bucket: 'dankbot' }, (err, data) => {
+		s3obj.listObjects({ Bucket: 'dankbot-auseast' }, (err, data) => {
 			console.log(err);
 			cb(err, data.Contents);
 		});
@@ -60,7 +60,7 @@ class Storage {
 
 	static download(file, filePath) {
 		const s3 = new AWS.S3();
-		const params = { Bucket: 'dankbot', Key: file };
+		const params = { Bucket: 'dankbot-auseast', Key: file };
 		const f = fs.createWriteStream(filePath);
 
 		return new Promise((resolve, reject) => {
