@@ -44,15 +44,3 @@ test('Can get giphy', async t => {
 	
 	t.true(fl.length > 0);
 });
-
-test('Try get giphy with unmatchable string sends text message', async t => {
-	let sent = [];
-	let fl = [];
-	let stb = store(sent, fl);
-	stb.content = '!gif nothingwillmatchthishaha123098';
-	
-	const bar = await Giphy.giphy(stb)
-	
-	t.true(fl.length === 0);
-	t.true(sent.length > 0);
-});

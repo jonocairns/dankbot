@@ -5,9 +5,6 @@ const Promise = require('promise');
 const request = require('request');
 
 
-AWS.config.update({ correctClockSkew: true });
-AWS.config.region = 'us-west-2';
-
 if (!process.env.AWS_ACCESS_KEY_ID && !process.env.AWS_SECRET_ACCESS_KEY) {
 	process.env.AWS_ACCESS_KEY_ID = TestConfig.AWS_ACCESS_KEY_ID;
 	process.env.AWS_SECRET_ACCESS_KEY = TestConfig.AWS_SECRET_ACCESS_KEY;
