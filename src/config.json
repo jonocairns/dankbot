@@ -1,6 +1,6 @@
 {
   "botPrefix": "bot",
-  "commandTrigger": "!",
+  "commandTrigger": ".",
   "soundPath": "./sounds/",
   "banList": "",
   "discordClientId": "236314177298366469",

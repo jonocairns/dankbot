@@ -10,8 +10,8 @@ class File {
 			files.forEach((element) => {
 				const cmd = element.split('.')[0];
 				if (cmd) {
-					const reg = new RegExp(`!${cmd}`, 'i');
-					File.doesAlreadyExists(`!${cmd}`, commands);
+					const reg = `.${cmd}`;
+					File.doesAlreadyExists(`.${cmd}`, commands);
 
 					commands.set(reg, ['sound', element]);
 
@@ -46,7 +46,7 @@ class File {
 
 	static doesAlreadyExists(cmd, list) {
 		list.forEach((item, regexp) => {
-			if (cmd.match(regexp)) {
+			if (cmd.toLowerCase().startsWith(regexp.toLowerCase())) {
 				console.log(`${cmd} already exists and conflicts with the regex ${regexp}. Change the name for it.`);
 			}
 		});

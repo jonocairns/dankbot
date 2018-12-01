@@ -25,10 +25,7 @@ class Help {
 		});
 
 		chunks.push(helpMessage);
-		const funcString = functionality.join(', ');
-		const ttsString = tts.join(', ');
-		message.member.sendMessage(`**Functions**\r\n\r\n${funcString}`);
-		message.member.sendMessage(`**Text-to-speech**\r\n\r\n${ttsString}`);
+
 		chunks.forEach((chunk) => {
 			message.member.sendMessage(chunk);
 		});

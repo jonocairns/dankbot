@@ -1,10 +1,11 @@
 const Logger = require('./logger.js');
 const config = require('../config.json');
-const Database = require('./db.js');
 const ytdl = require('ytdl-core');
 
 class Player {
-	static playSound(authorVoiceChannel, command, sound) {
+	static playSound(message, sound) {
+		const authorVoiceChannel = message.member.voiceChannel;
+		console.log(`playing sound file for and sound ${sound}...`);
 		if (authorVoiceChannel) {
 			authorVoiceChannel.join().then((
 				connection,
@@ -19,38 +20,23 @@ class Player {
 
 				dispatcher.on('error', (err) => {
 					Logger.logError(err, `There was an playing the sound ${config.soundPath + sound}`);
+					message.delete();
+					console.log('playsound errored');
 				});
 				dispatcher.on('end', () => {
-					if (config.saveStats) {
-						Database.load({ command }, 'stats', (i) => {
-							if (i.length === 0) {
-								Database.update({ command }, { $setOnInsert: { count: 1 } }, 'stats', () => {
-								});
-							} else {
-								Database.update({ command }, { $inc: { count: 1 } }, 'stats', () => {
-								});
-							}
-						});
-					}
+					message.delete();
+					console.log('playsound ended');
 				});
+				return dispatcher;
 			}).catch((e) => {
-				Logger.trace(`There was an issue joining the channel ${authorVoiceChannel.name} to play the command ${command}`);
+				Logger.trace(`There was an issue joining the channel ${authorVoiceChannel.name}`);
 				Logger.logError(e);
 			});
 		}
 	}
 
-	static introSounds(newChannel, user, intro) {
-		intro.forEach((element) => {
-			if (user.user.username === element.user) {
-				const cmd = `!${element.sound}`;
-				const fileName = `${element.sound}.${element.ext}`;
-				Player.playSound(newChannel, cmd, fileName);
-			}
-		});
-	}
-
 	static playRandomSound(message, commands) {
+		console.log('random sound');
 		const keys = [...commands.keys()];
 		let randomKey;
 		let randomValue = ['', ''];
@@ -58,7 +44,7 @@ class Player {
 			randomKey = keys[Math.round(keys.length * Math.random())];
 			randomValue = commands.get(randomKey);
 		}
-		Player.playSound(message.member.voiceChannel, randomKey.toString().split('/')[1], randomValue[1]);
+		Player.playSound(message, randomValue[1]);
 	}
 
 	static validateYoutubeUrl(url) {
@@ -67,6 +53,7 @@ class Player {
 	}
 
 	static playYt(message) {
+		console.log('playing yt...');
 		const contents = message.content.split(' ');
 		const url = contents[1];
 
@@ -86,33 +73,26 @@ class Player {
 		}
 		console.log(`Triggered yt play on ${url} with start ${time} and volume ${vol}`);
 
-		const streamOptions = { seek: time, volume: vol };
+		
+		const streamOptions = { seek: time, volume: vol, filter : 'audioonly' };
 		message.member.voiceChannel.join()
 			.then((connection) => {
 				console.log('Connected to voice channel... Attempting to play video');
 				const stream = ytdl(url);
-				stream.on('error', (error) => {
-					message.channel.sendMessage('Some bad shit went down. Probs some shit with yo shitty youtube video. RIP');
-					console.log(error);
-					error.destroy();
-				});
-
-				stream.on('response', (res) => {
-					if (res.statusCode === 403) {
-						message.channel.sendMessage('Can\'t play that shitty video..');
-						console.log(`code:${res.statusCode} message:${res.statusMessage}`);
-						console.log(res);
-						res.destroy();
-					}
-				});
 
 				const dispatcher = connection.playStream(stream, streamOptions);
-				dispatcher.on('error', err => console.log('Error occured attempting to stream', err));
-				// dispatcher.on('debug', console.log);
-				// connection.player.on('debug', console.log);
-				connection.player.on('error', err => console.log('Connection issue occured', err));
-			}).catch(console.log);
-		message.delete();
+				
+				dispatcher.on("end", end => {
+					console.log("yt ended");
+					message.delete();
+				});
+
+				dispatcher.on("error", end => {
+					console.log("yt error");
+					message.delete();
+				});
+				return dispatcher;
+			}).catch(console.error);
 	}
 }
 module.exports = Player;

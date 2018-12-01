@@ -2,7 +2,6 @@
 require('dotenv').config({path: '../../.env'});
 
 import test from 'ava';
-import sinon from 'sinon';
 
 const storage = require('../lib/storage.js');
 const fs = require('fs');
@@ -27,8 +26,4 @@ test.cb('Can download file list from aws', t => {
             t.end();
         });
     });
-});
-
-test('Can download many from aws', async t => {
-    // await storage.downloadMany('dump/');
 });
