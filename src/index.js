@@ -81,8 +81,8 @@ class Dank {
 			Player.playYt,
 		]);
 		this.commands.set(`${config.commandTrigger}meme`, ['function',
-		Player.playRandomSound.bind(this),
-	]);
+			Player.playRandomSound.bind(this),
+		]);
 	}
 
 	static tryMe(fn, msg) {

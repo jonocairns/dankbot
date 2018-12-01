@@ -56,7 +56,8 @@ class Message {
 						default:
 							break;
 						}
-					} finally {
+					} catch (e) {
+						console.error(e);
 					}
 				}
 			});

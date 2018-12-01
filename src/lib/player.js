@@ -73,22 +73,21 @@ class Player {
 		}
 		console.log(`Triggered yt play on ${url} with start ${time} and volume ${vol}`);
 
-		
-		const streamOptions = { seek: time, volume: vol, filter : 'audioonly' };
+		const streamOptions = { seek: time, volume: vol, filter: 'audioonly' };
 		message.member.voiceChannel.join()
 			.then((connection) => {
 				console.log('Connected to voice channel... Attempting to play video');
 				const stream = ytdl(url);
 
 				const dispatcher = connection.playStream(stream, streamOptions);
-				
-				dispatcher.on("end", end => {
-					console.log("yt ended");
+
+				dispatcher.on('end', () => {
+					console.log('yt ended');
 					message.delete();
 				});
 
-				dispatcher.on("error", end => {
-					console.log("yt error");
+				dispatcher.on('error', () => {
+					console.log('yt error');
 					message.delete();
 				});
 				return dispatcher;
