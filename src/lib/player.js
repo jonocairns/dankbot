@@ -18,8 +18,6 @@ class Player {
 				}
 				const dispatcher = connection.playFile(config.soundPath + sound);
 
-				message.edit(':robot::loudspeaker:');
-
 				dispatcher.on('error', (err) => {
 					Logger.logError(err, `There was an playing the sound ${config.soundPath + sound}`);
 					message.delete();
