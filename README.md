@@ -67,7 +67,7 @@ Ban people from using the command by going in to the config.json file and adding
 
 ## Getting Started
 1. Clone this repository
-2. After completing the prerequisites (below, mainly ffmpeg), run `npm install` on this project making sure nothing fails, particularly `node-opus`
+2. After completing the prerequisites (below, mainly ffmpeg), run `npm install` on this project making sure nothing fails, particularly `node-opus` (https://www.microsoft.com/en-nz/download/confirmation.aspx?id=48159)
 3. Create a mongodb somewhere (MLab/local) then create a connection string for it (e.g mongodb://user:password@server:port/database)
 4. Open `env.json` and add your bot's `token`, then add your mongodb connection string for the `mongo` property.
 5. Authorize your bot using this URL `https://discordapp.com/oauth2/authorize?client_id=APPLICATION_ID&scope=bot&permissions=0` where APPLICATION_ID is your `Application ID` and add it to a server you manage.
