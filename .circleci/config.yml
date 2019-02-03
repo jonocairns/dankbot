@@ -20,11 +20,11 @@ jobs:
           paths:
             - ~/.cache/yarn
       - run:
-        name: Run linting
-        command: yarn run lint
+          name: Run linting
+          command: yarn run lint
       - run:
-        name: Run tests
-        command: yarn test
+          name: Run tests
+          command: yarn test
 
   deploy:
     machine:
