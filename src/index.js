@@ -15,7 +15,6 @@ class Dank {
 		this.savedTts = [];
 		this.intro = [];
 		this.commands = new Map();
-		this.newCommands = [];
 
 		this.player = player;
 		this.msg = message;
@@ -27,18 +26,12 @@ class Dank {
 			process.env.DISCORD_BOT_TOKEN = LocalDevConfig.token;
 		}
 
-		if (!process.env.DANK_MONGODB) {
-			process.env.DANK_MONGODB = LocalDevConfig.mongo;
-		}
-
 		this.bot.login(process.env.DISCORD_BOT_TOKEN);
 		this.triggerPrefix = `${config.commandTrigger}${config.botPrefix} `;
 		this.setDefaultCommands();
 		this.setEventHandlers();
 		File.readSoundFiles((cmdObj) => {
 			this.commands = new Map([...cmdObj.commands, ...this.commands]);
-
-			this.newCommands = cmdObj.newCommands.map(a => a.sound);
 		});
 	}
 
@@ -58,10 +51,6 @@ class Dank {
 		this.bot.on('message', (message) => {
 			console.log('message recieved');
 			Dank.tryMe(() => {
-				if (this.newCommands.length > 0) {
-					message.channel.sendMessage(`New dankness added: ${this.newCommands.join(', ')}`);
-					this.newCommands = [];
-				}
 				Message.messageHandler(message, this.bot, this.commands);
 			});
 		});
