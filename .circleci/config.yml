@@ -1,0 +1,51 @@
+version: 2.1
+
+jobs:
+  build:
+    docker: # use the docker executor type; machine and macos executors are also supported
+      - image: circleci/node:8.9.0 # the primary container, where your job's commands are run
+    working_directory: ~/work
+    steps:
+      - checkout # check out the code in the project directory
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+      - run:
+        name: Run linting
+        command: yarn run lint
+      - run:
+        name: Run tests
+        command: yarn test
+
+  deploy:
+    machine:
+        enabled: true
+    working_directory: ~/work
+    environment:
+      HEROKU_APP: "dankbot-69"
+    steps:
+      - checkout
+      - run:
+          name: Deploy Master to Heroku
+          command: |
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git master
+
+workflows:
+    "build and deploy":
+      jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: sequential-branch-filter
