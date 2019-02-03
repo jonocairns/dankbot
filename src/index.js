@@ -22,11 +22,16 @@ class Dank {
 	}
 
 	init() {
+		const token = '';
 		if (!process.env.DISCORD_BOT_TOKEN) {
-			process.env.DISCORD_BOT_TOKEN = LocalDevConfig.token;
+			token = LocalDevConfig.token;
 		}
 
-		this.bot.login(process.env.DISCORD_BOT_TOKEN);
+		if (process.env.HEROKU_APP_NAME && process.env.HEROKU_APP_NAME.indexOf('pr') !== -1) {
+			token = process.env.STAGING_DISCORD_BOT_TOKEN;
+		}
+
+		this.bot.login(token);
 		this.triggerPrefix = `${config.commandTrigger}${config.botPrefix} `;
 		this.setDefaultCommands();
 		this.setEventHandlers();
