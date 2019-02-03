@@ -13,16 +13,16 @@
     }
   ],
   "env": {
+    "HEROKU_APP_NAME": {
+      "required": true
+    },
     "AWS_ACCESS_KEY_ID": {
       "required": true
     },
     "AWS_SECRET_ACCESS_KEY": {
       "required": true
     },
-    "DANK_MONGODB": {
-      "required": true
-    },
-    "DISCORD_BOT_TOKEN": {
+    "STAGING_DISCORD_BOT_TOKEN": {
       "required": true
     },
     "NEW_RELIC_LICENSE_KEY": {
