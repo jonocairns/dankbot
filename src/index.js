@@ -22,7 +22,7 @@ class Dank {
 	}
 
 	init() {
-		let token = '';
+		let token = process.env.DISCORD_BOT_TOKEN;
 		if (!process.env.DISCORD_BOT_TOKEN) {
 			token = LocalDevConfig.token;
 		}
