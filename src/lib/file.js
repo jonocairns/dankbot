@@ -21,13 +21,9 @@ class File {
 	static readSoundFiles(callback) {
 		console.log('Loading sounds...');
 
-		if (fs.existsSync('sounds/')) {
+		Storage.downloadMany('sounds/').then(() => {
 			File.readFs(callback);
-		} else {
-			Storage.downloadMany('sounds/').then(() => {
-				File.readFs(callback);
-			});
-		}
+		});
 	}
 
 	static doesAlreadyExists(cmd, list) {
