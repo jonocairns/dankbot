@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Storage = require('./storage.js');
 
 class File {
 	static readFs(callback) {
@@ -22,14 +21,9 @@ class File {
 		console.log('Loading sounds...');
 
 		if (fs.existsSync('sounds')) {
-			console.log('Loading cached...');
 			File.readFs(callback);
 		} else {
-			console.log('Downloading...');
-			Storage.downloadMany('sounds/').then(() => {
-				console.log('Completed downloading...');
-				File.readFs(callback);
-			});
+			console.log('could not find files...');
 		}
 	}
 

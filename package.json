@@ -7,7 +7,8 @@
     "lint": "eslint **/*.js",
     "test": "ava **/*-spec.js --verbose",
     "start": "node src/index.js",
-    "prep": "node_modules/.bin/eslint **/*.js --fix && ava **/*-spec.js --verbose"
+    "prep": "node_modules/.bin/eslint **/*.js --fix && ava **/*-spec.js --verbose",
+    "download": "node src/lib/download.js"
   },
   "repository": {
     "type": "git",
