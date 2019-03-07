@@ -22,9 +22,12 @@ class File {
 		console.log('Loading sounds...');
 
 		if (fs.existsSync('sounds') && fs.readdirSync('sounds').length > 0) {
+			console.log('Loading cached...');
 			File.readFs(callback);
 		} else {
+			console.log('Downloading...');
 			Storage.downloadMany('sounds/').then(() => {
+				console.log('Completed downloading...');
 				File.readFs(callback);
 			});
 		}
