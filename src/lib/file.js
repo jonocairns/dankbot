@@ -21,7 +21,7 @@ class File {
 	static readSoundFiles(callback) {
 		console.log('Loading sounds...');
 
-		if (fs.existsSync('sounds') && fs.readdirSync('sounds').length > 0) {
+		if (fs.existsSync('sounds')) {
 			console.log('Loading cached...');
 			File.readFs(callback);
 		} else {
