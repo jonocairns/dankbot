@@ -28,7 +28,7 @@
     "ava": "0.16.0",
     "aws-sdk": "2.6.12",
     "discord.js": "11.4.2",
-    "dotenv": "6.1.0",
+    "dotenv": "8.1.0",
     "erlpack": "hammerandchisel/erlpack",
     "node-opus": "^0.2.7",
     "promise": "8.0.3",
