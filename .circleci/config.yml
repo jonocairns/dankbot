@@ -21,9 +21,6 @@ jobs:
       - run:
           name: Run linting
           command: yarn run lint
-      - run:
-          name: Run tests
-          command: yarn test
 
 workflows:
     version: 2
