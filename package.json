@@ -5,7 +5,6 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint **/*.js",
-    "test": "ava **/*-spec.js --verbose",
     "start": "node src/index.js",
     "prep": "node_modules/.bin/eslint **/*.js --fix && ava **/*-spec.js --verbose",
     "download": "node src/lib/download.js"
@@ -25,7 +24,6 @@
   },
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
-    "ava": "0.16.0",
     "aws-sdk": "2.6.12",
     "discord.js": "11.4.2",
     "dotenv": "8.1.0",
@@ -33,7 +31,6 @@
     "node-opus": "^0.2.7",
     "promise": "8.0.3",
     "request": "2.88.0",
-    "sinon": "7.4.2",
     "uws": "9.14.0",
     "ytdl-core": "0.29.6"
   },
