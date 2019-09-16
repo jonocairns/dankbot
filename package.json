@@ -31,7 +31,7 @@
     "dotenv": "6.1.0",
     "erlpack": "hammerandchisel/erlpack",
     "node-opus": "^0.2.7",
-    "promise": "8.0.2",
+    "promise": "8.0.3",
     "request": "2.88.0",
     "sinon": "7.1.1",
     "uws": "9.14.0",
