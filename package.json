@@ -26,7 +26,7 @@
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
     "ava": "0.16.0",
-    "aws-sdk": "2.6.12",
+    "aws-sdk": "2.534.0",
     "discord.js": "11.4.2",
     "dotenv": "6.1.0",
     "erlpack": "hammerandchisel/erlpack",
