@@ -1,9 +1,0 @@
-{
-  "botPrefix": "bot",
-  "commandTrigger": ".",
-  "soundPath": "./sounds/",
-  "banList": "",
-  "discordClientId": "236314177298366469",
-  "saveStats": false,
-  "admins": "J1s,jonosma"
-}
