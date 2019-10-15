@@ -8,7 +8,7 @@
     "start": "nodemon",
     "lint": "eslint {src,__tests__}/**/* --ext .{{t,j}s{,x}}",
     "lint:fix": "yarn lint --fix",
-    "build": "tsc"
+    "build": "tsc && rollup ./dist/index.js --format cjs --file ./dist/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -24,14 +24,13 @@
     "url": "https://github.com/jonocairns/dankbot/issues"
   },
   "homepage": "https://github.com/jonocairns/dankbot#readme",
-  "dependencies": {
-    "ts-node": "^8.4.1"
-  },
+  "dependencies": {},
   "engines": {
     "node": "10.16.3",
     "npm": "6.9.0"
   },
   "devDependencies": {
+    "@discordjs/uws": "^11.149.1",
     "@types/dotenv": "^6.1.1",
     "@types/node": "^12.7.12",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
@@ -39,17 +38,22 @@
     "add": "^2.0.6",
     "discord.js": "^11.5.1",
     "dotenv": "^8.1.0",
+    "erlpack": "discordapp/erlpack",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.19.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-simple-import-sort": "^4.0.0",
+    "ffmpeg-binaries": "^4.0.0",
     "husky": "^3.0.9",
     "lint-staged": "8.2.1",
     "node-opus": "^0.3.2",
     "nodemon": "^1.19.3",
     "prettier": "^1.18.2",
+    "rollup": "^1.24.0",
+    "ts-loader": "^6.2.0",
+    "ts-node": "^8.4.1",
     "typescript": "^3.6.4",
     "yarn": "^1.19.1"
   }
