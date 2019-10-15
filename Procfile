@@ -1,1 +1,1 @@
-web: node dist/bundle.js
+worker: node dist/bundle.js

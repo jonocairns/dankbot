@@ -1,7 +1,6 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import https from 'https';
 import path from 'path';
 
 dotenv.config();
@@ -62,5 +61,3 @@ client.on('message', msg => {
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
-
-https.createServer().listen(3000);
