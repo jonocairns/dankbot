@@ -12,7 +12,7 @@
     "env": {
       "browser": false
     },
-    "plugins": ["@typescript-eslint", "react-hooks", "jest", "prettier", "simple-import-sort"],
+    "plugins": ["@typescript-eslint", "jest", "prettier", "simple-import-sort"],
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/eslint-recommended",
@@ -26,7 +26,7 @@
     "rules": {
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/array-type": { "default": "generic" },
+      "@typescript-eslint/array-type": ["warn", { "default": "generic"}],
       "react/prop-types": "off",
       "import/prefer-default-export": "off",
       "no-undef":"off",
@@ -40,10 +40,5 @@
       "simple-import-sort/sort": "error",
       "sort-imports": "off",
       "import/order": "off"
-    },
-    "settings": {
-      "react": {
-        "version": "detect"
-      }
     }
   }
