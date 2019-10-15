@@ -18,25 +18,24 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('message', msg => {
+let timer: NodeJS.Timeout;
+
+client.on('message', (msg: Discord.Message) => {
   if (!msg.content.startsWith('.')) return;
   if (!msg.guild) return;
 
   if (msg.member.voiceChannel) {
     msg.member.voiceChannel
       .join()
-      .then(connection => {
+      .then((connection: Discord.VoiceConnection) => {
         let targetFile = msg.content.split('.').pop();
 
-        if (targetFile === 'leave') {
-          msg.member.voiceChannel.leave();
-        }
+        if (targetFile === 'leave') msg.member.voiceChannel.leave();
 
-        if (targetFile === 'meme') {
+        if (targetFile === 'meme')
           targetFile = sounds[Math.floor(Math.random() * sounds.length)]
             .split('.')
             .shift();
-        }
 
         const file = sounds.find(s => s.split('.').shift() === targetFile);
 
@@ -47,9 +46,13 @@ client.on('message', msg => {
 
           dispatcher.on('end', () => {
             msg.delete();
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+              connection.disconnect();
+            }, 600000);
           });
 
-          dispatcher.on('error', e => {
+          dispatcher.on('error', (e: Error) => {
             console.log(e);
           });
         }
