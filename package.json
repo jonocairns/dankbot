@@ -30,7 +30,9 @@
     "dotenv": "^8.1.0",
     "erlpack": "discordapp/erlpack",
     "ffmpeg-binaries": "^4.0.0",
-    "node-opus": "^0.3.2"
+    "lodash": "^4.17.15",
+    "node-opus": "^0.3.2",
+    "ytdl-core": "^1.0.0"
   },
   "engines": {
     "node": "10.16.3",
@@ -38,6 +40,7 @@
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
+    "@types/lodash": "^4.14.144",
     "@types/node": "^12.7.12",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",

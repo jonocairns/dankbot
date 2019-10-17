@@ -1,11 +1,16 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import {sampleSize} from 'lodash';
 import path from 'path';
+
+import {help} from './help';
+import {play} from './sound';
+import {youtube} from './youtube';
 
 dotenv.config();
 const client = new Discord.Client();
-const sounds: Array<string> = [];
+export const sounds: Array<string> = [];
 
 fs.readdir(path.join(__dirname, '../sounds'), (err, files) => {
   if (err) {
@@ -20,38 +25,29 @@ client.on('ready', () => {
 
 client.on('message', msg => {
   if (!msg.content.startsWith('.')) return;
+
+  if (msg.content.startsWith('.help')) {
+    help(msg);
+    return;
+  }
+
+  if (msg.content.startsWith('.eg')) {
+    msg.channel.send(sampleSize(sounds, 10));
+    return;
+  }
+
   if (!msg.guild) return;
 
   if (msg.member.voiceChannel) {
     msg.member.voiceChannel
       .join()
       .then(connection => {
-        let targetFile = msg.content.split('.').pop();
-
-        if (targetFile === 'leave') {
+        if (msg.content.startsWith('.leave')) {
           msg.member.voiceChannel.leave();
-        }
-
-        if (targetFile === 'meme') {
-          targetFile = sounds[Math.floor(Math.random() * sounds.length)]
-            .split('.')
-            .shift();
-        }
-
-        const file = sounds.find(s => s.split('.').shift() === targetFile);
-
-        if (file) {
-          const dispatcher = connection.playFile(
-            path.join(__dirname, `../sounds/${file}`)
-          );
-
-          dispatcher.on('end', () => {
-            msg.delete();
-          });
-
-          dispatcher.on('error', e => {
-            console.log(e);
-          });
+        } else if (msg.content.startsWith('.yt')) {
+          youtube(msg, connection);
+        } else {
+          play(msg, connection);
         }
       })
       .catch(console.log);
