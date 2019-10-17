@@ -1,11 +1,20 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import {sampleSize} from 'lodash';
 import path from 'path';
+
+import {help} from './help';
+import {play} from './sound';
+import {youtube} from './youtube';
 
 dotenv.config();
 const client = new Discord.Client();
-const sounds: Array<string> = [];
+export const sounds: Array<string> = [];
+export let timer: NodeJS.Timeout;
+export const setTimer = (t: NodeJS.Timeout) => {
+  timer = t;
+};
 
 fs.readdir(path.join(__dirname, '../sounds'), (err, files) => {
   if (err) {
@@ -18,43 +27,32 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-let timer: NodeJS.Timeout;
-
 client.on('message', (msg: Discord.Message) => {
   if (!msg.content.startsWith('.')) return;
+
+  if (msg.content.startsWith('.help')) {
+    help(msg);
+    return;
+  }
+
+  if (msg.content.startsWith('.eg')) {
+    msg.channel.send(sampleSize(sounds, 10));
+    return;
+  }
+
   if (!msg.guild) return;
 
   if (msg.member.voiceChannel) {
     msg.member.voiceChannel
       .join()
-      .then((connection: Discord.VoiceConnection) => {
-        let targetFile = msg.content.split('.').pop();
-
-        if (targetFile === 'leave') msg.member.voiceChannel.leave();
-
-        if (targetFile === 'meme')
-          targetFile = sounds[Math.floor(Math.random() * sounds.length)]
-            .split('.')
-            .shift();
-
-        const file = sounds.find(s => s.split('.').shift() === targetFile);
-
-        if (file) {
-          const dispatcher = connection.playFile(
-            path.join(__dirname, `../sounds/${file}`)
-          );
-
-          dispatcher.on('end', () => {
-            msg.delete();
-            if (timer) clearTimeout(timer);
-            timer = setTimeout(() => {
-              connection.disconnect();
-            }, 600000);
-          });
-
-          dispatcher.on('error', (e: Error) => {
-            console.log(e);
-          });
+      .then(connection => {
+        if (timer) clearTimeout(timer);
+        if (msg.content.startsWith('.leave')) {
+          msg.member.voiceChannel.leave();
+        } else if (msg.content.startsWith('.yt')) {
+          youtube(msg, connection);
+        } else {
+          play(msg, connection);
         }
       })
       .catch(console.log);
