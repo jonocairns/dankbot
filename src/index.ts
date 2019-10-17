@@ -11,6 +11,10 @@ import {youtube} from './youtube';
 dotenv.config();
 const client = new Discord.Client();
 export const sounds: Array<string> = [];
+export let timer: NodeJS.Timeout;
+export const setTimer = (t: NodeJS.Timeout) => {
+  timer = t;
+};
 
 fs.readdir(path.join(__dirname, '../sounds'), (err, files) => {
   if (err) {
@@ -23,7 +27,7 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('message', msg => {
+client.on('message', (msg: Discord.Message) => {
   if (!msg.content.startsWith('.')) return;
 
   if (msg.content.startsWith('.help')) {
@@ -42,6 +46,7 @@ client.on('message', msg => {
     msg.member.voiceChannel
       .join()
       .then(connection => {
+        if (timer) clearTimeout(timer);
         if (msg.content.startsWith('.leave')) {
           msg.member.voiceChannel.leave();
         } else if (msg.content.startsWith('.yt')) {
