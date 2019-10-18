@@ -46,13 +46,17 @@ client.on('message', (msg: Discord.Message) => {
     msg.member.voiceChannel
       .join()
       .then(connection => {
-        if (timer) clearTimeout(timer);
-        if (msg.content.startsWith('.leave')) {
-          msg.member.voiceChannel.leave();
-        } else if (msg.content.startsWith('.yt')) {
-          youtube(msg, connection);
-        } else {
-          play(msg, connection);
+        try {
+          if (timer) clearTimeout(timer);
+          if (msg.content.startsWith('.leave')) {
+            msg.member.voiceChannel.leave();
+          } else if (msg.content.startsWith('.yt')) {
+            youtube(msg, connection);
+          } else {
+            play(msg, connection);
+          }
+        } catch (e) {
+          console.log(e);
         }
       })
       .catch(console.log);
