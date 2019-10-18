@@ -20,7 +20,9 @@ fs.readdir(path.join(__dirname, '../sounds'), (err, files) => {
   if (err) {
     return console.log('Unable to scan directory: ' + err);
   }
+  console.log(`loading files...`);
   files.forEach(file => sounds.push(file));
+  console.log(`loaded ${files.length} files.`);
 });
 
 client.on('ready', () => {
