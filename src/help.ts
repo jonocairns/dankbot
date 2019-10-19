@@ -1,5 +1,7 @@
 import Discord from 'discord.js';
 
+import {languages} from './speech';
+
 export const help = (msg: Discord.Message) => {
   const embed = new Discord.RichEmbed()
     .addField(
@@ -16,9 +18,24 @@ export const help = (msg: Discord.Message) => {
     )
     .addField('.eg', 'will return a sample of the possible sounds you can play')
     .addField(
+      '.speak',
+      'will say a some words in the voice channel you are in e.g. `.speak i love lamp`'
+    )
+    .addField(
+      '.lang',
+      `will switch the voice acent, possible values are: ${languages
+        .map(l => l.short)
+        .join(', ')} e.g. \`.lang english\``
+    )
+    .addField('.joke', 'will say a random joke in the current voice channel')
+    .addField(
       '.leave',
       `will make the bot leave the voice channel they're currently in`
     );
-  msg.member.send(embed);
-  msg.delete();
+  if (msg.member) {
+    msg.member.send(embed);
+    msg.delete();
+  } else {
+    msg.reply(embed);
+  }
 };
