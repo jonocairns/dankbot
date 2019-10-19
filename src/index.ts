@@ -7,6 +7,7 @@ import winston from 'winston';
 
 import {help} from './help';
 import {play} from './sound';
+import {speech} from './speech';
 import {youtube} from './youtube';
 
 dotenv.config();
@@ -80,7 +81,7 @@ client.on('message', async (msg: Discord.Message) => {
   if (msg.member.voiceChannel) {
     msg.member.voiceChannel
       .join()
-      .then(connection => {
+      .then(async connection => {
         try {
           msg.react(`👍`);
           if (timer) clearTimeout(timer);
@@ -88,6 +89,8 @@ client.on('message', async (msg: Discord.Message) => {
             msg.member.voiceChannel.leave();
           } else if (msg.content.startsWith(`${prefix}yt`)) {
             youtube(msg, connection);
+          } else if (msg.content.startsWith(`${prefix}speak`)) {
+            speech(msg, connection);
           } else {
             play(msg, connection);
           }
