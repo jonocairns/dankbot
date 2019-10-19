@@ -7,6 +7,30 @@ import stream from 'stream';
 import {clean} from './clean';
 import {logger} from './index';
 
+interface Language {
+  short: string;
+  code: string;
+  gender: 'MALE' | 'FEMALE';
+}
+
+export const languages: Array<Language> = [
+  {short: 'chinese', code: 'cmn-CN-Wavenet-B', gender: 'MALE'},
+  {short: 'german', code: 'de-DE-Wavenet-D', gender: 'MALE'},
+  {short: 'australian', code: 'en-AU-Wavenet-B', gender: 'MALE'},
+  {short: 'indian', code: 'en-IN-Wavenet-A', gender: 'FEMALE'},
+  {short: 'english', code: 'en-GB-Wavenet-B', gender: 'MALE'},
+  {short: 'us', code: 'en-US-Wavenet-A', gender: 'MALE'},
+  {short: 'french', code: 'fr-FR-Wavenet-B', gender: 'MALE'},
+  {short: 'italian', code: 'it-IT-Standard-D', gender: 'MALE'},
+  {short: 'russian', code: 'ru-RU-Wavenet-B', gender: 'MALE'},
+];
+
+let defaultLanguage = languages[0];
+
+export const setLang = (lang: Language) => {
+  defaultLanguage = lang;
+};
+
 export const speech = async (
   msg: Discord.Message,
   connection: Discord.VoiceConnection
@@ -28,8 +52,8 @@ export const speech = async (
   const request: SynthesizeSpeechRequest = {
     input: {text},
     voice: {
-      languageCode: 'de-DE-Wavenet-B',
-      ssmlGender: 'MALE',
+      languageCode: defaultLanguage.code,
+      ssmlGender: defaultLanguage.gender as 'MALE' | 'FEMALE',
     },
     audioConfig: {audioEncoding: 'OGG_OPUS'},
   };

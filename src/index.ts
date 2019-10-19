@@ -7,7 +7,7 @@ import winston from 'winston';
 
 import {help} from './help';
 import {play} from './sound';
-import {speech} from './speech';
+import {languages, setLang, speech} from './speech';
 import {youtube} from './youtube';
 
 dotenv.config();
@@ -18,7 +18,6 @@ export let timer: NodeJS.Timeout;
 export const setTimer = (t: NodeJS.Timeout) => {
   timer = t;
 };
-
 export const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
   format: winston.format.printf(
@@ -67,6 +66,17 @@ client.on('message', async (msg: Discord.Message) => {
   if (msg.content.startsWith(`${prefix}stats`)) {
     const status = await fetchStatus();
     msg.reply(status);
+    return;
+  }
+
+  if (msg.content.startsWith(`${prefix}lang`)) {
+    const targetLang = msg.content.replace('.lang', '');
+    const lang = languages.find(l => l.short === targetLang.trim());
+
+    if (lang) {
+      setLang(lang);
+    }
+    msg.delete();
     return;
   }
 
