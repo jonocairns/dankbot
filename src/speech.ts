@@ -84,8 +84,12 @@ export const speech = async (
     bufferStream.end(response.audioContent);
 
     const dispatch = connection.playStream(bufferStream);
-
-    clean(dispatch, msg);
+    bufferStream.destroy();
+    dispatch.on('end', () => {
+      msg.delete();
+      bufferStream.destroy();
+      connection.channel.leave();
+    });
   } catch (e) {
     logger.error(e);
   }
