@@ -19,7 +19,7 @@ export const youtube = (
       const dispatcher = connection.playStream(stream);
       clean(dispatcher, msg);
     } else {
-      ytsr(msg.content.replace('.yt', ''), {}, (err, results) => {
+      ytsr(msg.content.toLowerCase().replace('.yt', ''), {}, (err, results) => {
         if (err) {
           logger.error(err.message);
         }

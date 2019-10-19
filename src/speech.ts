@@ -48,7 +48,7 @@ export const speech = async (
       private_key: key,
     },
   });
-  const text = msg.content.replace('.speak', '');
+  const text = msg.content.toLowerCase().replace('.speak', '');
 
   const request: SynthesizeSpeechRequest = {
     input: {text},

@@ -12,12 +12,14 @@ export const play = (
 ) => {
   let arg = args(msg.content);
 
-  if (arg === 'meme') {
+  if (arg && arg.toLowerCase() === 'meme') {
     const random = sample(sounds) || '';
     arg = random.split('.').shift();
   }
 
-  const file = sounds.find(s => s.split('.').shift() === arg);
+  const file = sounds.find(
+    s => arg && s.split('.').shift() === arg.toLowerCase()
+  );
 
   if (file) {
     const dispatcher = connection.playFile(

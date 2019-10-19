@@ -56,21 +56,22 @@ client.on('ready', async () => {
 });
 
 client.on('message', async (msg: Discord.Message) => {
-  if (!msg.content.startsWith(prefix)) return;
+  const msgContent = msg.content.toLowerCase();
+  if (!msgContent.startsWith(prefix)) return;
 
-  if (msg.content.startsWith(`${prefix}help`)) {
+  if (msgContent.startsWith(`${prefix}help`)) {
     help(msg);
     return;
   }
 
-  if (msg.content.startsWith(`${prefix}stats`)) {
+  if (msgContent.startsWith(`${prefix}stats`)) {
     const status = await fetchStatus();
     msg.reply(status);
     return;
   }
 
-  if (msg.content.startsWith(`${prefix}lang`)) {
-    const targetLang = msg.content.replace('.lang', '');
+  if (msgContent.startsWith(`${prefix}lang`)) {
+    const targetLang = msgContent.replace('.lang', '');
     const lang = languages.find(l => l.short === targetLang.trim());
 
     if (lang) {
@@ -80,7 +81,7 @@ client.on('message', async (msg: Discord.Message) => {
     return;
   }
 
-  if (msg.content.startsWith(`${prefix}eg`)) {
+  if (msgContent.startsWith(`${prefix}eg`)) {
     msg.channel.send(sampleSize(sounds, 10));
     msg.delete();
     return;
@@ -95,11 +96,11 @@ client.on('message', async (msg: Discord.Message) => {
         try {
           msg.react(`👍`);
           if (timer) clearTimeout(timer);
-          if (msg.content.startsWith(`${prefix}leave`)) {
+          if (msgContent.startsWith(`${prefix}leave`)) {
             msg.member.voiceChannel.leave();
-          } else if (msg.content.startsWith(`${prefix}yt`)) {
+          } else if (msgContent.startsWith(`${prefix}yt`)) {
             youtube(msg, connection);
-          } else if (msg.content.startsWith(`${prefix}speak`)) {
+          } else if (msgContent.startsWith(`${prefix}speak`)) {
             speech(msg, connection);
           } else {
             play(msg, connection);
@@ -113,6 +114,10 @@ client.on('message', async (msg: Discord.Message) => {
     msg.reply('You need to join a voice channel first!');
     msg.delete();
   }
+});
+
+client.on('guildMemberSpeaking', (m, speaking) => {
+  logger.info(m);
 });
 
 client.on('debug', m => logger.debug(m));
