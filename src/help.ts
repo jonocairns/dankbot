@@ -18,17 +18,6 @@ export const help = (msg: Discord.Message) => {
     )
     .addField('.eg', 'will return a sample of the possible sounds you can play')
     .addField(
-      '.speak',
-      'will say a some words in the voice channel you are in e.g. `.speak i love lamp`'
-    )
-    .addField(
-      '.lang',
-      `will switch the voice acent, possible values are: ${languages
-        .map(l => l.short)
-        .join(', ')} e.g. \`.lang english\``
-    )
-    .addField('.joke', 'will say a random joke in the current voice channel')
-    .addField(
       '.leave',
       `will make the bot leave the voice channel they're currently in`
     );
