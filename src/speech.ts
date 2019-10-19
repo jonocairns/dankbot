@@ -15,7 +15,7 @@ interface Language {
 
 export const languages: Array<Language> = [
   {short: 'chinese', code: 'cmn-CN', gender: 'MALE'},
-  {short: 'german', code: 'de-', gender: 'MALE'},
+  {short: 'german', code: 'de-DE', gender: 'MALE'},
   {short: 'australian', code: 'en-AU', gender: 'MALE'},
   {short: 'indian', code: 'en-IN', gender: 'FEMALE'},
   {short: 'english', code: 'en-GB', gender: 'MALE'},
@@ -54,7 +54,7 @@ export const speech = async (
     input: {text},
     voice: {
       languageCode: defaultLanguage.code,
-      ssmlGender: defaultLanguage.gender as 'MALE' | 'FEMALE',
+      ssmlGender: defaultLanguage.gender,
     },
     audioConfig: {audioEncoding: 'OGG_OPUS'},
   };
