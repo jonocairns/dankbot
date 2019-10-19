@@ -44,6 +44,7 @@ client.on('ready', async () => {
     (acc, curr) => acc + curr.members.array().length,
     0
   );
+  client.user.setActivity('you from a distance', {type: 'WATCHING'});
 
   logger.info(
     `Logged in as ${client.user.tag}. Serving ${allGuilds.length} guild(s) and ${people} people`
