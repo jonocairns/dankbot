@@ -1,6 +1,6 @@
 import Discord from 'discord.js';
 
-import {setTimer, timer} from './index';
+import {logger, setTimer, timer} from './index';
 
 export const clean = (
   dispatcher: Discord.StreamDispatcher,
@@ -17,6 +17,6 @@ export const clean = (
   });
 
   dispatcher.on('error', e => {
-    console.log(e);
+    logger.error(e);
   });
 };
