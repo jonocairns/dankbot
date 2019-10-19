@@ -28,8 +28,8 @@ export const speech = async (
   const request: SynthesizeSpeechRequest = {
     input: {text},
     voice: {
-      languageCode: 'en-IN',
-      ssmlGender: 'FEMALE',
+      languageCode: 'en-AU-Standard-B',
+      ssmlGender: 'MALE',
     },
     audioConfig: {audioEncoding: 'OGG_OPUS'},
   };
