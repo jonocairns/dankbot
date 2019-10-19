@@ -23,15 +23,19 @@ export const help = (msg: Discord.Message) => {
     )
     .addField(
       '.lang',
-      `will switch the voice acent, possible values are: ${languages.join(
-        ', '
-      )} e.g. \`.lang english\``
+      `will switch the voice acent, possible values are: ${languages
+        .map(l => l.short)
+        .join(', ')} e.g. \`.lang english\``
     )
     .addField('.joke', 'will say a random joke in the current voice channel')
     .addField(
       '.leave',
       `will make the bot leave the voice channel they're currently in`
     );
-  msg.member.send(embed);
-  msg.delete();
+  if (msg.member) {
+    msg.member.send(embed);
+    msg.delete();
+  } else {
+    msg.reply(embed);
+  }
 };
