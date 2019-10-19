@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import {sampleSize} from 'lodash';
 import path from 'path';
+import winston from 'winston';
 
 import {help} from './help';
 import {play} from './sound';
@@ -10,35 +11,67 @@ import {youtube} from './youtube';
 
 dotenv.config();
 const client = new Discord.Client();
+export const prefix = '.';
 export const sounds: Array<string> = [];
 export let timer: NodeJS.Timeout;
 export const setTimer = (t: NodeJS.Timeout) => {
   timer = t;
 };
 
+export const logger = winston.createLogger({
+  transports: [new winston.transports.Console()],
+  format: winston.format.printf(
+    log => `[${log.level.toUpperCase()}] - ${log.message}`
+  ),
+});
+
 fs.readdir(path.join(__dirname, '../sounds'), (err, files) => {
   if (err) {
-    return console.log('Unable to scan directory: ' + err);
+    logger.error('Unable to scan directory: ' + err);
+    return;
   }
-  console.log(`loading files...`);
+  logger.debug(`loading files...`);
   files.forEach(file => sounds.push(file));
-  console.log(`loaded ${files.length} files.`);
+  logger.debug(`loaded ${files.length} files.`);
 });
 
-client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+const fetchStatus = async () => {
+  const guilds = await Promise.all(
+    client.guilds.map(async g => g.fetchMembers())
+  );
+
+  const people = guilds.reduce(
+    (acc, curr) => acc + curr.members.array().length,
+    0
+  );
+
+  return `Serving ${guilds.length} guilds and ${people} people.`;
+};
+
+client.on('ready', async () => {
+  const status = await fetchStatus();
+  client.user.setActivity('you from a distance', {type: 'WATCHING'});
+
+  logger.info(`Logged in as ${client.user.tag}. ${status}`);
 });
 
-client.on('message', (msg: Discord.Message) => {
-  if (!msg.content.startsWith('.')) return;
+client.on('message', async (msg: Discord.Message) => {
+  if (!msg.content.startsWith(prefix)) return;
 
-  if (msg.content.startsWith('.help')) {
+  if (msg.content.startsWith(`${prefix}help`)) {
     help(msg);
     return;
   }
 
-  if (msg.content.startsWith('.eg')) {
+  if (msg.content.startsWith(`${prefix}stats`)) {
+    const status = await fetchStatus();
+    msg.reply(status);
+    return;
+  }
+
+  if (msg.content.startsWith(`${prefix}eg`)) {
     msg.channel.send(sampleSize(sounds, 10));
+    msg.delete();
     return;
   }
 
@@ -49,22 +82,30 @@ client.on('message', (msg: Discord.Message) => {
       .join()
       .then(connection => {
         try {
+          msg.react(`👍`);
           if (timer) clearTimeout(timer);
-          if (msg.content.startsWith('.leave')) {
+          if (msg.content.startsWith(`${prefix}leave`)) {
             msg.member.voiceChannel.leave();
-          } else if (msg.content.startsWith('.yt')) {
+          } else if (msg.content.startsWith(`${prefix}yt`)) {
             youtube(msg, connection);
           } else {
             play(msg, connection);
           }
         } catch (e) {
-          console.log(e);
+          logger.log(e);
         }
       })
-      .catch(console.log);
+      .catch(logger.log);
   } else {
     msg.reply('You need to join a voice channel first!');
+    msg.delete();
   }
 });
+
+client.on('debug', m => logger.debug(m));
+client.on('warn', m => logger.warn(m));
+client.on('error', m => logger.error(m.message));
+
+process.on('uncaughtException', error => logger.error(error.message));
 
 client.login(process.env.DISCORD_BOT_TOKEN);

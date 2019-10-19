@@ -8,8 +8,10 @@ export const youtube = (
   connection: Discord.VoiceConnection
 ) => {
   const url = msg.content.split(' ').pop();
+
   if (url) {
-    const stream = ytdl(url, {filter: 'audioonly'});
+    msg.react(`🎵`);
+    const stream = ytdl(url, {filter: 'audioonly', highWaterMark: 1 << 25});
     const dispatcher = connection.playStream(stream);
 
     clean(dispatcher, msg);

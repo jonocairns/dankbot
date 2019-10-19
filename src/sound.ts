@@ -1,6 +1,8 @@
 import Discord from 'discord.js';
+import {sample} from 'lodash';
 import path from 'path';
 
+import {args} from './args';
 import {clean} from './clean';
 import {sounds} from './index';
 
@@ -8,15 +10,14 @@ export const play = (
   msg: Discord.Message,
   connection: Discord.VoiceConnection
 ) => {
-  let targetFile = msg.content.split('.').pop();
+  let arg = args(msg.content);
 
-  if (msg.content.startsWith('.meme')) {
-    targetFile = sounds[Math.floor(Math.random() * sounds.length)]
-      .split('.')
-      .shift();
+  if (arg === 'meme') {
+    const random = sample(sounds) || '';
+    arg = random.split('.').shift();
   }
 
-  const file = sounds.find(s => s.split('.').shift() === targetFile);
+  const file = sounds.find(s => s.split('.').shift() === arg);
 
   if (file) {
     const dispatcher = connection.playFile(
