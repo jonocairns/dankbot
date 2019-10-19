@@ -100,7 +100,10 @@ client.on('message', async (msg: Discord.Message) => {
             msg.member.voiceChannel.leave();
           } else if (msgContent.startsWith(`${prefix}yt`)) {
             youtube(msg, connection);
-          } else if (msgContent.startsWith(`${prefix}speak`)) {
+          } else if (
+            msgContent.startsWith(`${prefix}speak`) ||
+            msgContent.startsWith(`${prefix}joke`)
+          ) {
             speech(msg, connection);
           } else {
             play(msg, connection);
@@ -114,10 +117,6 @@ client.on('message', async (msg: Discord.Message) => {
     msg.reply('You need to join a voice channel first!');
     msg.delete();
   }
-});
-
-client.on('guildMemberSpeaking', (m, speaking) => {
-  logger.info(m);
 });
 
 client.on('debug', m => logger.debug(m));
