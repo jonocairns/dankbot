@@ -14,15 +14,16 @@ interface Language {
 }
 
 export const languages: Array<Language> = [
-  {short: 'chinese', code: 'cmn-CN-Wavenet-B', gender: 'MALE'},
-  {short: 'german', code: 'de-DE-Wavenet-D', gender: 'MALE'},
-  {short: 'australian', code: 'en-AU-Standard-B', gender: 'MALE'},
-  {short: 'indian', code: 'en-IN-Wavenet-A', gender: 'FEMALE'},
-  {short: 'english', code: 'en-GB-Standard-B', gender: 'MALE'},
-  {short: 'us', code: 'en-US-Wavenet-A', gender: 'MALE'},
-  {short: 'french', code: 'fr-FR-Wavenet-B', gender: 'MALE'},
-  {short: 'italian', code: 'it-IT-Standard-D', gender: 'MALE'},
-  {short: 'russian', code: 'ru-RU-Wavenet-B', gender: 'MALE'},
+  {short: 'chinese', code: 'cmn-CN', gender: 'MALE'},
+  {short: 'german', code: 'de-', gender: 'MALE'},
+  {short: 'australian', code: 'en-AU', gender: 'MALE'},
+  {short: 'indian', code: 'en-IN', gender: 'FEMALE'},
+  {short: 'english', code: 'en-GB', gender: 'MALE'},
+  {short: 'us', code: 'en-US', gender: 'MALE'},
+  {short: 'french', code: 'fr-FR', gender: 'MALE'},
+  {short: 'italian', code: 'it-IT', gender: 'MALE'},
+  {short: 'russian', code: 'ru-RU', gender: 'MALE'},
+  {short: 'arabic', code: 'ar-XA', gender: 'MALE'},
 ];
 
 let defaultLanguage = languages[0];
