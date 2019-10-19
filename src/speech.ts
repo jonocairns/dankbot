@@ -28,7 +28,7 @@ export const speech = async (
   const request: SynthesizeSpeechRequest = {
     input: {text},
     voice: {
-      languageCode: 'en-AU-Standard-B',
+      languageCode: 'en-GB-Standard-B',
       ssmlGender: 'MALE',
     },
     audioConfig: {audioEncoding: 'OGG_OPUS'},
