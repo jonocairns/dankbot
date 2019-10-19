@@ -16,9 +16,9 @@ interface Language {
 export const languages: Array<Language> = [
   {short: 'chinese', code: 'cmn-CN-Wavenet-B', gender: 'MALE'},
   {short: 'german', code: 'de-DE-Wavenet-D', gender: 'MALE'},
-  {short: 'australian', code: 'en-AU-Wavenet-B', gender: 'MALE'},
+  {short: 'australian', code: 'en-AU-Standard-B', gender: 'MALE'},
   {short: 'indian', code: 'en-IN-Wavenet-A', gender: 'FEMALE'},
-  {short: 'english', code: 'en-GB-Wavenet-B', gender: 'MALE'},
+  {short: 'english', code: 'en-GB-Standard-B', gender: 'MALE'},
   {short: 'us', code: 'en-US-Wavenet-A', gender: 'MALE'},
   {short: 'french', code: 'fr-FR-Wavenet-B', gender: 'MALE'},
   {short: 'italian', code: 'it-IT-Standard-D', gender: 'MALE'},
