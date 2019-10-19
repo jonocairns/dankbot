@@ -35,27 +35,37 @@ fs.readdir(path.join(__dirname, '../sounds'), (err, files) => {
   logger.debug(`loaded ${files.length} files.`);
 });
 
-client.on('ready', async () => {
-  const allGuilds = await Promise.all(
+const fetchStatus = async () => {
+  const guilds = await Promise.all(
     client.guilds.map(async g => g.fetchMembers())
   );
 
-  const people = allGuilds.reduce(
+  const people = guilds.reduce(
     (acc, curr) => acc + curr.members.array().length,
     0
   );
+
+  return `Serving ${guilds.length} guilds and ${people} people.`;
+};
+
+client.on('ready', async () => {
+  const status = await fetchStatus();
   client.user.setActivity('you from a distance', {type: 'WATCHING'});
 
-  logger.info(
-    `Logged in as ${client.user.tag}. Serving ${allGuilds.length} guild(s) and ${people} people`
-  );
+  logger.info(`Logged in as ${client.user.tag}. ${status}`);
 });
 
-client.on('message', (msg: Discord.Message) => {
+client.on('message', async (msg: Discord.Message) => {
   if (!msg.content.startsWith(prefix)) return;
 
   if (msg.content.startsWith(`${prefix}help`)) {
     help(msg);
+    return;
+  }
+
+  if (msg.content.startsWith(`${prefix}stats`)) {
+    const status = await fetchStatus();
+    msg.reply(status);
     return;
   }
 
