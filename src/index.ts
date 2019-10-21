@@ -7,7 +7,6 @@ import winston from 'winston';
 
 import {help} from './help';
 import {play} from './sound';
-import {languages, setLang, speech} from './speech';
 import {youtube} from './youtube';
 
 dotenv.config();
@@ -70,17 +69,6 @@ client.on('message', async (msg: Discord.Message) => {
     return;
   }
 
-  if (msgContent.startsWith(`${prefix}lang`)) {
-    const targetLang = msgContent.replace('.lang', '');
-    const lang = languages.find(l => l.short === targetLang.trim());
-
-    if (lang) {
-      setLang(lang);
-    }
-    msg.delete();
-    return;
-  }
-
   if (msgContent.startsWith(`${prefix}eg`)) {
     msg.channel.send(sampleSize(sounds, 10));
     msg.delete();
@@ -98,13 +86,9 @@ client.on('message', async (msg: Discord.Message) => {
           if (timer) clearTimeout(timer);
           if (msgContent.startsWith(`${prefix}leave`)) {
             msg.member.voiceChannel.leave();
+            msg.delete();
           } else if (msgContent.startsWith(`${prefix}yt`)) {
             youtube(msg, connection);
-          } else if (
-            msgContent.startsWith(`${prefix}speak`) ||
-            msgContent.startsWith(`${prefix}joke`)
-          ) {
-            speech(msg, connection);
           } else {
             play(msg, connection);
           }
