@@ -1,7 +1,5 @@
 import Discord from 'discord.js';
 
-import {languages} from './speech';
-
 export const help = (msg: Discord.Message) => {
   const embed = new Discord.RichEmbed()
     .addField(
