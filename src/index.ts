@@ -1,13 +1,9 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import {sampleSize} from 'lodash';
+import {some} from 'lodash';
 import path from 'path';
 import winston from 'winston';
-
-import {help} from './help';
-import {play} from './sound';
-import {youtube} from './youtube';
 
 dotenv.config();
 const client = new Discord.Client();
@@ -47,9 +43,23 @@ const fetchStatus = async () => {
   return `Serving ${guilds.length} guilds and ${people} people.`;
 };
 
+export interface Handler {
+  cmd: Array<string>;
+  action(msg: Discord.Message): Promise<Discord.Message>;
+}
+
+const commands: Array<Handler> = [];
+
 client.on('ready', async () => {
   const status = await fetchStatus();
   client.user.setActivity('you from a distance', {type: 'WATCHING'});
+
+  logger.info(`initialising handlers...`);
+  fs.readdir(path.join(__dirname, './handlers'), (err, files) =>
+    files.forEach(file =>
+      commands.push(require(`./handlers/${file.split('.')[0]}`).default)
+    )
+  );
 
   logger.info(`Logged in as ${client.user.tag}. ${status}`);
 });
@@ -58,48 +68,22 @@ client.on('message', async (msg: Discord.Message) => {
   const msgContent = msg.content.toLowerCase();
   if (!msgContent.startsWith(prefix)) return;
 
-  if (msgContent.startsWith(`${prefix}help`)) {
-    help(msg);
-    return;
-  }
+  logger.info(
+    `processing command: '${msgContent}' by user '${msg.author.username}' in channel '${msg.channel}' in guild '${msg.guild}'`
+  );
 
-  if (msgContent.startsWith(`${prefix}stats`)) {
-    const status = await fetchStatus();
-    msg.reply(status);
-    return;
-  }
-
-  if (msgContent.startsWith(`${prefix}eg`)) {
-    msg.channel.send(sampleSize(sounds, 10));
-    msg.delete();
-    return;
-  }
-
-  if (!msg.guild) return;
-
-  if (msg.member.voiceChannel) {
-    msg.member.voiceChannel
-      .join()
-      .then(async connection => {
-        try {
-          msg.react(`👍`);
-          if (timer) clearTimeout(timer);
-          if (msgContent.startsWith(`${prefix}leave`)) {
-            msg.member.voiceChannel.leave();
-            msg.delete();
-          } else if (msgContent.startsWith(`${prefix}yt`)) {
-            youtube(msg, connection);
-          } else {
-            play(msg, connection);
-          }
-        } catch (e) {
-          logger.log(e);
-        }
-      })
-      .catch(logger.log);
-  } else {
-    msg.reply('You need to join a voice channel first!');
-    msg.delete();
+  try {
+    const command = commands.find(c =>
+      some(c.cmd, c => msgContent.startsWith(`${prefix}${c}`))
+    );
+    if (command) {
+      await command.action(msg);
+    } else {
+      msg.reply('no dice.');
+    }
+  } catch (e) {
+    logger.error(e);
+    msg.member.voiceChannel.leave();
   }
 });
 
