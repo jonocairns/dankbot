@@ -31,15 +31,10 @@ const play = async (msg: Discord.Message) => {
     dispatcher.on('error', e => {
       logger.error(e);
       connection.disconnect();
-      msg.delete();
-    });
-
-    dispatcher.on('end', () => {
-      msg.delete();
     });
   }
 
-  return msg;
+  return msg.delete();
 };
 const sound: Handler = {
   cmd: ['meme'].concat(sounds.map(s => s.split('.')[0])),
