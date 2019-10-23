@@ -56,9 +56,10 @@ client.on('ready', async () => {
 
   logger.info(`initialising handlers...`);
   fs.readdir(path.join(__dirname, './handlers'), (err, files) =>
-    files.forEach(file =>
-      commands.push(require(`./handlers/${file.split('.')[0]}`).default)
-    )
+    files.forEach(async file => {
+      const handler = await import(`./handlers/${file.split('.')[0]}`);
+      commands.push(handler.default);
+    })
   );
 
   logger.info(`Logged in as ${client.user.tag}. ${status}`);
