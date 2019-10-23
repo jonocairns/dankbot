@@ -28,11 +28,6 @@ const play = async (msg: Discord.Message) => {
       path.join(__dirname, `../../sounds/${file}`)
     );
 
-    dispatcher.on('start', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (connection.player as any).streamingData.pausedTime = 0;
-    });
-
     dispatcher.on('error', e => {
       logger.error(e);
       connection.disconnect();
