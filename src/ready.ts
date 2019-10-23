@@ -3,7 +3,8 @@ import {commands} from './message';
 import {readFiles} from './util';
 
 export const ready = async () => {
-  client.user.setActivity('you from a distance', {type: 'WATCHING'});
+  client.user &&
+    client.user.setActivity('you from a distance', {type: 'WATCHING'});
 
   logger.debug(`initialising handlers...`);
 
@@ -18,7 +19,7 @@ export const ready = async () => {
   });
 
   logger.info(
-    `Logged in as ${client.user.tag}. Serving ${
+    `Logged in as ${client.user && client.user.tag}. Serving ${
       client.guilds.array().length
     } guild(s)`
   );

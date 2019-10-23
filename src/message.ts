@@ -30,7 +30,7 @@ export const message = async (msg: Discord.Message) => {
   } catch (e) {
     logger.error(e);
     if (msg.member) {
-      msg.member.voiceChannel.leave();
+      msg.member.voice.channel && msg.member.voice.channel.leave();
     }
   }
 };
