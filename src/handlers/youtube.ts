@@ -2,13 +2,24 @@ import Discord from 'discord.js';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 
-import { logger, Handler } from '../index';
+import {Handler, logger} from '../index';
+
+const playUrl = (url: string, connection: Discord.VoiceConnection) => {
+  const stream = ytdl(url, {
+    filter: 'audioonly',
+    highWaterMark: 1 << 25,
+  });
+  const dispatcher = connection.playStream(stream);
+  dispatcher.on('error', e => {
+    logger.error(e);
+  });
+};
 
 export const yt = async (msg: Discord.Message): Promise<Discord.Message> => {
   if (!msg.member.voiceChannel) return msg;
 
   const connection = await msg.member.voiceChannel.join();
-  if(!connection || !msg.guild) return msg;
+  if (!connection || !msg.guild) return msg;
   const url = msg.content.split(' ').pop();
 
   if (url) {
@@ -28,17 +39,6 @@ export const yt = async (msg: Discord.Message): Promise<Discord.Message> => {
   }
   return msg.delete();
 };
-
-const playUrl = (url: string, connection: Discord.VoiceConnection) => {
-  const stream = ytdl(url, {
-    filter: 'audioonly',
-    highWaterMark: 1 << 25,
-  });
-  const dispatcher = connection.playStream(stream);
-  dispatcher.on('error', e => {
-    logger.error(e);
-  });
-}
 
 const youtube: Handler = {
   cmd: ['yt'],
