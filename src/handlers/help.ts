@@ -1,6 +1,22 @@
 import Discord from 'discord.js';
+import {sampleSize} from 'lodash';
 
-export const help = (msg: Discord.Message) => {
+import {prefix, sounds} from '../index';
+import {Handler} from '../message';
+
+const h = async (msg: Discord.Message): Promise<Discord.Message> => {
+  const msgContent = msg.content.toLowerCase();
+  if (msgContent.startsWith(`${prefix}eg`)) {
+    const examples = sampleSize(sounds, 10);
+    msg.channel.send(examples.map(e => e.split('.')[0]));
+    return msg;
+  }
+
+  if (msgContent.startsWith(`${prefix}leave`)) {
+    msg.member.voiceChannel.leave();
+    return msg.delete();
+  }
+
   const embed = new Discord.RichEmbed()
     .addField(
       'how can I invite you to my server?',
@@ -25,4 +41,12 @@ export const help = (msg: Discord.Message) => {
   } else {
     msg.reply(embed);
   }
+  return msg;
 };
+
+const help: Handler = {
+  cmd: ['help', 'eg', 'leave'],
+  action: (msg: Discord.Message): Promise<Discord.Message> => h(msg),
+};
+
+export default help;
