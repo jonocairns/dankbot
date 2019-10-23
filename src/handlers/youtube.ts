@@ -2,7 +2,8 @@ import Discord from 'discord.js';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 
-import {Handler, logger} from '../index';
+import {logger} from '../index';
+import {Handler} from '../message';
 
 const playUrl = (url: string, connection: Discord.VoiceConnection) => {
   const stream = ytdl(url, {

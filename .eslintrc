@@ -12,7 +12,7 @@
     "env": {
       "browser": false
     },
-    "plugins": ["@typescript-eslint", "jest", "prettier", "simple-import-sort"],
+    "plugins": ["@typescript-eslint", "jest", "prettier"],
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/eslint-recommended",
@@ -37,7 +37,6 @@
           "allowTernary": true
         }
       ],
-      "simple-import-sort/sort": "error",
       "sort-imports": "off",
       "import/order": "off"
     }

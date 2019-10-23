@@ -3,7 +3,8 @@ import {sample} from 'lodash';
 import path from 'path';
 
 import {args} from '../args';
-import {Handler, logger, sounds} from '../index';
+import {logger, sounds} from '../index';
+import {Handler} from '../message';
 
 const play = async (msg: Discord.Message) => {
   if (!msg.member.voiceChannel) return msg;

@@ -1,13 +1,15 @@
 import Discord from 'discord.js';
 import {sampleSize} from 'lodash';
 
-import {Handler, prefix, sounds} from '../index';
+import {prefix, sounds} from '../index';
+import {Handler} from '../message';
 
 const h = async (msg: Discord.Message): Promise<Discord.Message> => {
   const msgContent = msg.content.toLowerCase();
   if (msgContent.startsWith(`${prefix}eg`)) {
-    msg.channel.send(sampleSize(sounds, 10));
-    return msg.delete();
+    const examples = sampleSize(sounds, 10);
+    msg.channel.send(examples.map(e => e.split('.')[0]));
+    return msg;
   }
 
   if (msgContent.startsWith(`${prefix}leave`)) {
