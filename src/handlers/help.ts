@@ -13,11 +13,11 @@ const h = async (msg: Discord.Message): Promise<Discord.Message> => {
   }
 
   if (msgContent.startsWith(`${prefix}leave`)) {
-    msg.member.voiceChannel.leave();
+    msg.member && msg.member.voice.channel && msg.member.voice.channel.leave();
     return msg.delete();
   }
 
-  const embed = new Discord.RichEmbed()
+  const embed = new Discord.MessageEmbed()
     .addField(
       'how can I invite you to my server?',
       'use this link -> https://bit.ly/2MURMYo'

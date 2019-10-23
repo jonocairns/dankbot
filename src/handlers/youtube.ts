@@ -10,16 +10,16 @@ const playUrl = (url: string, connection: Discord.VoiceConnection) => {
     filter: 'audioonly',
     highWaterMark: 1 << 25,
   });
-  const dispatcher = connection.playStream(stream);
+  const dispatcher = connection.play(stream);
   dispatcher.on('error', e => {
     logger.error(e);
   });
 };
 
 export const yt = async (msg: Discord.Message): Promise<Discord.Message> => {
-  if (!msg.member.voiceChannel) return msg;
+  if (!msg.member || !msg.member.voice.channel) return msg;
 
-  const connection = await msg.member.voiceChannel.join();
+  const connection = await msg.member.voice.channel.join();
   if (!connection || !msg.guild) return msg;
   const url = msg.content.split(' ').pop();
 

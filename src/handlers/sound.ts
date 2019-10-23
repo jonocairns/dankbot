@@ -7,9 +7,9 @@ import {logger, sounds} from '../index';
 import {Handler} from '../message';
 
 const play = async (msg: Discord.Message) => {
-  if (!msg.member.voiceChannel) return msg;
+  if (!msg.member || !msg.member.voice.channel) return msg;
 
-  const connection = await msg.member.voiceChannel.join();
+  const connection = await msg.member.voice.channel.join();
   if (!connection || !msg.guild) return msg;
 
   let arg = args(msg.content);
@@ -24,7 +24,7 @@ const play = async (msg: Discord.Message) => {
   );
 
   if (file) {
-    const dispatcher = connection.playFile(
+    const dispatcher = connection.play(
       path.join(__dirname, `../../sounds/${file}`)
     );
 
