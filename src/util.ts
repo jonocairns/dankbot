@@ -12,6 +12,6 @@ export const readFiles = async (
       return;
     }
     action(files);
-    logger.info(`loaded ${files.length} files from ${directory}`);
+    logger.debug(`loaded ${files.length} files from ${directory}`);
   });
 };

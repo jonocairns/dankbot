@@ -5,7 +5,7 @@ import {readFiles} from './util';
 export const ready = async () => {
   client.user.setActivity('you from a distance', {type: 'WATCHING'});
 
-  logger.info(`initialising handlers...`);
+  logger.debug(`initialising handlers...`);
 
   readFiles('./handlers', files => {
     files.forEach(async file => {
@@ -13,7 +13,7 @@ export const ready = async () => {
       const handler = await import(`./handlers/${handlerFileName}`);
       commands.push(handler.default);
     });
-    logger.info(`loaded handlers: 
+    logger.debug(`loaded handlers: 
       ${files.map(f => f.split('.')[0]).join(', ')}...`);
   });
 
