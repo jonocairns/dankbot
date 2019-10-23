@@ -5,7 +5,7 @@ import winston from 'winston';
 import {message} from './message';
 import {ready} from './ready';
 import {readFiles} from './util';
-import { some, sample } from 'lodash';
+import {some, sample} from 'lodash';
 import path from 'path';
 
 dotenv.config();
@@ -28,30 +28,28 @@ const delay = () => {
   const timeout = Math.random() * tenMins + 5000;
   console.log(`timer set ${timeout}`);
   setTimeout(async () => {
-
     const connection = await hotChannel.join();
     const random = sample(sounds) || '';
     const arg = random.split('.').shift();
     const file = sounds.find(
       s => arg && s.split('.').shift() === arg.toLowerCase()
     );
-  
+
     if (file) {
       const dispatcher = connection.play(
         path.join(__dirname, `../sounds/${file}`)
       );
-  
+
       dispatcher.on('error', e => {
         logger.error(e);
         connection.disconnect();
       });
       dispatcher.on('end', () => {
         delay();
-      })
+      });
     }
   }, timeout);
 };
-
 
 client.on('voiceStateUpdate', async voiceState => {
   if (
