@@ -21,15 +21,15 @@ steps:
 
 - script: |
     yarn lint
-  displayName: 'yarn lint'
-
-- script: |
-    yarn test
-  displayName: 'yarn test'
+  displayName: 'lint'
 
 - script: |
     yarn build
-  displayName: 'yarn build'
+  displayName: 'compile'
+
+- script: |
+    yarn test
+  displayName: 'test'
 
 - publish: '$(System.DefaultWorkingDirectory)/dist'
   artifact: 'dist'
