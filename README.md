@@ -1,11 +1,11 @@
 # dankbot
 A dank soundboard for discord. Check out the sounds folder for all the current lols.
 
-[![Circle CI](https://circleci.com/gh/jonocairns/dankbot.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/jonocairns/dankbot) [![Code Climate](https://codeclimate.com/github/jonocairns/dankbot/badges/gpa.svg)](https://codeclimate.com/github/jonocairns/dankbot)
+[![Build Status](https://sask.visualstudio.com/Dankbot/_apis/build/status/jonocairns.dankbot?branchName=master)](https://sask.visualstudio.com/Dankbot/_build/latest?definitionId=1&branchName=master) [![Code Climate](https://codeclimate.com/github/jonocairns/dankbot/badges/gpa.svg)](https://codeclimate.com/github/jonocairns/dankbot)
 
 Uses node, typescript, eslint, circle-ci (build) and heroku (deployment/environment)
 
-## Mini Docs
+## Docs
 
 Play a random meme with `.meme` 
 
