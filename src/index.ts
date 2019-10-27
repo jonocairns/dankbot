@@ -1,6 +1,7 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
 import winston from 'winston';
+import https from 'https';
 
 import {message} from './message';
 import {ready} from './ready';
@@ -28,3 +29,5 @@ client.on('error', m => logger.error(m.message));
 process.on('uncaughtException', error => logger.error(error.message));
 
 client.login(process.env.DISCORD_BOT_TOKEN);
+
+https.createServer().listen(3000);
