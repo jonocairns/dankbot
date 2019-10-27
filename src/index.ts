@@ -30,4 +30,4 @@ process.on('uncaughtException', error => logger.error(error.message));
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
-https.createServer().listen(3000);
+https.createServer().listen(process.env.PORT || 3000);
