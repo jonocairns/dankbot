@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo 'do this'",
     "start:development": "nodemon -L",
-    "start:production": "yarn build && node dist/index.js",
+    "start:production": "node dist/index.js",
     "start": "by-node-env",
     "lint": "eslint {src,__tests__}/**/* --ext .{{t,j}s{,x}}",
     "lint:fix": "yarn lint --fix",
