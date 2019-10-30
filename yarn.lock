@@ -3936,10 +3936,10 @@ ytdl-core@^1.0.0:
     miniget "^1.6.0"
     sax "^1.1.3"
 
-ytsr@^0.1.8:
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/ytsr/-/ytsr-0.1.8.tgz#e23b6cb0e952a4a375a84fae6dfe64eb0571e100"
-  integrity sha512-HuqB6pK2mRLi45HUe/doDE9MSF08m02sismcC8HuS48A8w9ILGzlzWmHOTNJkF0OnFXA9+vxtz9SaV+kfjw3RA==
+ytsr@^0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/ytsr/-/ytsr-0.1.9.tgz#989ad5daef8518bc66482b9fab6dc6f2e6e55ac6"
+  integrity sha512-UM3h36FNAySOqr3sEr6x+3FyER8CJc7XwCv2sVOa8jtwgN+WyWCpePu9Y1e/1rka9CDXVOtnFnAVXX8U7xXqbQ==
   dependencies:
     html-entities "^1.1.3"
 
