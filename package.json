@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
-    "@discordjs/uws": "^10.149.0",
+    "@discordjs/uws": "^11.149.1",
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
     "erlpack": "discordapp/erlpack",
