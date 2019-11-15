@@ -47,7 +47,7 @@
     "@types/lodash": "^4.14.146",
     "@types/node": "^12.12.7",
     "@types/winston": "^2.4.4",
-    "@typescript-eslint/eslint-plugin": "^2.6.0",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.6.1",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
