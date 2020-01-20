@@ -48,7 +48,7 @@
     "@types/node": "^13.1.6",
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
-    "@typescript-eslint/parser": "^2.15.0",
+    "@typescript-eslint/parser": "^2.16.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-import": "^2.20.0",
