@@ -29,7 +29,7 @@
     "discord.js": "discordjs/discord.js",
     "dotenv": "^8.2.0",
     "erlpack": "discordapp/erlpack",
-    "ffmpeg-static": "^2.7.0",
+    "ffmpeg-static": "^4.2.5",
     "libsodium-wrappers": "^0.7.6",
     "lodash": "^4.17.15",
     "node-opus": "^0.3.3",
