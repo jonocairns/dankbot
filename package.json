@@ -29,18 +29,17 @@
     "discord.js": "12.3.1",
     "dotenv": "^8.2.0",
     "erlpack": "discordapp/erlpack",
-    "ffmpeg-static": "^2.7.0",
+    "ffmpeg-static": "^4.2.7",
     "libsodium-wrappers": "^0.7.6",
     "lodash": "^4.17.15",
-    "node-opus": "^0.3.3",
     "winston": "^3.2.1",
     "ytdl-core": "^2.1.7",
     "ytsr": "^0.1.10",
     "zucc": "^0.1.2"
   },
   "engines": {
-    "node": "12.18.4",
-    "npm": "6.14.6"
+    "node": "12.16.1",
+    "npm": "6.13.4"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
@@ -57,7 +56,7 @@
     "eslint-plugin-simple-import-sort": "^4.0.0",
     "husky": "^3.1.0",
     "lint-staged": "8.2.1",
-    "nodemon": "^1.19.4",
+    "nodemon": "^2.0.4",
     "prettier": "^1.19.1",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.6.2",
