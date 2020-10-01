@@ -25,8 +25,8 @@
   },
   "homepage": "https://github.com/jonocairns/dankbot#readme",
   "dependencies": {
-    "@discordjs/uws": "^11.149.1",
-    "discord.js": "discordjs/discord.js",
+    "@discordjs/opus": "^0.3.2",
+    "discord.js": "12.3.1",
     "dotenv": "^8.2.0",
     "erlpack": "discordapp/erlpack",
     "ffmpeg-static": "^2.7.0",
@@ -39,8 +39,8 @@
     "zucc": "^0.1.2"
   },
   "engines": {
-    "node": "10.16.3",
-    "npm": "6.9.0"
+    "node": "12.18.4",
+    "npm": "6.14.6"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
