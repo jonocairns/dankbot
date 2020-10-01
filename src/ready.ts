@@ -20,7 +20,7 @@ export const ready = async () => {
 
   logger.info(
     `Logged in as ${client.user && client.user.tag}. Serving ${
-      client.guilds.array().length
+      client.guilds.valueOf().array().length
     } guild(s)`
   );
 };
