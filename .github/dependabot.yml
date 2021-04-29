@@ -1,0 +1,46 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "17:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: ytsr
+    versions:
+    - 3.2.3
+    - 3.2.4
+    - 3.3.1
+    - 3.4.0
+    - 3.4.1
+  - dependency-name: "@types/node"
+    versions:
+    - 14.14.22
+    - 14.14.25
+    - 14.14.28
+    - 14.14.31
+    - 14.14.32
+    - 14.14.34
+    - 14.14.35
+    - 14.14.37
+  - dependency-name: husky
+    versions:
+    - 4.3.8
+    - 5.0.9
+    - 5.1.1
+    - 5.1.2
+    - 5.1.3
+    - 5.2.0
+  - dependency-name: typescript
+    versions:
+    - 4.1.3
+    - 4.1.5
+    - 4.2.2
+    - 4.2.3
+  - dependency-name: ytdl-core
+    versions:
+    - 4.4.5
+  - dependency-name: lint-staged
+    versions:
+    - 10.5.3
