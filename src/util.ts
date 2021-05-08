@@ -5,7 +5,7 @@ import {logger} from './index';
 export const readFiles = async (
   directory: string,
   action: (files: Array<string>) => void
-) => {
+): Promise<void> => {
   fs.readdir(path.join(__dirname, directory), (err, files) => {
     if (err) {
       logger.error('Unable to scan directory: ' + err);

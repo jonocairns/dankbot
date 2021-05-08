@@ -11,7 +11,7 @@ const playUrl = (url: string, connection: Discord.VoiceConnection) => {
     highWaterMark: 1 << 25,
   });
   const dispatcher = connection.play(stream);
-  dispatcher.on('error', e => {
+  dispatcher.on('error', (e) => {
     logger.error(e);
   });
 };

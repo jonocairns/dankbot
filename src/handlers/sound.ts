@@ -20,7 +20,7 @@ const play = async (msg: Discord.Message) => {
   }
 
   const file = sounds.find(
-    s => arg && s.split('.').shift() === arg.toLowerCase()
+    (s) => arg && s.split('.').shift() === arg.toLowerCase()
   );
 
   if (file) {
@@ -28,7 +28,7 @@ const play = async (msg: Discord.Message) => {
       path.join(__dirname, `../../sounds/${file}`)
     );
 
-    dispatcher.on('error', e => {
+    dispatcher.on('error', (e) => {
       logger.error(e);
       connection.disconnect();
     });
@@ -37,7 +37,7 @@ const play = async (msg: Discord.Message) => {
   return msg.delete();
 };
 const sound: Handler = {
-  cmd: ['meme'].concat(sounds.map(s => s.split('.')[0])),
+  cmd: ['meme'].concat(sounds.map((s) => s.split('.')[0])),
   action: (msg: Discord.Message): Promise<Discord.Message> => play(msg),
 };
 

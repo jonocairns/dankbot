@@ -8,7 +8,7 @@ const h = async (msg: Discord.Message): Promise<Discord.Message> => {
   const msgContent = msg.content.toLowerCase();
   if (msgContent.startsWith(`${prefix}eg`)) {
     const examples = sampleSize(sounds, 10);
-    msg.channel.send(examples.map(e => e.split('.')[0]));
+    msg.channel.send(examples.map((e) => e.split('.')[0]));
     return msg;
   }
 

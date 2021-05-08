@@ -10,7 +10,7 @@ export interface Handler {
 
 export const commands: Array<Handler> = [];
 
-export const message = async (msg: Discord.Message) => {
+export const message = async (msg: Discord.Message): Promise<void> => {
   const msgContent = msg.content.toLowerCase();
   if (!msgContent.startsWith(prefix)) return;
 
@@ -19,8 +19,8 @@ export const message = async (msg: Discord.Message) => {
   );
 
   try {
-    const command = commands.find(c =>
-      some(c.cmd, c => msgContent.startsWith(`${prefix}${c}`))
+    const command = commands.find((c) =>
+      some(c.cmd, (c) => msgContent.startsWith(`${prefix}${c}`))
     );
     if (command) {
       await command.action(msg);

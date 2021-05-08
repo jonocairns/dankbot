@@ -13,13 +13,13 @@ declare function ytsr(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options: any,
   callback: (error: Error, result: SearchResult) => void
-): {};
+): Record<string, unknown>;
 
 declare namespace ytsr {
   function getFilters(
     searchString: string,
     callback: (error: Error, result: SearchResult) => void
-  ): {};
+  ): Record<string, unknown>;
 }
 
 export default ytsr;
