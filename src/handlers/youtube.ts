@@ -10,6 +10,7 @@ const playUrl = (url: string, connection: Discord.VoiceConnection) => {
     filter: 'audioonly',
     highWaterMark: 1 << 25,
   });
+
   const dispatcher = connection.play(stream);
   dispatcher.on('error', e => {
     logger.error(e);
@@ -27,14 +28,10 @@ export const yt = async (msg: Discord.Message): Promise<Discord.Message> => {
     if (ytdl.validateURL(url)) {
       playUrl(url, connection);
     } else {
-      ytsr(msg.content.toLowerCase().replace('.yt', ''), {}, (err, results) => {
-        if (err) {
-          logger.error(err.message);
-        }
-        if (results.items.length > 0) {
-          playUrl(results.items[0].link, connection);
-        }
-      });
+      const results = await ytsr(msg.content.toLowerCase().replace('.yt', ''));
+      if (results.items.length > 0) {
+        playUrl(results.items[0].url, connection);
+      }
     }
     await msg.react(`🎵`);
   }

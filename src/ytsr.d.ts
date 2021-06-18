@@ -1,5 +1,5 @@
 interface Result {
-  link: string;
+  url: string;
   title: string;
 }
 
@@ -11,9 +11,8 @@ interface SearchResult {
 declare function ytsr(
   searchString: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  options: any,
-  callback: (error: Error, result: SearchResult) => void
-): {};
+  options?: any
+): Promise<SearchResult>;
 
 declare namespace ytsr {
   function getFilters(
