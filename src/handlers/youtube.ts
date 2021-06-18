@@ -28,7 +28,7 @@ export const yt = async (msg: Discord.Message): Promise<Discord.Message> => {
     if (ytdl.validateURL(url)) {
       playUrl(url, connection);
     } else {
-      const results = await ytsr(msg.content.toLowerCase().replace('.yt', ''));
+      const results = await ytsr(msg.content.toLowerCase().replace('.yt', ''), {limit: 1});
       if (results.items.length > 0) {
         playUrl(results.items[0].url, connection);
       }

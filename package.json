@@ -28,14 +28,12 @@
     "@discordjs/opus": "^0.3.2",
     "discord.js": "12.3.1",
     "dotenv": "^8.2.0",
-    "erlpack": "discordapp/erlpack",
     "ffmpeg-static": "^4.2.7",
     "libsodium-wrappers": "^0.7.6",
     "lodash": "^4.17.15",
     "winston": "^3.2.1",
-    "ytdl-core": "^2.1.7",
-    "ytsr": "^0.1.10",
-    "zucc": "^0.1.2"
+    "ytdl-core": "^4.8.2",
+    "ytsr": "^3.5.0"
   },
   "engines": {
     "node": "12.18.4",
