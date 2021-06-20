@@ -3,8 +3,7 @@ import {commands} from './message';
 import {readFiles} from './util';
 
 export const ready = async () => {
-  client.user &&
-    client.user.setActivity('you from a distance', {type: 'WATCHING'});
+  client.user && client.user.setActivity('.help', {type: 'WATCHING'});
 
   logger.debug(`initialising handlers...`);
 
