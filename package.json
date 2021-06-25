@@ -29,7 +29,7 @@
     "discord.js": "12.3.1",
     "dotenv": "^8.2.0",
     "ffmpeg-static": "^4.2.7",
-    "libsodium-wrappers": "^0.7.6",
+    "libsodium-wrappers": "^0.7.9",
     "lodash": "^4.17.15",
     "winston": "^3.2.1",
     "ytdl-core": "^4.8.2",
