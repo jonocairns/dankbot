@@ -27,7 +27,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
     "discord.js": "12.5.3",
-    "dotenv": "^8.2.0",
+    "dotenv": "^16.0.1",
     "ffmpeg-static": "^4.4.0",
     "libsodium-wrappers": "^0.7.9",
     "lodash": "^4.17.21",
