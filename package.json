@@ -35,8 +35,8 @@
     "ytdl-core": "^4.11.2"
   },
   "engines": {
-    "node": "16.18.0",
-    "npm": "8.19.2"
+    "node": "16",
+    "npm": "8"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
