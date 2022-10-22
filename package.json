@@ -2,7 +2,7 @@
   "name": "dankbot",
   "version": "1.0.1",
   "description": "A dank discord bot",
-  "main": "dist/api/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo 'do this'",
     "start": "nodemon",
