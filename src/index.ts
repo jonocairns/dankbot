@@ -82,10 +82,10 @@ const init = async (guilds: Array<string>) => {
     }
 };
 
-const player = createAudioPlayer();
-
 client.on('interactionCreate', async (interaction) => {
     if (interaction.isChatInputCommand()) {
+        const player = createAudioPlayer();
+
         const voiceChannel = (interaction.member as GuildMember)?.voice?.channel
             ?.id;
 
