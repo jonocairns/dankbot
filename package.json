@@ -8,7 +8,10 @@
     "start": "nodemon",
     "lint": "eslint {src,__tests__}/**/* --ext .{{t,j}s{,x}}",
     "lint:fix": "yarn lint --fix",
-    "build": "tsc"
+    "build": "tsc",
+    "docker:build": "docker build . -t jonocairns/dankbot",
+    "docker:run": "docker run --env-file=.env -d jonocairns/dankbot:latest",
+    "docker:push": "docker push jonocairns/dankbot:latest"
   },
   "repository": {
     "type": "git",
