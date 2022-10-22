@@ -4,32 +4,32 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
-- master
+  - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '12.18.4'
-  displayName: 'Install Node.js'
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "16.18.0"
+    displayName: "Install Node.js"
 
-- script: |
-    yarn install
-  displayName: 'yarn install'
+  - script: |
+      yarn install
+    displayName: "yarn install"
 
-- script: |
-    yarn lint
-  displayName: 'lint'
+  - script: |
+      yarn lint
+    displayName: "lint"
 
-- script: |
-    yarn build
-  displayName: 'compile'
+  - script: |
+      yarn build
+    displayName: "compile"
 
-- script: |
-    yarn test
-  displayName: 'test'
+  - script: |
+      yarn test
+    displayName: "test"
 
-- publish: '$(System.DefaultWorkingDirectory)/dist'
-  artifact: 'dist'
+  - publish: "$(System.DefaultWorkingDirectory)/dist"
+    artifact: "dist"
