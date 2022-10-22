@@ -2,7 +2,7 @@
   "name": "dankbot",
   "version": "1.0.1",
   "description": "A dank discord bot",
-  "main": "src/index.js",
+  "main": "dist/api/index.js",
   "scripts": {
     "test": "echo 'do this'",
     "start": "nodemon",
@@ -44,6 +44,7 @@
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
+    "@vercel/node": "^2.5.26",
     "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
