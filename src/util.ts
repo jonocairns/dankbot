@@ -5,7 +5,7 @@ import {
 } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
-import {logger} from '../';
+import {logger} from './logger';
 
 export const readFiles = async (
     directory: string,

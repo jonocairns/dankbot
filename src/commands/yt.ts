@@ -7,7 +7,6 @@ import {Command, CommandName} from '../util';
 import {createAudioResource} from '@discordjs/voice';
 import ytdl from 'ytdl-core';
 import {getPlayer} from '../getPlayer';
-import {cleanUp} from '../cleanUp';
 
 export const yt: Command = {
     id: CommandName.yt,
@@ -25,7 +24,7 @@ export const yt: Command = {
         const url = interaction.options.get('link')?.value as string;
 
         if (!url) {
-            await interaction.reply({content: 'No link provided. Idiot'});
+            await interaction.editReply({content: 'No link provided. Idiot'});
             return;
         }
 
@@ -33,13 +32,9 @@ export const yt: Command = {
             filter: 'audioonly',
             highWaterMark: 1 << 25,
         });
+
+        await interaction.editReply({content: `playing ${url}`});
         const resource = createAudioResource(stream);
         player.play(resource);
-
-        if (interaction.isRepliable()) {
-            await interaction.reply({content: `playing ${url}`});
-        }
-
-        await cleanUp(interaction);
     },
 };

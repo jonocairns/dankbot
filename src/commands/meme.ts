@@ -8,7 +8,7 @@ import {sounds} from '../';
 import {createAudioResource} from '@discordjs/voice';
 import {createReadStream} from 'fs';
 import {getPlayer} from '../getPlayer';
-import {cleanUp} from '../cleanUp';
+import {logger} from '../logger';
 
 export const meme: Command = {
     id: CommandName.meme,
@@ -28,16 +28,17 @@ export const meme: Command = {
                 sound = inputSound;
             } else {
                 await interaction.editReply(
-                    `You dummy McIdiot, '${input}' doesn't exist`
+                    `'${input}' does not exist you dummy`
                 );
                 return;
             }
         }
-        await interaction.editReply(`memed '${sound.split('.')[0]}'`);
+        const meme = sound.split('.')[0];
+        await interaction.editReply(`memed '${meme}'`);
+        logger.info(`${interaction.member?.user.id} triggered ${meme}`);
         const {player} = getPlayer(interaction);
         const stream = createReadStream(`./sounds/${sound}`);
         const resource = createAudioResource(stream);
         player.play(resource);
-        await cleanUp(interaction);
     },
 };
