@@ -1,6 +1,11 @@
+import {
+    CacheType,
+    ChatInputCommandInteraction,
+    SlashCommandBuilder,
+} from 'discord.js';
 import fs from 'fs';
 import path from 'path';
-import {logger} from './index';
+import {logger} from './logger';
 
 export const readFiles = async (
     directory: string,
@@ -16,3 +21,14 @@ export const readFiles = async (
         logger.debug(`loaded ${files.length} files from ${directory}`);
     });
 };
+
+export interface Command {
+    id: CommandName;
+    register: Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+    run(interaction: ChatInputCommandInteraction<CacheType>): Promise<void>;
+}
+
+export enum CommandName {
+    meme = 'meme',
+    yt = 'yt',
+}
