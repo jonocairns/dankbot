@@ -3,20 +3,8 @@
     80,
     120
   ],
-  "editor.formatOnSave": false,
-  "[javascript]": {
-    "editor.formatOnSave": false
-  },
-  "[javascriptreact]": {
-    "editor.formatOnSave": false
-  },
-  "[typescript]": {
-    "editor.formatOnSave": false
-  },
-  "[typescriptreact]": {
-    "editor.formatOnSave": false
-  },
-  "eslint.enable": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnSave": true,
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true

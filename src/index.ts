@@ -6,12 +6,13 @@ import {readFiles} from './util';
 import {getVariables} from './getVariables';
 import {logger} from './logger';
 import {cleanUp} from './cleanUp';
+import {doj} from './commands/doj';
 
 dotenv.config();
 export const sounds: Array<string> = [];
 
 const {appId, token} = getVariables();
-const commands = [meme, yt];
+const commands = [meme, yt, doj];
 
 readFiles('../sounds', (files) => files.forEach((file) => sounds.push(file)));
 

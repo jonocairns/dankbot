@@ -31,4 +31,5 @@ export interface Command {
 export enum CommandName {
     meme = 'meme',
     yt = 'yt',
+    doj = 'doj',
 }
