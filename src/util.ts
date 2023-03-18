@@ -32,4 +32,5 @@ export enum CommandName {
     meme = 'meme',
     yt = 'yt',
     doj = 'doj',
+    ai = 'ai',
 }
