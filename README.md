@@ -1,4 +1,7 @@
 # dankbot
+![build-status](https://github.com/jonocairns/dankbot/actions/workflows/ci.yml/badge.svg?branch=master)
+![build-status](https://github.com/jonocairns/dankbot/actions/workflows/docker.yml/badge.svg?branch=master)
+
 A dank soundboard for discord. Check out the sounds folder for all the current lols.
 
 Uses node, typescript, eslint, github actions (build) and docker
