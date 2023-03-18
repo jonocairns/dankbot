@@ -2,7 +2,7 @@ import {meme, yt, doj, ai} from './commands';
 import {Client, Events, GatewayIntentBits, REST, Routes} from 'discord.js';
 import dotenv from 'dotenv';
 
-import {readFiles} from './util';
+import {CommandName, readFiles} from './util';
 import {getVariables} from './getVariables';
 import {logger} from './logger';
 import {cleanUp} from './cleanUp';
@@ -50,6 +50,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } catch (err) {
         logger.error(err);
     } finally {
-        await cleanUp(interaction);
+        const needsCleanUp = ![CommandName.ai].includes(command.id);
+        if (needsCleanUp) {
+            await cleanUp(interaction);
+        }
     }
 });
