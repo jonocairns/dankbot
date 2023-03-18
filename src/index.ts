@@ -1,4 +1,4 @@
-import {meme, yt} from './commands';
+import {meme, yt, doj, ai} from './commands';
 import {Client, Events, GatewayIntentBits, REST, Routes} from 'discord.js';
 import dotenv from 'dotenv';
 
@@ -6,13 +6,12 @@ import {readFiles} from './util';
 import {getVariables} from './getVariables';
 import {logger} from './logger';
 import {cleanUp} from './cleanUp';
-import {doj} from './commands/doj';
 
 dotenv.config();
 export const sounds: Array<string> = [];
 
 const {appId, token} = getVariables();
-const commands = [meme, yt, doj];
+const commands = [meme, yt, doj, ai];
 
 readFiles('../sounds', (files) => files.forEach((file) => sounds.push(file)));
 
