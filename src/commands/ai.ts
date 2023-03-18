@@ -26,6 +26,6 @@ export const ai: Command = {
         const prompt = interaction.options.get('prompt')?.value as string;
         const completion = await openai.createCompletion({model, prompt});
         const content = completion.data.choices[0].text;
-        await interaction.reply({content});
+        await interaction.editReply({content});
     },
 };
