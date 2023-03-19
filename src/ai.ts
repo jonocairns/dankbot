@@ -13,7 +13,6 @@ export const ai = async (message: Message, botId?: string) => {
         });
         const openai = new OpenAIApi(configuration);
         const prompt = message.content.replace(`<@${botId}>`, '').trim();
-
         const completion = await openai.createCompletion({
             model: AI_MODEL,
             prompt,
