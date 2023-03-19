@@ -7,6 +7,7 @@ import {Command, CommandName} from '../util';
 import {createAudioResource} from '@discordjs/voice';
 import ytdl from 'ytdl-core';
 import {getPlayer} from '../getPlayer';
+import {cleanUp} from '../cleanUp';
 
 export const yt: Command = {
     id: CommandName.yt,
@@ -36,5 +37,6 @@ export const yt: Command = {
         await interaction.editReply({content: `playing ${url}`});
         const resource = createAudioResource(stream);
         player.play(resource);
+        await cleanUp(interaction);
     },
 };

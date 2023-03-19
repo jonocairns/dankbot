@@ -1,29 +1,45 @@
-import {meme, yt, doj, ai} from './commands';
+import {meme, yt} from './commands';
 import {Client, Events, GatewayIntentBits, REST, Routes} from 'discord.js';
 import dotenv from 'dotenv';
 
-import {CommandName, readFiles} from './util';
+import {readFiles} from './util';
 import {getVariables} from './getVariables';
 import {logger} from './logger';
-import {cleanUp} from './cleanUp';
+import {ai} from './ai';
 
 dotenv.config();
 export const sounds: Array<string> = [];
 
 const {appId, token} = getVariables();
-const commands = [meme, yt, doj, ai];
+const commands = [meme, yt];
 
 readFiles('../sounds', (files) => files.forEach((file) => sounds.push(file)));
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+    ],
 });
 
 client.login(token);
 
+client.on(Events.MessageCreate, async (message) => {
+    if (message.author.bot) return;
+    const mentionsBot = message.mentions.members?.find(
+        (m) => m.id === client.application?.id
+    );
+    if (mentionsBot) {
+        await ai(message, mentionsBot?.id);
+    }
+});
+
 client.once(Events.ClientReady, async (c) => {
     logger.info(`Ready! Logged in as ${c.user.tag}`);
     const guildIds = client.guilds.cache.map((guild) => guild.id);
+
     for (const guildId of guildIds) {
         const commandList = commands.map((c) => c.id).join(', ');
         logger.info(`registering ${commandList} run guild ${guildId}`);
@@ -49,10 +65,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await command.run(interaction);
     } catch (err) {
         logger.error(err);
-    } finally {
-        const needsCleanUp = ![CommandName.ai].includes(command.id);
-        if (needsCleanUp) {
-            await cleanUp(interaction);
-        }
+        await interaction.editReply(`Something went wrong my G.`);
     }
 });

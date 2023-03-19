@@ -9,6 +9,7 @@ import {createAudioResource} from '@discordjs/voice';
 import {createReadStream} from 'fs';
 import {getPlayer} from '../getPlayer';
 import {logger} from '../logger';
+import {cleanUp} from '../cleanUp';
 
 export const meme: Command = {
     id: CommandName.meme,
@@ -40,5 +41,6 @@ export const meme: Command = {
         const stream = createReadStream(`./sounds/${sound}`);
         const resource = createAudioResource(stream);
         player.play(resource);
+        await cleanUp(interaction);
     },
 };
