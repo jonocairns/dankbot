@@ -1,8 +1,8 @@
 import {Message} from 'discord.js';
 import {logger} from './logger';
 import {Configuration, OpenAIApi} from 'openai';
-
-const AI_MODEL = 'text-davinci-003';
+import {AI_MODEL} from './commands';
+import {system} from './system';
 
 export const ai = async (message: Message, botId?: string) => {
 	message.channel.sendTyping();
@@ -13,13 +13,12 @@ export const ai = async (message: Message, botId?: string) => {
 		});
 		const openai = new OpenAIApi(configuration);
 		const prompt = message.content.replace(`<@${botId}>`, '').trim();
-		const completion = await openai.createCompletion({
+		const completion = await openai.createChatCompletion({
 			model: AI_MODEL,
-			prompt,
-			max_tokens: 2048,
+			messages: [...system, {role: 'user', content: prompt}],
 		});
 
-		const content = completion.data.choices[0].text;
+		const content = completion.data.choices[0].message?.content;
 		await message.reply({content});
 	} catch (err) {
 		logger.error(err);

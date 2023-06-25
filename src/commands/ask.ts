@@ -4,9 +4,9 @@ import {createAudioResource} from '@discordjs/voice';
 import {Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
 import axios from 'axios';
+import {system} from '../system';
 
-const AI_MODEL = 'text-davinci-003';
-
+export const AI_MODEL = 'gpt-3.5-turbo';
 const CLONED_VOICES_API_URL = 'https://play.ht/api/v2/cloned-voices';
 const TTS_STREAM_API_URL = 'https://play.ht/api/v2/tts/stream';
 
@@ -23,13 +23,12 @@ export const ask: Command = {
 			apiKey: process.env.OPENAI_API_KEY,
 		});
 		const openai = new OpenAIApi(configuration);
-		const completion = await openai.createCompletion({
+		const completion = await openai.createChatCompletion({
 			model: AI_MODEL,
-			prompt: `respond to the following question like donald trump would but include funny shit talking and offensive language: "${prompt}"`,
-			max_tokens: 2048,
+			messages: [...system, {role: 'user', content: prompt}],
 		});
 
-		const text = completion.data.choices[0].text;
+		const text = completion.data.choices[0].message?.content;
 
 		console.log(`response: ${text}`);
 
