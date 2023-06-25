@@ -1,4 +1,4 @@
-FROM node:16-alpine as build
+FROM node:16.18.0-alpine as build
 
 WORKDIR /usr/src/app
 
@@ -12,7 +12,7 @@ RUN yarn build
 
 RUN yarn install --production --ignore-scripts --prefer-offline
 
-FROM node:16-alpine 
+FROM node:16.18.0-alpine 
 
 ENV NODE_ENV=production
 USER node
