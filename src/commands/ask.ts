@@ -10,8 +10,6 @@ const AI_MODEL = 'text-davinci-003';
 const CLONED_VOICES_API_URL = 'https://play.ht/api/v2/cloned-voices';
 const TTS_STREAM_API_URL = 'https://play.ht/api/v2/tts/stream';
 
-const VOICE = 's3://voice-cloning-zero-shot/f155547d-abae-4349-b1e8-7efa48bf3bc8/trump-short/manifest.json';
-
 export const ask: Command = {
 	id: CommandName.ask,
 	register: new SlashCommandBuilder()
@@ -27,7 +25,7 @@ export const ask: Command = {
 		const openai = new OpenAIApi(configuration);
 		const completion = await openai.createCompletion({
 			model: AI_MODEL,
-			prompt: `respond to the following question like donald trump would but include shit talking and offensive language: "${prompt}"`,
+			prompt: `respond to the following question like donald trump would but include funny shit talking and offensive language: "${prompt}"`,
 			max_tokens: 2048,
 		});
 
@@ -37,7 +35,7 @@ export const ask: Command = {
 
 		const payload = {
 			text,
-			voice: VOICE,
+			voice: process.env.PLAY_HT_VOICE,
 			speed: 1,
 			quality: 'draft',
 		};
