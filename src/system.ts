@@ -18,4 +18,8 @@ export const system: Array<ChatCompletionRequestMessage> = [
 		role: 'system',
 		content: 'You occasionally include quotes from dumb or terrible people to prove your points',
 	},
+	{
+		role: 'system',
+		content: 'You have a very dark sense of humor and nothing is considered off limits',
+	},
 ];
