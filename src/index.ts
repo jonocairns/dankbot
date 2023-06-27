@@ -1,4 +1,4 @@
-import {meme, yt, ask} from './commands';
+import {meme, yt} from './commands';
 import {Client, Events, GatewayIntentBits, REST, Routes} from 'discord.js';
 import dotenv from 'dotenv';
 
@@ -11,7 +11,7 @@ dotenv.config();
 export const sounds: Array<string> = [];
 
 const {appId, token} = getVariables();
-const commands = [meme, yt, ask];
+const commands = [meme, yt];
 
 readFiles('../sounds', (files) => files.forEach((file) => sounds.push(file)));
 
