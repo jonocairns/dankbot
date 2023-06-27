@@ -30,7 +30,7 @@ client.on(Events.MessageCreate, async (message) => {
 	if (message.author.bot) return;
 	const mentionsBot = message.mentions.members?.find((m) => m.id === client.application?.id);
 	if (mentionsBot) {
-		await ai(message, mentionsBot?.id);
+		await ai({message, botId: mentionsBot.id});
 	}
 });
 
