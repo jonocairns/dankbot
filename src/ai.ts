@@ -1,8 +1,9 @@
 import {Message} from 'discord.js';
 import {logger} from './logger';
 import {Configuration, OpenAIApi} from 'openai';
-import {AI_MODEL} from './commands';
 import {system} from './system';
+
+export const AI_MODEL = 'gpt-3.5-turbo';
 
 export const ai = async (message: Message, botId?: string) => {
 	message.channel.sendTyping();
