@@ -12,6 +12,9 @@ interface Input {
 	botId: string;
 }
 
+const LIMIT = 100;
+const BOT_NAME = '@realDonaldTrump';
+
 export const ai = async ({message, botId}: Input) => {
 	message.channel.sendTyping();
 
@@ -20,7 +23,16 @@ export const ai = async ({message, botId}: Input) => {
 		const prompt = getContent({message, botId});
 		const messages: Array<ChatCompletionRequestMessage> = [];
 		if (isThread) {
-			const thread = await message.channel.messages.fetch();
+			if (message.channel.archived) {
+				return;
+			}
+			const thread = await message.channel.messages.fetch({limit: LIMIT});
+
+			if (thread.size >= LIMIT) {
+				await message.reply({content: `I'm sick of this thread. I'm off to try bigly and betterly things.`});
+				await message.channel.setArchived(true, `This is beneath me. I have a country to run.`);
+				return;
+			}
 			messages.push(...prepareThread({thread, botId}));
 			messages.reverse();
 		} else {
@@ -29,13 +41,13 @@ export const ai = async ({message, botId}: Input) => {
 		const content = await request(messages);
 		await message.reply({content});
 	} catch (err) {
-		logger.error(err);
+		logger.error(JSON.stringify(err));
 		message.reply({content: 'I may or may not have shat myself...'});
 	}
 };
 
 const getContent = ({message, botId}: {message: Message; botId: string}) =>
-	message.content.replace(`<@${botId}>`, `@realDonaldTrump`).trim();
+	message.content.replace(`<@${botId}>`, BOT_NAME).trim();
 
 const request = async (messages: Array<ChatCompletionRequestMessage>) => {
 	const configuration = new Configuration({apiKey: process.env.OPENAI_API_KEY});
@@ -43,7 +55,7 @@ const request = async (messages: Array<ChatCompletionRequestMessage>) => {
 
 	const completion = await openai.createChatCompletion({
 		model: AI_MODEL,
-		messages: [...system, ...messages],
+		messages: [system, ...messages],
 	});
 
 	return (
@@ -69,5 +81,6 @@ const prepareThread = ({thread, botId}: MapThreadInput) =>
 			return {
 				role: t.author.bot ? Assistant : User,
 				content,
+				name: t.author.bot ? BOT_NAME.replace('@', '') : t.author.username,
 			};
 		});
