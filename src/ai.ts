@@ -12,7 +12,7 @@ interface Input {
 	botId: string;
 }
 
-const LIMIT = 50;
+const LIMIT = 100;
 const BOT_NAME = '@realDonaldTrump';
 
 export const ai = async ({message, botId}: Input) => {
@@ -31,7 +31,6 @@ export const ai = async ({message, botId}: Input) => {
 			if (thread.size >= LIMIT) {
 				await message.reply({content: `I'm sick of this thread. I'm off to try bigly and betterly things.`});
 				await message.channel.setArchived(true, `This is beneath me. I have a country to run.`);
-				await message.channel.leave();
 				return;
 			}
 			messages.push(...prepareThread({thread, botId}));
