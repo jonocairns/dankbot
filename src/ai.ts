@@ -41,7 +41,7 @@ export const ai = async ({message, botId}: Input) => {
 		const content = await request(messages);
 		await message.reply({content});
 	} catch (err) {
-		logger.error(err);
+		logger.error(JSON.stringify(err));
 		message.reply({content: 'I may or may not have shat myself...'});
 	}
 };
@@ -78,6 +78,6 @@ const prepareThread = ({thread, botId}: MapThreadInput) =>
 			return {
 				role: t.author.bot ? Assistant : User,
 				content,
-				name: t.author.bot ? BOT_NAME : t.author.username,
+				name: t.author.bot ? BOT_NAME.replace('@', '') : t.author.username,
 			};
 		});
