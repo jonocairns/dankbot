@@ -80,7 +80,7 @@ const prepareThread = ({thread, botId}: MapThreadInput) =>
 		.map((t) => {
 			const content = getContent({message: t, botId});
 			const {bot, username} = t.author;
-			const author = !bot ? `${username} said ` : '';
+			const author = bot ? '' : `${username} said `;
 
 			return {
 				role: bot ? Assistant : User,
