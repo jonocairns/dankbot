@@ -17,11 +17,11 @@ const BOT_NAME = '@realDonaldTrump';
 
 export const ai = async ({message, botId}: Input) => {
 	message.channel.sendTyping();
+	const messages: Array<ChatCompletionRequestMessage> = [];
 
 	try {
 		const isThread = message.channel.isThread();
 		const prompt = getContent({message, botId});
-		const messages: Array<ChatCompletionRequestMessage> = [];
 		if (isThread) {
 			if (message.channel.archived) {
 				return;
@@ -42,6 +42,7 @@ export const ai = async ({message, botId}: Input) => {
 		await message.reply({content});
 	} catch (err) {
 		logger.error(JSON.stringify(err));
+		logger.info(messages);
 		message.reply({content: 'I may or may not have shat myself...'});
 	}
 };
@@ -78,9 +79,12 @@ const prepareThread = ({thread, botId}: MapThreadInput) =>
 		})
 		.map((t) => {
 			const content = getContent({message: t, botId});
+			const {bot, username} = t.author;
+			const author = bot ? '' : `${username} said `;
+
 			return {
-				role: t.author.bot ? Assistant : User,
-				content,
-				name: t.author.bot ? BOT_NAME.replace('@', '') : t.author.username,
+				role: bot ? Assistant : User,
+				content: `${author}${content}`,
+				name: bot ? BOT_NAME.replace('@', '') : username,
 			};
 		});
