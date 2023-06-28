@@ -12,7 +12,7 @@ interface Input {
 	botId: string;
 }
 
-const LIMIT = 100;
+const LIMIT = 50;
 const BOT_NAME = '@realDonaldTrump';
 
 export const ai = async ({message, botId}: Input) => {
@@ -31,6 +31,7 @@ export const ai = async ({message, botId}: Input) => {
 			if (thread.size >= LIMIT) {
 				await message.reply({content: `I'm sick of this thread. I'm off to try bigly and betterly things.`});
 				await message.channel.setArchived(true, `This is beneath me. I have a country to run.`);
+				await message.channel.leave();
 				return;
 			}
 			messages.push(...prepareThread({thread, botId}));
@@ -41,7 +42,7 @@ export const ai = async ({message, botId}: Input) => {
 		const content = await request(messages);
 		await message.reply({content});
 	} catch (err) {
-		logger.error(err);
+		logger.error(JSON.stringify(err));
 		message.reply({content: 'I may or may not have shat myself...'});
 	}
 };
@@ -78,6 +79,6 @@ const prepareThread = ({thread, botId}: MapThreadInput) =>
 			return {
 				role: t.author.bot ? Assistant : User,
 				content,
-				name: t.author.bot ? BOT_NAME : t.author.username,
+				name: t.author.bot ? BOT_NAME.replace('@', '') : t.author.username,
 			};
 		});
