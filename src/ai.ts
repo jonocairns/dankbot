@@ -46,7 +46,10 @@ const request = async (messages: Array<ChatCompletionRequestMessage>) => {
 		messages: [...system, ...messages],
 	});
 
-	return completion.data.choices[0].message?.content;
+	return (
+		completion.data.choices[0].message?.content ??
+		`My response requires a bigly IQ, so bigly that you wouldn't understand. Sad!`
+	);
 };
 
 interface MapThreadInput {
