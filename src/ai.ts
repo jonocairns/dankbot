@@ -16,21 +16,21 @@ const LIMIT = 100;
 const BOT_NAME = '@realDonaldTrump';
 
 export const ai = async ({message, botId}: Input) => {
-	message.channel.sendTyping();
 	const messages: Array<ChatCompletionRequestMessage> = [];
 
 	try {
 		const isThread = message.channel.isThread();
 		const prompt = getContent({message, botId});
 		if (isThread) {
-			if (message.channel.archived) {
+			if (message.channel.locked) {
 				return;
 			}
+			message.channel.sendTyping();
 			const thread = await message.channel.messages.fetch({limit: LIMIT});
 
 			if (thread.size >= LIMIT) {
 				await message.reply({content: `I'm sick of this thread. I'm off to try bigly and betterly things.`});
-				await message.channel.setArchived(true, `This is beneath me. I have a country to run.`);
+				await message.channel.setLocked(true);
 				return;
 			}
 			messages.push(...prepareThread({thread, botId}));
