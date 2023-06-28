@@ -46,8 +46,7 @@ export const ai = async ({message, botId}: Input) => {
 	}
 };
 
-const getContent = ({message, botId}: {message: Message; botId: string}) =>
-	message.content.replace(`<@${botId}>`, BOT_NAME).trim();
+const getContent = ({message, botId}: {message: Message; botId: string}) => message.content.replace(`<@${botId}>`, BOT_NAME).trim();
 
 const request = async (messages: Array<ChatCompletionRequestMessage>) => {
 	const configuration = new Configuration({apiKey: process.env.OPENAI_API_KEY});
