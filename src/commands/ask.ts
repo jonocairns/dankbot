@@ -56,7 +56,7 @@ export const ask: Command = {
 			logger.error(response.data);
 		}
 
-		const {player} = getPlayer(interaction);
+		const {player, connection} = getPlayer(interaction);
 		const resource = createAudioResource(response.data);
 
 		resource.playStream.on('error', (error: Error) => {
@@ -68,6 +68,7 @@ export const ask: Command = {
 		player.on('stateChange', async (oldState, newState) => {
 			if (oldState.status === AudioPlayerStatus.Playing && newState.status === AudioPlayerStatus.Idle) {
 				await interaction.editReply(text ?? 'You are welcome.');
+				connection.destroy();
 			}
 		});
 	},
