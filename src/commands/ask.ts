@@ -5,8 +5,9 @@ import {Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
 import axios, {AxiosRequestConfig} from 'axios';
 import {logger} from '../logger';
+import {system} from '../system';
+import {AI_MODEL} from '../ai';
 
-const AI_MODEL = 'text-davinci-003';
 const OK = 200;
 
 export const ask: Command = {
@@ -16,19 +17,16 @@ export const ask: Command = {
 		.setDescription('Ask me anything')
 		.addStringOption((option) => option.setName('ask').setDescription('The thing to ask')),
 	async run(interaction: ChatInputCommandInteraction<CacheType>) {
-		const prompt = interaction.options.get('ask')?.value as string;
+		const content = interaction.options.get('ask')?.value as string;
 
-		const configuration = new Configuration({
-			apiKey: process.env.OPENAI_API_KEY,
-		});
+		const configuration = new Configuration({apiKey: process.env.OPENAI_API_KEY});
 		const openai = new OpenAIApi(configuration);
-		const completion = await openai.createCompletion({
+		const completion = await openai.createChatCompletion({
 			model: AI_MODEL,
-			prompt: `respond to the following question like donald trump would but include funny shit talking and offensive language: "${prompt}"`,
-			max_tokens: 2048,
+			messages: [system, {role: 'user', content}],
 		});
 
-		const text = completion.data.choices[0].text;
+		const text = completion.data.choices[0].message?.content;
 		logger.info(`response: ${text}`);
 
 		const payload = {
