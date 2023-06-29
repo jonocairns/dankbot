@@ -3,7 +3,8 @@ import {Command, CommandName} from '../util';
 import {AudioPlayerStatus, createAudioResource} from '@discordjs/voice';
 import {Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
-import axios, {AxiosRequestConfig} from 'axios';
+import axios from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 import {logger} from '../logger';
 import {system} from '../system';
 import {AI_MODEL} from '../ai';
@@ -38,7 +39,7 @@ export const ask: Command = {
 			},
 		};
 
-		const options: AxiosRequestConfig = {
+		const options: AxiosRequestConfig<typeof payload> = {
 			responseType: 'stream',
 			headers: {
 				'ACCEPT': 'audio/mpeg',
