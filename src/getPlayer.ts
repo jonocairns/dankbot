@@ -24,9 +24,14 @@ export const getPlayer = (interaction: ChatInputCommandInteraction<CacheType>) =
 		adapterCreator: guild.voiceAdapterCreator,
 		selfDeaf: false,
 		selfMute: false,
+		debug: true,
 	});
 
 	connection.subscribe(player);
+
+	connection.on('error', (error) => {
+		logger.error(error);
+	});
 
 	player.on('error', (error) => {
 		logger.error(error);

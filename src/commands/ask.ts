@@ -1,11 +1,13 @@
 import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
 import {Command, CommandName} from '../util';
-import {createAudioResource} from '@discordjs/voice';
+import {AudioPlayerStatus, createAudioResource} from '@discordjs/voice';
 import {Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
-import axios from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
+import {logger} from '../logger';
 
 const AI_MODEL = 'text-davinci-003';
+const OK = 200;
 
 export const ask: Command = {
 	id: CommandName.ask,
@@ -27,19 +29,47 @@ export const ask: Command = {
 		});
 
 		const text = completion.data.choices[0].text;
+		logger.info(`response: ${text}`);
 
-		console.log(`response: ${text}`);
+		const payload = {
+			text: text,
+			model_id: 'eleven_monolingual_v1',
+			voice_settings: {
+				stability: 0.5,
+				similarity_boost: 0.5,
+			},
+		};
 
-		const response = await axios.get(
-			`http://[::1]:5002//api/tts?text=${text ?? 'Nothing'}&speaker_id=ED&style_wav=&language_id=`,
-			{responseType: 'stream'}
-		);
+		const options: AxiosRequestConfig = {
+			responseType: 'stream',
+			headers: {
+				'ACCEPT': 'audio/mpeg',
+				'XI-API-KEY': process.env.ELEVEN_LABS_API_KEY ?? '',
+				'CONTENT-TYPE': 'application/json',
+			},
+		};
+
+		const url = `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVEN_LABS_VOICE_ID}`;
+		const response = await axios.post(url, payload, options);
+
+		if (response.status !== OK) {
+			logger.error(response.statusText);
+			logger.error(response.data);
+		}
 
 		const {player} = getPlayer(interaction);
-		console.log('streaming...');
 		const resource = createAudioResource(response.data);
+
+		resource.playStream.on('error', (error: Error) => {
+			logger.error(error.message);
+		});
+
 		player.play(resource);
 
-		await interaction.editReply(text ?? 'You are welcome.');
+		player.on('stateChange', async (oldState, newState) => {
+			if (oldState.status === AudioPlayerStatus.Playing && newState.status === AudioPlayerStatus.Idle) {
+				await interaction.editReply(text ?? 'You are welcome.');
+			}
+		});
 	},
 };
