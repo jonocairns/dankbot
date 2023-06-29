@@ -16,21 +16,21 @@ const LIMIT = 100;
 const BOT_NAME = '@realDonaldTrump';
 
 export const ai = async ({message, botId}: Input) => {
-	message.channel.sendTyping();
+	const messages: Array<ChatCompletionRequestMessage> = [];
 
 	try {
 		const isThread = message.channel.isThread();
 		const prompt = getContent({message, botId});
-		const messages: Array<ChatCompletionRequestMessage> = [];
 		if (isThread) {
-			if (message.channel.archived) {
+			if (message.channel.locked) {
 				return;
 			}
+			message.channel.sendTyping();
 			const thread = await message.channel.messages.fetch({limit: LIMIT});
 
 			if (thread.size >= LIMIT) {
 				await message.reply({content: `I'm sick of this thread. I'm off to try bigly and betterly things.`});
-				await message.channel.setArchived(true, `This is beneath me. I have a country to run.`);
+				await message.channel.setLocked(true);
 				return;
 			}
 			messages.push(...prepareThread({thread, botId}));
@@ -42,6 +42,7 @@ export const ai = async ({message, botId}: Input) => {
 		await message.reply({content});
 	} catch (err) {
 		logger.error(JSON.stringify(err));
+		logger.info(messages);
 		message.reply({content: 'I may or may not have shat myself...'});
 	}
 };
@@ -78,9 +79,12 @@ const prepareThread = ({thread, botId}: MapThreadInput) =>
 		})
 		.map((t) => {
 			const content = getContent({message: t, botId});
+			const {bot, username} = t.author;
+			const author = bot ? '' : `${username} said `;
+
 			return {
-				role: t.author.bot ? Assistant : User,
-				content,
-				name: t.author.bot ? BOT_NAME.replace('@', '') : t.author.username,
+				role: bot ? Assistant : User,
+				content: `${author}${content}`,
+				name: bot ? BOT_NAME.replace('@', '') : username,
 			};
 		});
