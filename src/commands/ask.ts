@@ -53,24 +53,25 @@ export const ask: Command = {
 
 		if (response.status !== OK) {
 			logger.error(response.statusText);
-			logger.error(await response.text());
+			const text = await response.json();
+			logger.error(text);
+		} else {
+			logger.info(`getting tts response buffer...`);
+			const buffer = await response.buffer();
+
+			logger.info(`creating readable stream...`);
+			const stream = Readable.from(buffer);
+
+			const {player} = getPlayer(interaction);
+			const resource = createAudioResource(stream);
+
+			resource.playStream.on('error', (error: Error) => {
+				logger.error(error.message);
+			});
+
+			logger.info(`attempting to play...`);
+			player.play(resource);
 		}
-
-		logger.info(`getting tts response buffer...`);
-		const buffer = await response.buffer();
-
-		logger.info(`creating readable stream...`);
-		const stream = Readable.from(buffer);
-
-		const {player} = getPlayer(interaction);
-		const resource = createAudioResource(stream);
-
-		resource.playStream.on('error', (error: Error) => {
-			logger.error(error.message);
-		});
-
-		logger.info(`attempting to play...`);
-		player.play(resource);
 
 		await interaction.editReply(text ?? 'You are welcome.');
 	},
