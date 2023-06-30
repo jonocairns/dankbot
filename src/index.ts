@@ -1,6 +1,7 @@
 import {meme, yt, ask} from './commands';
 import {Client, Events, GatewayIntentBits, REST, Routes} from 'discord.js';
 import dotenv from 'dotenv';
+import {generateDependencyReport} from '@discordjs/voice';
 
 import {readFiles} from './util';
 import {getVariables} from './getVariables';
@@ -14,6 +15,8 @@ const {appId, token} = getVariables();
 const commands = [meme, yt, ask];
 
 readFiles('../sounds', (files) => files.forEach((file) => sounds.push(file)));
+
+logger.info(generateDependencyReport());
 
 const client = new Client({
 	intents: [
