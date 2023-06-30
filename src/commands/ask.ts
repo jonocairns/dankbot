@@ -3,11 +3,11 @@ import {Command, CommandName} from '../util';
 import {createAudioResource} from '@discordjs/voice';
 import {Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
-import axios from 'axios';
-import type {AxiosRequestConfig} from 'axios';
 import {logger} from '../logger';
 import {system} from '../system';
 import {AI_MODEL} from '../ai';
+import {Readable} from 'stream';
+import fetch from 'node-fetch';
 
 const OK = 200;
 
@@ -39,30 +39,37 @@ export const ask: Command = {
 			},
 		};
 
-		const options: AxiosRequestConfig<typeof payload> = {
-			responseType: 'stream',
+		const url = `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVEN_LABS_VOICE_ID}/stream`;
+
+		const response = await fetch(url, {
 			headers: {
-				'ACCEPT': 'audio/mpeg',
+				'ACCEPT': 'audio/mp3',
 				'XI-API-KEY': process.env.ELEVEN_LABS_API_KEY ?? '',
 				'CONTENT-TYPE': 'application/json',
 			},
-		};
-
-		const url = `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVEN_LABS_VOICE_ID}`;
-		const response = await axios.post(url, payload, options);
+			body: JSON.stringify(payload),
+			method: 'POST',
+		});
 
 		if (response.status !== OK) {
 			logger.error(response.statusText);
-			logger.error(response.data);
+			logger.error(await response.text());
 		}
 
+		logger.info(`getting tts response buffer...`);
+		const buffer = await response.buffer();
+
+		logger.info(`creating readable stream...`);
+		const stream = Readable.from(buffer);
+
 		const {player} = getPlayer(interaction);
-		const resource = createAudioResource(response.data);
+		const resource = createAudioResource(stream);
 
 		resource.playStream.on('error', (error: Error) => {
 			logger.error(error.message);
 		});
 
+		logger.info(`attempting to play...`);
 		player.play(resource);
 
 		await interaction.editReply(text ?? 'You are welcome.');
