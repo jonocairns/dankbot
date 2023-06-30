@@ -31,7 +31,6 @@ export const getPlayer = (interaction: ChatInputCommandInteraction<CacheType>) =
 
 	connection.on('error', (error) => {
 		logger.error(error);
-		connection.destroy();
 	});
 
 	player.on('error', (error) => {
