@@ -14,6 +14,8 @@ RUN yarn install --production --ignore-scripts --prefer-offline
 
 FROM node:16.18.0-alpine 
 
+RUN apk update && apk add --no-cache ffmpeg
+
 ENV NODE_ENV=production
 USER node
 WORKDIR /usr/src/app

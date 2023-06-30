@@ -1,6 +1,6 @@
 import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
 import {Command, CommandName} from '../util';
-import {AudioPlayerStatus, createAudioResource} from '@discordjs/voice';
+import {createAudioResource} from '@discordjs/voice';
 import {Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
 import axios from 'axios';
@@ -56,7 +56,7 @@ export const ask: Command = {
 			logger.error(response.data);
 		}
 
-		const {player, connection} = getPlayer(interaction);
+		const {player} = getPlayer(interaction);
 		const resource = createAudioResource(response.data);
 
 		resource.playStream.on('error', (error: Error) => {
@@ -65,11 +65,6 @@ export const ask: Command = {
 
 		player.play(resource);
 
-		player.on('stateChange', async (oldState, newState) => {
-			if (oldState.status === AudioPlayerStatus.Playing && newState.status === AudioPlayerStatus.Idle) {
-				await interaction.editReply(text ?? 'You are welcome.');
-				connection.destroy();
-			}
-		});
+		await interaction.editReply(text ?? 'You are welcome.');
 	},
 };
