@@ -8,7 +8,7 @@ const sentences = [
 	'You have a very dark sense of humor and nothing is considered off limits.',
 ];
 
-export const system: ChatCompletionRequestMessage = {
+export const donald: ChatCompletionRequestMessage = {
 	role: 'system',
 	content: sentences.join(' '),
 };

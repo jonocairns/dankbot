@@ -4,27 +4,39 @@ import {createAudioResource} from '@discordjs/voice';
 import {Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
 import {logger} from '../logger';
-import {system} from '../system';
 import {AI_MODEL} from '../ai';
 import {Readable} from 'stream';
 import fetch from 'node-fetch';
+import {DONALD, voices} from '../voices';
 
 const OK = 200;
+const RANDOM = 'random';
 
 export const ask: Command = {
 	id: CommandName.ask,
 	register: new SlashCommandBuilder()
 		.setName(CommandName.ask)
 		.setDescription('Ask me anything')
-		.addStringOption((option) => option.setName('ask').setDescription('The thing to ask')),
+		.addStringOption((option) => option.setName('ask').setDescription('The thing to ask').setRequired(true))
+		.addStringOption((option) =>
+			option
+				.setName('person')
+				.setDescription('The person you want to ask')
+				.addChoices(...voices.map((v) => ({name: v.name, value: v.id})), {name: 'Random', value: RANDOM})
+		),
 	async run(interaction: ChatInputCommandInteraction<CacheType>) {
 		const content = interaction.options.get('ask')?.value as string;
+		const selected = interaction.options.get('person')?.value;
+		const random = voices[Math.floor(Math.random() * voices.length)].id;
 
+		const person = selected === RANDOM ? random : selected ?? voices.find((v) => v.name === DONALD)?.id;
 		const configuration = new Configuration({apiKey: process.env.OPENAI_API_KEY});
 		const openai = new OpenAIApi(configuration);
+		const sys = voices.filter((p) => p.id === person).map((p) => p.system);
+
 		const completion = await openai.createChatCompletion({
 			model: AI_MODEL,
-			messages: [system, {role: 'user', content}],
+			messages: [...sys, {role: 'user', content}],
 		});
 
 		const text = completion.data.choices[0].message?.content;
@@ -39,7 +51,7 @@ export const ask: Command = {
 			},
 		};
 
-		const url = `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVEN_LABS_VOICE_ID}/stream`;
+		const url = `https://api.elevenlabs.io/v1/text-to-speech/${person}/stream`;
 
 		const response = await fetch(url, {
 			headers: {

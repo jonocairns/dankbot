@@ -1,7 +1,7 @@
 import {Collection, Message} from 'discord.js';
 import {logger} from './logger';
 import {ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum, Configuration, OpenAIApi} from 'openai';
-import {system} from './system';
+import {donald} from './prompts/donald';
 
 export const AI_MODEL = 'gpt-3.5-turbo';
 
@@ -56,7 +56,7 @@ const request = async (messages: Array<ChatCompletionRequestMessage>) => {
 
 	const completion = await openai.createChatCompletion({
 		model: AI_MODEL,
-		messages: [system, ...messages],
+		messages: [donald, ...messages],
 	});
 
 	return (
