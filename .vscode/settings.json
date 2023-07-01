@@ -11,5 +11,8 @@
   },
   "exportall.config.relExclusion": [
     "/src/commands/index.ts"
-  ]
+  ],
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
 }
