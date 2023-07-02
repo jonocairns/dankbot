@@ -1,42 +1,57 @@
 import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
 import {Command, CommandName} from '../util';
 import {createAudioResource} from '@discordjs/voice';
-import {Configuration, OpenAIApi} from 'openai';
+import {ChatCompletionRequestMessageRoleEnum, Configuration, OpenAIApi} from 'openai';
 import {getPlayer} from '../getPlayer';
 import {logger} from '../logger';
 import {AI_MODEL} from '../ai';
 import {Readable} from 'stream';
 import fetch from 'node-fetch';
-import {DONALD, voices} from '../voices';
+import {voices} from '../voices';
+const {User} = ChatCompletionRequestMessageRoleEnum;
 
 const OK = 200;
-const RANDOM = 'random';
+const OPTIONS = {
+	ask: {
+		name: 'ask',
+		description: 'The thing to ask',
+	},
+	person: {
+		name: 'person',
+		description: 'The person you want to ask',
+	},
+};
+const MODEL = 'eleven_monolingual_v1';
 
 export const ask: Command = {
 	id: CommandName.ask,
 	register: new SlashCommandBuilder()
 		.setName(CommandName.ask)
 		.setDescription('Ask me anything')
-		.addStringOption((option) => option.setName('ask').setDescription('The thing to ask').setRequired(true))
+		.addStringOption((option) =>
+			option.setName(OPTIONS.ask.name).setDescription(OPTIONS.ask.description).setRequired(true)
+		)
 		.addStringOption((option) =>
 			option
-				.setName('person')
-				.setDescription('The person you want to ask')
-				.addChoices(...voices.map((v) => ({name: v.name, value: v.id})), {name: 'Random', value: RANDOM})
+				.setName(OPTIONS.person.name)
+				.setDescription(OPTIONS.person.description)
+				.addChoices(...voices.map((v) => ({name: v.name, value: v.name})))
 		),
 	async run(interaction: ChatInputCommandInteraction<CacheType>) {
-		const content = interaction.options.get('ask')?.value as string;
-		const selected = interaction.options.get('person')?.value;
-		const random = voices[Math.floor(Math.random() * voices.length)].id;
+		const content = interaction.options.get(OPTIONS.ask.name)?.value as string;
+		const personName = interaction.options.get(OPTIONS.person.name)?.value;
+		const randomId = voices[Math.floor(Math.random() * voices.length)].id;
+		const voiceId = voices.find((v) => v.name === personName)?.id;
+		const personId = voiceId ?? randomId;
+		logger.info(`voice: ${personId}:${voices.find((v) => v.id === personId)?.name}`);
 
-		const person = selected === RANDOM ? random : selected ?? voices.find((v) => v.name === DONALD)?.id;
 		const configuration = new Configuration({apiKey: process.env.OPENAI_API_KEY});
 		const openai = new OpenAIApi(configuration);
-		const sys = voices.filter((p) => p.id === person).map((p) => p.system);
+		const sys = voices.filter((p) => p.id === personId).map((p) => p.system);
 
 		const completion = await openai.createChatCompletion({
 			model: AI_MODEL,
-			messages: [...sys, {role: 'user', content}],
+			messages: [...sys, {role: User, content}],
 		});
 
 		const text = completion.data.choices[0].message?.content;
@@ -44,14 +59,14 @@ export const ask: Command = {
 
 		const payload = {
 			text: text,
-			model_id: 'eleven_monolingual_v1',
+			model_id: MODEL,
 			voice_settings: {
 				stability: 0.5,
 				similarity_boost: 0.5,
 			},
 		};
 
-		const url = `https://api.elevenlabs.io/v1/text-to-speech/${person}/stream`;
+		const url = `https://api.elevenlabs.io/v1/text-to-speech/${personId}/stream`;
 
 		const response = await fetch(url, {
 			headers: {
