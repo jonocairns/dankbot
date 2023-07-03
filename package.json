@@ -49,7 +49,7 @@
     "@types/node-fetch": "^2.6.4",
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
-    "@typescript-eslint/parser": "^5.40.1",
+    "@typescript-eslint/parser": "^5.60.1",
     "@vercel/node": "^2.5.26",
     "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
