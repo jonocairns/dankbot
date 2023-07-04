@@ -1,9 +1,9 @@
-import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
+import {CacheType, ChatInputCommandInteraction, GuildMember, SlashCommandBuilder} from 'discord.js';
 import {Command, CommandName} from '../util';
 import {sounds} from '../';
 import {createAudioResource} from '@discordjs/voice';
 import {createReadStream} from 'fs';
-import {getPlayer} from '../getPlayer';
+import {UNABLE_TO_CONNECT_ERROR, getPlayer} from '../getPlayer';
 import {logger} from '../logger';
 import {cleanUp} from '../cleanUp';
 
@@ -15,6 +15,12 @@ export const meme: Command = {
 		.addStringOption((option) => option.setName('meme').setDescription('A specific meme')),
 	async run(interaction: ChatInputCommandInteraction<CacheType>) {
 		const input = interaction.options.get('meme')?.value as string;
+		const canJoin = (interaction.member as GuildMember)?.voice?.channel?.id;
+
+		if (!canJoin) {
+			await interaction.editReply(UNABLE_TO_CONNECT_ERROR);
+			return;
+		}
 
 		let sound = sounds[Math.floor(Math.random() * sounds.length)];
 		if (input) {

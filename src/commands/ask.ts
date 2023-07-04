@@ -1,8 +1,8 @@
-import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
+import {CacheType, ChatInputCommandInteraction, GuildMember, SlashCommandBuilder} from 'discord.js';
 import {Command, CommandName} from '../util';
 import {createAudioResource} from '@discordjs/voice';
 import {ChatCompletionRequestMessageRoleEnum, Configuration, OpenAIApi} from 'openai';
-import {getPlayer} from '../getPlayer';
+import {UNABLE_TO_CONNECT_ERROR, getPlayer} from '../getPlayer';
 import {logger} from '../logger';
 import {AI_MODEL} from '../ai';
 import {Readable} from 'stream';
@@ -43,11 +43,16 @@ export const ask: Command = {
 		const randomId = voices[Math.floor(Math.random() * voices.length)].id;
 		const voiceId = voices.find((v) => v.name === personName)?.id;
 		const personId = voiceId ?? randomId;
-		logger.info(`voice: ${personId}:${voices.find((v) => v.id === personId)?.name}`);
 
 		const configuration = new Configuration({apiKey: process.env.OPENAI_API_KEY});
 		const openai = new OpenAIApi(configuration);
 		const sys = voices.filter((p) => p.id === personId).map((p) => p.system);
+		const canJoin = (interaction.member as GuildMember)?.voice?.channel?.id;
+
+		if (!canJoin) {
+			await interaction.editReply(UNABLE_TO_CONNECT_ERROR);
+			return;
+		}
 
 		const completion = await openai.createChatCompletion({
 			model: AI_MODEL,
@@ -55,6 +60,7 @@ export const ask: Command = {
 		});
 
 		const text = completion.data.choices[0].message?.content;
+		logger.info(`voice: ${personId}:${voices.find((v) => v.id === personId)?.name}`);
 		logger.info(`response: ${text}`);
 
 		const payload = {
