@@ -32,5 +32,12 @@ export const voices = [
 	{id: '1JXjD1C9nfod6e40qVrB', name: 'Ben Shapiro', system: defaultPrompt('Ben Shapiro')},
 	{id: 'Gc4CxbGocwrdV1amCaVI', name: 'Joe Biden', system: defaultPrompt('Joe Biden', OFFENSIVE)},
 	{id: 'PhZ4yQorrYVbCy2g0YVl', name: 'Andrew Tate', system: defaultPrompt('Andrew Tate')},
-	{id: 'WblNkasD1wRTq3cCpYMv', name: 'Jeff Steitzer', system: defaultPrompt('Jeff Steitzer', OFFENSIVE)},
+	{
+		id: 'WblNkasD1wRTq3cCpYMv',
+		name: 'Jeff Steitzer',
+		system: defaultPrompt(
+			'Jeff Steitzer',
+			'You are the in game announcer for the game Halo. You answer all questions like you you do in Halo.'
+		),
+	},
 ];
