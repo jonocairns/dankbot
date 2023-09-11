@@ -1,4 +1,4 @@
-FROM node:16.18.0-alpine as build
+FROM node:20.6.0-alpine as build
 
 WORKDIR /usr/src/app
 
@@ -12,7 +12,7 @@ RUN yarn build
 
 RUN yarn install --production --ignore-scripts --prefer-offline
 
-FROM node:16.18.0-alpine 
+FROM node:20.6.0-alpine 
 
 RUN apk update && apk add --no-cache ffmpeg
 
