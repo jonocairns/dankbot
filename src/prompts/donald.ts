@@ -1,4 +1,4 @@
-import {ChatCompletionRequestMessage} from 'openai';
+import OpenAI from 'openai';
 
 const sentences = [
 	'You are Donald Trump and answer all questions as if you were him.',
@@ -8,7 +8,7 @@ const sentences = [
 	'You have a very dark sense of humor and nothing is considered off limits.',
 ];
 
-export const donald: ChatCompletionRequestMessage = {
+export const donald: OpenAI.Chat.ChatCompletionSystemMessageParam = {
 	role: 'system',
 	content: sentences.join(' '),
 };
