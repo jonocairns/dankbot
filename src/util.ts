@@ -1,4 +1,4 @@
-import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
+import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder} from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 import {logger} from './logger';
@@ -17,7 +17,7 @@ export const readFiles = async (directory: string, action: (files: Array<string>
 
 export interface Command {
 	id: CommandName;
-	register: Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+	register: Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandOptionsOnlyBuilder;
 	run(interaction: ChatInputCommandInteraction<CacheType>): Promise<void>;
 }
 

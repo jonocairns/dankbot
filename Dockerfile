@@ -1,18 +1,25 @@
-FROM node:16.18.0-alpine as build
+FROM node:22-alpine as build
 
 WORKDIR /usr/src/app
 
+# Enable Corepack for Yarn 4
+RUN corepack enable
+
 RUN touch .env
+
+# Copy package files and Yarn 4 configuration
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn .yarn
+
+RUN yarn install --immutable
 
 COPY . .
 
-RUN yarn install
-
 RUN yarn build
 
-RUN yarn install --production --ignore-scripts --prefer-offline
+RUN yarn workspaces focus --production
 
-FROM node:16.18.0-alpine 
+FROM node:22-alpine 
 
 RUN apk update && apk add --no-cache ffmpeg
 
