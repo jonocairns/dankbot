@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import {ImageService} from './image-service';
 import {logger} from '../logger';
+import {SafetyViolationError, ImageGenerationError} from './image-errors';
 
 export class OpenAIImageService implements ImageService {
 	private client: OpenAI;
@@ -26,8 +27,9 @@ export class OpenAIImageService implements ImageService {
 
 			return await this.generateImageFromText(prompt);
 		} catch (error) {
-			logger.error('Error generating image with OpenAI:', error);
-			throw error;
+			const parsedError = this.parseOpenAIError(error);
+			logger.error('Error generating image with OpenAI:', parsedError);
+			throw parsedError;
 		}
 	}
 
@@ -112,5 +114,41 @@ export class OpenAIImageService implements ImageService {
 		}
 
 		throw new Error('No image URL or base64 data returned from OpenAI API');
+	}
+
+	private parseOpenAIError(error: unknown): Error {
+		if (error && typeof error === 'object' && 'message' in error) {
+			const errorMessage = String((error as {message: string}).message || '');
+
+			const safetyViolationMatch = errorMessage.match(/safety_violations=\[([^\]]+)\]/);
+			const requestIdMatch = errorMessage.match(/request ID ([a-z0-9_]+)/);
+
+			if (safetyViolationMatch) {
+				const violations = safetyViolationMatch[1].split(',').map((v) => v.trim());
+				const requestId = requestIdMatch?.[1];
+
+				return new SafetyViolationError(
+					`Request rejected by OpenAI safety system. Violations: ${violations.join(', ')}`,
+					violations,
+					requestId,
+					error
+				);
+			}
+
+			if (errorMessage.includes('rejected by the safety system')) {
+				return new SafetyViolationError(
+					'Request rejected by OpenAI safety system',
+					['unspecified'],
+					requestIdMatch?.[1],
+					error
+				);
+			}
+		}
+
+		if (error instanceof Error) {
+			return new ImageGenerationError(error.message, error);
+		}
+
+		return new ImageGenerationError('Unknown error occurred during image generation', error);
 	}
 }

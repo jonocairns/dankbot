@@ -1,7 +1,7 @@
 import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder} from 'discord.js';
 import {Command, CommandName} from '../util';
 import {logger} from '../logger';
-import {getImageService} from '../image';
+import {getImageService, SafetyViolationError} from '../image';
 
 const OPTIONS = {
 	prompt: {
@@ -62,7 +62,20 @@ export const img: Command = {
 			logger.info('Image sent successfully');
 		} catch (error) {
 			logger.error('Error generating image:', error);
-			await interaction.editReply('An error occurred while generating the image.');
+
+			const isSafetyError =
+				error instanceof SafetyViolationError ||
+				(error && typeof error === 'object' && 'name' in error && error.name === 'SafetyViolationError');
+
+			if (isSafetyError) {
+				const safetyError = error as SafetyViolationError;
+				const violationsList = safetyError.violations.join(', ');
+				const message = `Image generation was blocked by the safety system due to: ${violationsList}.`;
+
+				await interaction.editReply(message);
+			} else {
+				await interaction.editReply('An error occurred while generating the image.');
+			}
 		}
 	},
 };
