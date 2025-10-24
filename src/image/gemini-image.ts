@@ -16,13 +16,53 @@ export class GeminiImageService implements ImageService {
 		logger.info(`Initialized Gemini image service with model: ${this.model}`);
 	}
 
-	async generateImage(prompt: string): Promise<Buffer> {
+	async generateImage(prompt: string, inputImageUrls?: Array<string>): Promise<Buffer> {
 		logger.info(`Generating image with Gemini model ${this.model}`);
 
 		try {
+			let contents: string | Array<{text?: string; inlineData?: {mimeType: string; data: string}}>;
+
+			if (inputImageUrls && inputImageUrls.length > 0) {
+				logger.info(`Processing ${inputImageUrls.length} input image(s) with prompt`);
+
+				const parts: Array<{text?: string; inlineData?: {mimeType: string; data: string}}> = [{text: prompt}];
+
+				for (const imageUrl of inputImageUrls) {
+					try {
+						const imageResponse = await fetch(imageUrl);
+						const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+						const base64Image = imageBuffer.toString('base64');
+
+						let mimeType = 'image/png';
+						if (imageUrl.includes('.jpg') || imageUrl.includes('.jpeg')) {
+							mimeType = 'image/jpeg';
+						} else if (imageUrl.includes('.gif')) {
+							mimeType = 'image/gif';
+						} else if (imageUrl.includes('.webp')) {
+							mimeType = 'image/webp';
+						}
+
+						parts.push({
+							inlineData: {
+								mimeType,
+								data: base64Image,
+							},
+						});
+
+						logger.info(`Added image to request (${imageBuffer.length} bytes, ${mimeType})`);
+					} catch (error) {
+						logger.error(`Error fetching image from ${imageUrl}:`, error);
+					}
+				}
+
+				contents = parts;
+			} else {
+				contents = prompt;
+			}
+
 			const response = await this.client.models.generateContent({
 				model: this.model,
-				contents: prompt,
+				contents: contents,
 			});
 
 			if (!response.candidates || response.candidates.length === 0) {

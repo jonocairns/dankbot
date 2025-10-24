@@ -2,7 +2,7 @@ import {GeminiImageService} from './gemini-image';
 import {OpenAIImageService} from './openai-image';
 
 export interface ImageService {
-	generateImage(prompt: string): Promise<Buffer>;
+	generateImage(prompt: string, inputImageUrls?: Array<string>): Promise<Buffer>;
 }
 
 export enum ImageProvider {
