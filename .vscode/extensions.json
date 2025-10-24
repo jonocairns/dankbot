@@ -1,8 +1,7 @@
 {
 	"recommendations": [
-		"dbaeumer.vscode-eslint",
+		"biomejs.biome",
 		"pmneo.tsimporter",
-		"coenraads.bracket-pair-colorizer",
 		"ms-azuretools.vscode-docker"
 	]
 }
