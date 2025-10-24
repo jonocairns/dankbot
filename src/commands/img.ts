@@ -25,7 +25,6 @@ export const img: Command = {
 		logger.info(`Generating image with prompt: ${prompt}`);
 
 		try {
-			// Generate image using DALL-E 3
 			const response = await openai.images.generate({
 				model: 'dall-e-3',
 				prompt: prompt,
@@ -43,11 +42,9 @@ export const img: Command = {
 
 			logger.info(`Image generated successfully: ${imageUrl}`);
 
-			// Fetch the image from the URL
 			const imageResponse = await fetch(imageUrl);
 			const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
-			// Send the image to Discord
 			await interaction.editReply({
 				content: `Generated image for: "${prompt}"`,
 				files: [

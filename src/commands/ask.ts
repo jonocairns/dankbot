@@ -16,7 +16,6 @@ const OPTIONS = {
 	},
 };
 
-// Use onyx voice - a deep male voice
 const TTS_VOICE = 'onyx' as const;
 
 export const ask: Command = {
@@ -37,7 +36,6 @@ export const ask: Command = {
 			return;
 		}
 
-		// Get chat completion
 		const completion = await openai.chat.completions.create({
 			model: AI_MODEL,
 			messages: [voices[0].system, {role: 'user', content}],
@@ -51,7 +49,6 @@ export const ask: Command = {
 			return;
 		}
 
-		// Generate speech using configured TTS service
 		logger.info(`Getting TTS service...`);
 		const ttsService = getTTSService();
 		logger.info(`Calling generateSpeech with text length: ${text.length}`);
