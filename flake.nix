@@ -24,8 +24,7 @@
 
           shellHook = ''
             export NODE_OPTIONS="--max-old-space-size=4096"
-            # Enable Corepack for Yarn 4 (uses .yarnrc.yml and .yarn/releases)
-            corepack enable
+            # Yarn 4 is already in .yarn/releases, no corepack enable needed
             echo "Node $(node -v) | Yarn $(yarn -v 2>/dev/null || echo 'run: yarn install') | Claude $(claude --version 2>/dev/null || echo not-installed)"
           '';
         };
