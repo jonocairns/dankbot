@@ -20,7 +20,6 @@ export class GeminiImageService implements ImageService {
 		logger.info(`Generating image with Gemini model ${this.model}`);
 
 		try {
-			// Build contents array with text and images if provided
 			let contents: string | Array<{text?: string; inlineData?: {mimeType: string; data: string}}>;
 
 			if (inputImageUrls && inputImageUrls.length > 0) {
@@ -28,14 +27,12 @@ export class GeminiImageService implements ImageService {
 
 				const parts: Array<{text?: string; inlineData?: {mimeType: string; data: string}}> = [{text: prompt}];
 
-				// Fetch and convert images to base64
 				for (const imageUrl of inputImageUrls) {
 					try {
 						const imageResponse = await fetch(imageUrl);
 						const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 						const base64Image = imageBuffer.toString('base64');
 
-						// Determine MIME type from URL or default to image/png
 						let mimeType = 'image/png';
 						if (imageUrl.includes('.jpg') || imageUrl.includes('.jpeg')) {
 							mimeType = 'image/jpeg';
