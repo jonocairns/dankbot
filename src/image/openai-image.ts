@@ -20,24 +20,17 @@ export class OpenAIImageService implements ImageService {
 		logger.info(`Generating image with OpenAI model ${this.model}`);
 
 		try {
-			const isGptImageModel = this.model.startsWith('gpt-image');
 			const isDalleModel = this.model.startsWith('dall-e');
 
-			// Build request parameters based on model type
-			const requestParams: any = {
+			const requestParams: OpenAI.Images.ImageGenerateParamsNonStreaming = {
 				model: this.model,
 				prompt: prompt,
 				n: 1,
 			};
 
-			// Only add response_format for dall-e models (gpt-image models don't support it)
 			if (isDalleModel) {
 				requestParams.response_format = 'url';
-			} else if (isGptImageModel) {
-				// gpt-image models return base64 by default, no response_format parameter needed
-				// They use output_format for the image format (png, jpeg, etc.) not response type
 			}
-
 			const response = await this.client.images.generate(requestParams);
 
 			const imageData = response.data?.[0];
@@ -46,7 +39,6 @@ export class OpenAIImageService implements ImageService {
 				throw new Error('No image data returned from OpenAI API');
 			}
 
-			// Handle base64 response (gpt-image models return this by default)
 			if (imageData.b64_json) {
 				logger.info('Image generated successfully (base64 format)');
 				const buffer = Buffer.from(imageData.b64_json, 'base64');
@@ -54,7 +46,6 @@ export class OpenAIImageService implements ImageService {
 				return buffer;
 			}
 
-			// Handle URL response (dall-e-2, dall-e-3)
 			if (imageData.url) {
 				logger.info(`Image generated successfully (URL format): ${imageData.url}`);
 				const imageResponse = await fetch(imageData.url);
