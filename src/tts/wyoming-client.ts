@@ -51,7 +51,7 @@ export class WyomingClient {
 				logger.error('Wyoming timeout');
 				cleanup(true);
 				reject(new Error('Wyoming protocol timeout'));
-			}, 30000);
+			}, 10000);
 
 			socket.on('error', (err) => {
 				if (resolved) return;
