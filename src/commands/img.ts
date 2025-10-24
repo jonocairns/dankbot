@@ -14,7 +14,7 @@ export const img: Command = {
 	id: CommandName.img,
 	register: new SlashCommandBuilder()
 		.setName(CommandName.img)
-		.setDescription('Generate an image using DALL-E')
+		.setDescription('Generate an image using openai')
 		.addStringOption((option) =>
 			option.setName(OPTIONS.prompt.name).setDescription(OPTIONS.prompt.description).setRequired(true)
 		),
@@ -26,7 +26,7 @@ export const img: Command = {
 
 		try {
 			const response = await openai.images.generate({
-				model: 'dall-e-3',
+				model: process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1-mini',
 				prompt: prompt,
 				n: 1,
 				size: '1024x1024',
