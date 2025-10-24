@@ -2,7 +2,7 @@ import { generateDependencyReport } from "@discordjs/voice";
 import { Client, Events, GatewayIntentBits, REST, Routes } from "discord.js";
 import dotenv from "dotenv";
 import { ai } from "./ai";
-import { ask, img, meme, yt } from "./commands";
+import { ask, img, meme } from "./commands";
 import { getVariables } from "./getVariables";
 import { logger } from "./logger";
 import { readFiles } from "./util";
@@ -11,7 +11,7 @@ dotenv.config();
 export const sounds: Array<string> = [];
 
 const { appId, token } = getVariables();
-const commands = [meme, yt, ask, img];
+const commands = [meme, ask, img];
 
 readFiles("../sounds", (files) => files.forEach((file) => sounds.push(file)));
 

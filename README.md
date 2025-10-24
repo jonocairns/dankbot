@@ -9,7 +9,6 @@ Uses node, typescript, eslint, github actions (build) and docker
 ## Commands
 
 - `/meme` - Play a random meme sound, or `/meme {specific meme}` to play a specific one
-- `/yt https://youtube.com/watch?v=...` - Stream YouTube audio to your current voice channel
 - `/ask {question}` - Ask the bot a question using AI, with text-to-speech response in voice channel
 - `/img prompt: {description}` - Generate an image using AI (supports optional image attachment for context)
 

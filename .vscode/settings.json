@@ -7,7 +7,6 @@
 		"quickfix.biome": "explicit",
 		"source.organizeImports.biome": "explicit"
 	},
-	"exportall.config.relExclusion": ["/src/commands/index.ts"],
 	"[json]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
