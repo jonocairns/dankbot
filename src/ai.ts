@@ -1,11 +1,9 @@
 import {Collection, Message} from 'discord.js';
 import {logger} from './logger';
-import {ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum, Configuration, OpenAIApi} from 'openai';
+import OpenAI from 'openai';
 import {donald} from './prompts/donald';
 
-export const AI_MODEL = 'gpt-3.5-turbo';
-
-const {Assistant, User} = ChatCompletionRequestMessageRoleEnum;
+export const AI_MODEL = process.env.OPENAI_API_KEY ?? 'gpt-4o-mini';
 
 interface Input {
 	message: Message;
@@ -16,7 +14,7 @@ const LIMIT = 100;
 const BOT_NAME = '@realDonaldTrump';
 
 export const ai = async ({message, botId}: Input) => {
-	const messages: Array<ChatCompletionRequestMessage> = [];
+	const messages: Array<OpenAI.Chat.ChatCompletionMessageParam> = [];
 
 	try {
 		const isThread = message.channel.isThread();
@@ -36,7 +34,7 @@ export const ai = async ({message, botId}: Input) => {
 			messages.push(...prepareThread({thread, botId}));
 			messages.reverse();
 		} else {
-			messages.push({role: User, content: prompt});
+			messages.push({role: 'user', content: prompt});
 		}
 		const content = await request(messages);
 		await message.reply({content});
@@ -50,17 +48,16 @@ export const ai = async ({message, botId}: Input) => {
 const getContent = ({message, botId}: {message: Message; botId: string}) =>
 	message.content.replace(`<@${botId}>`, BOT_NAME).trim();
 
-const request = async (messages: Array<ChatCompletionRequestMessage>) => {
-	const configuration = new Configuration({apiKey: process.env.OPENAI_API_KEY});
-	const openai = new OpenAIApi(configuration);
+const request = async (messages: Array<OpenAI.Chat.ChatCompletionMessageParam>) => {
+	const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
-	const completion = await openai.createChatCompletion({
+	const completion = await openai.chat.completions.create({
 		model: AI_MODEL,
 		messages: [donald, ...messages],
 	});
 
 	return (
-		completion.data.choices[0].message?.content ??
+		completion.choices[0].message?.content ??
 		`My response requires a bigly IQ, so bigly that you wouldn't understand. Sad!`
 	);
 };
@@ -83,7 +80,7 @@ const prepareThread = ({thread, botId}: MapThreadInput) =>
 			const author = bot ? '' : `${username} said `;
 
 			return {
-				role: bot ? Assistant : User,
+				role: bot ? ('assistant' as const) : ('user' as const),
 				content: `${author}${content}`,
 				name: bot ? BOT_NAME.replace('@', '') : username,
 			};

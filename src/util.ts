@@ -25,4 +25,5 @@ export enum CommandName {
 	meme = 'meme',
 	yt = 'yt',
 	ask = 'ask',
+	img = 'img',
 }
