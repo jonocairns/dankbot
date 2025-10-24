@@ -39,7 +39,13 @@ Use the `/img` command in Discord:
 /img prompt: A picture of a nano banana dish in a fancy restaurant
 ```
 
-The bot will automatically use the configured image provider to generate and upload the image.
+You can also attach an image to provide context for generation:
+
+```
+/img prompt: Make this look like a Van Gogh painting [attach an image]
+```
+
+The bot will automatically use the configured image provider to generate and upload the image. Both OpenAI and Gemini providers support context images.
 
 ## Pricing Information (as of 2025)
 

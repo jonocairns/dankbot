@@ -1,17 +1,22 @@
-import {GeminiImageService} from './gemini-image';
-import {OpenAIImageService} from './openai-image';
+import { GeminiImageService } from "./gemini-image";
+import { OpenAIImageService } from "./openai-image";
 
 export interface ImageService {
-	generateImage(prompt: string, inputImageUrls?: Array<string>): Promise<Buffer>;
+	generateImage(
+		prompt: string,
+		inputImageUrls?: Array<string>,
+	): Promise<Buffer>;
 }
 
 export enum ImageProvider {
-	OPENAI = 'openai',
-	GEMINI = 'gemini',
+	OPENAI = "openai",
+	GEMINI = "gemini",
 }
 
 export function getImageService(): ImageService {
-	const provider = (process.env.IMAGE_PROVIDER || ImageProvider.OPENAI).toLowerCase();
+	const provider = (
+		process.env.IMAGE_PROVIDER || ImageProvider.OPENAI
+	).toLowerCase();
 
 	switch (provider) {
 		case ImageProvider.GEMINI:

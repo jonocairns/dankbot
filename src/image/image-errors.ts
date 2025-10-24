@@ -1,7 +1,10 @@
 export class ImageGenerationError extends Error {
-	constructor(message: string, public readonly originalError?: unknown) {
+	constructor(
+		message: string,
+		public readonly originalError?: unknown,
+	) {
 		super(message);
-		this.name = 'ImageGenerationError';
+		this.name = "ImageGenerationError";
 	}
 }
 
@@ -10,9 +13,9 @@ export class SafetyViolationError extends ImageGenerationError {
 		message: string,
 		public readonly violations: Array<string>,
 		public readonly requestId?: string,
-		originalError?: unknown
+		originalError?: unknown,
 	) {
 		super(message, originalError);
-		this.name = 'SafetyViolationError';
+		this.name = "SafetyViolationError";
 	}
 }

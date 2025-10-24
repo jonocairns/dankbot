@@ -6,7 +6,12 @@
  * @param bitsPerSample - Bits per sample (default 16)
  * @returns WAV formatted audio buffer
  */
-export function pcmToWav(pcmData: Buffer, sampleRate = 22050, channels = 1, bitsPerSample = 16): Buffer {
+export function pcmToWav(
+	pcmData: Buffer,
+	sampleRate = 22050,
+	channels = 1,
+	bitsPerSample = 16,
+): Buffer {
 	const dataSize = pcmData.length;
 	const headerSize = 44;
 	const fileSize = headerSize + dataSize - 8;
@@ -14,12 +19,12 @@ export function pcmToWav(pcmData: Buffer, sampleRate = 22050, channels = 1, bits
 	const header = Buffer.alloc(headerSize);
 
 	// RIFF chunk descriptor
-	header.write('RIFF', 0);
+	header.write("RIFF", 0);
 	header.writeUInt32LE(fileSize, 4);
-	header.write('WAVE', 8);
+	header.write("WAVE", 8);
 
 	// fmt sub-chunk
-	header.write('fmt ', 12);
+	header.write("fmt ", 12);
 	header.writeUInt32LE(16, 16); // fmt chunk size
 	header.writeUInt16LE(1, 20); // PCM format
 	header.writeUInt16LE(channels, 22);
@@ -29,7 +34,7 @@ export function pcmToWav(pcmData: Buffer, sampleRate = 22050, channels = 1, bits
 	header.writeUInt16LE(bitsPerSample, 34);
 
 	// data sub-chunk
-	header.write('data', 36);
+	header.write("data", 36);
 	header.writeUInt32LE(dataSize, 40);
 
 	return Buffer.concat([header, pcmData]);

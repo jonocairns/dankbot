@@ -1,6 +1,6 @@
-import {GoogleGenAI} from '@google/genai';
-import {ImageService} from './image-service';
-import {logger} from '../logger';
+import { GoogleGenAI } from "@google/genai";
+import { logger } from "../logger";
+import { ImageService } from "./image-service";
 
 export class GeminiImageService implements ImageService {
 	private client: GoogleGenAI;
@@ -8,38 +8,53 @@ export class GeminiImageService implements ImageService {
 
 	constructor() {
 		if (!process.env.GOOGLE_API_KEY) {
-			throw new Error('GOOGLE_API_KEY environment variable is required for Gemini image generation');
+			throw new Error(
+				"GOOGLE_API_KEY environment variable is required for Gemini image generation",
+			);
 		}
 
 		this.client = new GoogleGenAI({});
-		this.model = process.env.GEMINI_IMAGE_MODEL ?? 'gemini-2.5-flash-image';
+		this.model = process.env.GEMINI_IMAGE_MODEL ?? "gemini-2.5-flash-image";
 		logger.info(`Initialized Gemini image service with model: ${this.model}`);
 	}
 
-	async generateImage(prompt: string, inputImageUrls?: Array<string>): Promise<Buffer> {
+	async generateImage(
+		prompt: string,
+		inputImageUrls?: Array<string>,
+	): Promise<Buffer> {
 		logger.info(`Generating image with Gemini model ${this.model}`);
 
 		try {
-			let contents: string | Array<{text?: string; inlineData?: {mimeType: string; data: string}}>;
+			let contents:
+				| string
+				| Array<{
+						text?: string;
+						inlineData?: { mimeType: string; data: string };
+				  }>;
 
 			if (inputImageUrls && inputImageUrls.length > 0) {
-				logger.info(`Processing ${inputImageUrls.length} input image(s) with prompt`);
+				logger.info(
+					`Processing ${inputImageUrls.length} input image(s) with prompt`,
+				);
 
-				const parts: Array<{text?: string; inlineData?: {mimeType: string; data: string}}> = [{text: prompt}];
+				const parts: Array<{
+					text?: string;
+					inlineData?: { mimeType: string; data: string };
+				}> = [{ text: prompt }];
 
 				for (const imageUrl of inputImageUrls) {
 					try {
 						const imageResponse = await fetch(imageUrl);
 						const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-						const base64Image = imageBuffer.toString('base64');
+						const base64Image = imageBuffer.toString("base64");
 
-						let mimeType = 'image/png';
-						if (imageUrl.includes('.jpg') || imageUrl.includes('.jpeg')) {
-							mimeType = 'image/jpeg';
-						} else if (imageUrl.includes('.gif')) {
-							mimeType = 'image/gif';
-						} else if (imageUrl.includes('.webp')) {
-							mimeType = 'image/webp';
+						let mimeType = "image/png";
+						if (imageUrl.includes(".jpg") || imageUrl.includes(".jpeg")) {
+							mimeType = "image/jpeg";
+						} else if (imageUrl.includes(".gif")) {
+							mimeType = "image/gif";
+						} else if (imageUrl.includes(".webp")) {
+							mimeType = "image/webp";
 						}
 
 						parts.push({
@@ -49,7 +64,9 @@ export class GeminiImageService implements ImageService {
 							},
 						});
 
-						logger.info(`Added image to request (${imageBuffer.length} bytes, ${mimeType})`);
+						logger.info(
+							`Added image to request (${imageBuffer.length} bytes, ${mimeType})`,
+						);
 					} catch (error) {
 						logger.error(`Error fetching image from ${imageUrl}:`, error);
 					}
@@ -66,12 +83,12 @@ export class GeminiImageService implements ImageService {
 			});
 
 			if (!response.candidates || response.candidates.length === 0) {
-				throw new Error('No candidates returned from Gemini API');
+				throw new Error("No candidates returned from Gemini API");
 			}
 
 			const candidate = response.candidates[0];
 			if (!candidate.content || !candidate.content.parts) {
-				throw new Error('No content parts in Gemini response');
+				throw new Error("No content parts in Gemini response");
 			}
 
 			const parts = candidate.content.parts;
@@ -79,15 +96,17 @@ export class GeminiImageService implements ImageService {
 			for (const part of parts) {
 				if (part.inlineData && part.inlineData.data) {
 					const imageData = part.inlineData.data;
-					const buffer = Buffer.from(imageData, 'base64');
-					logger.info(`Successfully generated image with Gemini (${buffer.length} bytes)`);
+					const buffer = Buffer.from(imageData, "base64");
+					logger.info(
+						`Successfully generated image with Gemini (${buffer.length} bytes)`,
+					);
 					return buffer;
 				}
 			}
 
-			throw new Error('No image data found in Gemini response');
+			throw new Error("No image data found in Gemini response");
 		} catch (error) {
-			logger.error('Error generating image with Gemini:', error);
+			logger.error("Error generating image with Gemini:", error);
 			throw error;
 		}
 	}

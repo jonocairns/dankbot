@@ -1,12 +1,20 @@
-import {CacheType, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder} from 'discord.js';
-import fs from 'fs';
-import path from 'path';
-import {logger} from './logger';
+import {
+	CacheType,
+	ChatInputCommandInteraction,
+	SlashCommandBuilder,
+	SlashCommandOptionsOnlyBuilder,
+} from "discord.js";
+import fs from "fs";
+import path from "path";
+import { logger } from "./logger";
 
-export const readFiles = async (directory: string, action: (files: Array<string>) => void) => {
+export const readFiles = async (
+	directory: string,
+	action: (files: Array<string>) => void,
+) => {
 	fs.readdir(path.join(__dirname, directory), (err, files) => {
 		if (err) {
-			logger.error('Unable to scan directory: ' + err);
+			logger.error("Unable to scan directory: " + err);
 			return;
 		}
 
@@ -17,13 +25,15 @@ export const readFiles = async (directory: string, action: (files: Array<string>
 
 export interface Command {
 	id: CommandName;
-	register: Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandOptionsOnlyBuilder;
+	register:
+		| Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+		| SlashCommandOptionsOnlyBuilder;
 	run(interaction: ChatInputCommandInteraction<CacheType>): Promise<void>;
 }
 
 export enum CommandName {
-	meme = 'meme',
-	yt = 'yt',
-	ask = 'ask',
-	img = 'img',
+	meme = "meme",
+	yt = "yt",
+	ask = "ask",
+	img = "img",
 }
