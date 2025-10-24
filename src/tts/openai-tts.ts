@@ -9,7 +9,7 @@ export class OpenAITTSService implements TTSService {
 		this.client = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 	}
 
-	async generateSpeech(text: string, voice: string = 'onyx'): Promise<Buffer> {
+	async generateSpeech(text: string, voice = 'onyx'): Promise<Buffer> {
 		logger.info(`Generating speech with OpenAI TTS using voice: ${voice}...`);
 
 		const mp3Response = await this.client.audio.speech.create({

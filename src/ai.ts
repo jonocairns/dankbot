@@ -3,7 +3,7 @@ import {logger} from './logger';
 import OpenAI from 'openai';
 import {donald} from './prompts/donald';
 
-export const AI_MODEL = 'gpt-3.5-turbo';
+export const AI_MODEL = 'gpt-4o-mini'; // gpt-3.5-turbo
 
 interface Input {
 	message: Message;

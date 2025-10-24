@@ -14,249 +14,180 @@ enum ParserState {
 	READING_PAYLOAD,
 }
 
-export class WyomingClient {
-	private host: string;
-	private port: number;
+interface ParserContext {
+	buffer: Buffer;
+	state: ParserState;
+	bytesToRead: number;
+	currentEvent: WyomingEvent | null;
+	audioChunks: Array<Buffer>;
+	keepProcessing: boolean;
+}
 
-	constructor(host: string, port: number) {
-		this.host = host;
-		this.port = port;
-	}
+export class WyomingClient {
+	constructor(private host: string, private port: number) {}
 
 	async synthesize(text: string, voice?: string): Promise<Buffer> {
 		return new Promise((resolve, reject) => {
 			const socket = new Socket();
-			const audioChunks: Array<Buffer> = [];
-			let buffer = Buffer.alloc(0);
+			let resolved = false;
 
-			// State machine
-			let state = ParserState.READING_MESSAGE;
-			let bytesToRead = 0;
-			let currentEvent: WyomingEvent | null = null;
-			const resolvedState = {value: false};
+			const ctx: ParserContext = {
+				buffer: Buffer.alloc(0),
+				state: ParserState.READING_MESSAGE,
+				bytesToRead: 0,
+				currentEvent: null,
+				audioChunks: [],
+				keepProcessing: true,
+			};
 
-			// Timeout to prevent hanging forever
-			const timeout = setTimeout(() => {
-				if (resolvedState.value) return;
-				logger.error('Wyoming protocol timeout - no audio-stop received');
+			const cleanup = (isResolved: boolean) => {
+				resolved = isResolved;
+				clearTimeout(timeout);
 				socket.end();
-				if (audioChunks.length > 0) {
-					logger.info(`Returning ${audioChunks.length} audio chunks received before timeout`);
-					resolvedState.value = true;
-					resolve(Buffer.concat(audioChunks));
-				} else {
-					resolvedState.value = true;
-					reject(new Error('Wyoming protocol timeout'));
-				}
-			}, 30000); // 30 second timeout
+			};
+
+			const timeout = setTimeout(() => {
+				if (resolved) return;
+				logger.error('Wyoming timeout');
+				cleanup(true);
+				reject(new Error('Wyoming protocol timeout'));
+			}, 30000);
 
 			socket.on('error', (err) => {
-				if (resolvedState.value) return;
-				clearTimeout(timeout);
-				logger.error(`Wyoming socket error: ${err.message}`);
-				resolvedState.value = true;
+				if (resolved) return;
+				cleanup(true);
 				reject(err);
 			});
 
 			socket.on('data', (data) => {
-				buffer = Buffer.concat([buffer, data]);
+				ctx.buffer = Buffer.concat([ctx.buffer, data]);
+				ctx.keepProcessing = true;
 
-				// State machine parser
-				let keepProcessing = true;
-				while (keepProcessing) {
-					switch (state) {
-						case ParserState.READING_MESSAGE: {
-							// Look for newline to get JSON message
-							const newlineIndex = buffer.indexOf('\n');
-							if (newlineIndex === -1) {
-								keepProcessing = false;
-								break;
-							}
-
-							const messageLine = buffer.slice(0, newlineIndex).toString('utf-8');
-							buffer = buffer.slice(newlineIndex + 1);
-
-							// Skip empty lines
-							if (messageLine.trim() === '') {
-								break;
-							}
-
-							try {
-								const event = JSON.parse(messageLine) as WyomingEvent;
-								currentEvent = event;
-
-								logger.info(
-									`Wyoming: ${event.type} (data: ${event.data_length || 0}, payload: ${
-										event.payload_length || 0
-									})`
-								);
-
-								// Determine next state
-								if (event.data_length && event.data_length > 0) {
-									state = ParserState.READING_DATA;
-									bytesToRead = event.data_length;
-								} else if (event.payload_length && event.payload_length > 0) {
-									state = ParserState.READING_PAYLOAD;
-									bytesToRead = event.payload_length;
-								} else {
-									// No binary data, handle the event
-									this.handleEvent(
-										event,
-										null,
-										audioChunks,
-										socket,
-										resolve,
-										reject,
-										resolvedState,
-										timeout
-									);
-									currentEvent = null;
-								}
-							} catch (err) {
-								logger.error(`Failed to parse Wyoming message: ${err}`);
-								// Skip and continue
-							}
-							break;
-						}
-
-						case ParserState.READING_DATA: {
-							// Read data_length bytes (JSON metadata, we skip this)
-							if (buffer.length < bytesToRead) {
-								keepProcessing = false;
-								break;
-							}
-
-							// Skip the data
-							buffer = buffer.slice(bytesToRead);
-							bytesToRead = 0;
-
-							// Check if there's also a payload to read
-							if (currentEvent && currentEvent.payload_length && currentEvent.payload_length > 0) {
-								state = ParserState.READING_PAYLOAD;
-								bytesToRead = currentEvent.payload_length;
-							} else {
-								// Done with this event
-								if (currentEvent) {
-									this.handleEvent(
-										currentEvent,
-										null,
-										audioChunks,
-										socket,
-										resolve,
-										reject,
-										resolvedState,
-										timeout
-									);
-									currentEvent = null;
-								}
-								state = ParserState.READING_MESSAGE;
-							}
-							break;
-						}
-
-						case ParserState.READING_PAYLOAD: {
-							// Read payload_length bytes (binary audio data)
-							if (buffer.length < bytesToRead) {
-								keepProcessing = false;
-								break;
-							}
-
-							const payloadData = buffer.slice(0, bytesToRead);
-							buffer = buffer.slice(bytesToRead);
-							bytesToRead = 0;
-
-							// Handle the event with payload
-							if (currentEvent) {
-								this.handleEvent(
-									currentEvent,
-									payloadData,
-									audioChunks,
-									socket,
-									resolve,
-									reject,
-									resolvedState,
-									timeout
-								);
-								currentEvent = null;
-							}
-
-							state = ParserState.READING_MESSAGE;
-							break;
-						}
+				while (ctx.keepProcessing) {
+					if (ctx.state === ParserState.READING_MESSAGE) {
+						this.processMessage(ctx, resolve, cleanup);
+					} else if (ctx.state === ParserState.READING_DATA) {
+						this.processData(ctx, resolve, cleanup);
+					} else if (ctx.state === ParserState.READING_PAYLOAD) {
+						this.processPayload(ctx, resolve, cleanup);
 					}
 				}
 			});
 
 			socket.on('close', () => {
-				if (resolvedState.value) return;
-				clearTimeout(timeout);
-				logger.info('Wyoming socket closed');
-				if (audioChunks.length === 0) {
-					resolvedState.value = true;
+				if (!resolved && ctx.audioChunks.length === 0) {
+					cleanup(true);
 					reject(new Error('Connection closed without receiving audio'));
 				}
 			});
 
 			socket.connect(this.port, this.host, () => {
-				logger.info(`Connected to Wyoming server at ${this.host}:${this.port}`);
-
-				// Send synthesize request
 				const request = {
 					type: 'synthesize',
 					data: {text},
 					...(voice && {voice}),
 				};
-
-				const message = JSON.stringify(request) + '\n';
-				socket.write(message);
-				logger.info('Sent synthesize request to Wyoming server');
+				socket.write(JSON.stringify(request) + '\n');
 			});
 		});
+	}
+
+	private processMessage(
+		ctx: ParserContext,
+		resolve: (value: Buffer) => void,
+		cleanup: (isResolved: boolean) => void
+	): void {
+		const newlineIndex = ctx.buffer.indexOf('\n');
+		if (newlineIndex === -1) {
+			ctx.keepProcessing = false;
+			return;
+		}
+
+		const messageLine = ctx.buffer.slice(0, newlineIndex).toString('utf-8');
+		ctx.buffer = ctx.buffer.slice(newlineIndex + 1);
+
+		if (!messageLine.trim()) return;
+
+		try {
+			const event = JSON.parse(messageLine) as WyomingEvent;
+			ctx.currentEvent = event;
+
+			if (event.data_length && event.data_length > 0) {
+				ctx.state = ParserState.READING_DATA;
+				ctx.bytesToRead = event.data_length;
+			} else if (event.payload_length && event.payload_length > 0) {
+				ctx.state = ParserState.READING_PAYLOAD;
+				ctx.bytesToRead = event.payload_length;
+			} else {
+				this.handleEvent(event, null, ctx.audioChunks, resolve, cleanup);
+				ctx.currentEvent = null;
+			}
+		} catch (err) {
+			// Skip invalid JSON lines
+		}
+	}
+
+	private processData(
+		ctx: ParserContext,
+		resolve: (value: Buffer) => void,
+		cleanup: (isResolved: boolean) => void
+	): void {
+		if (ctx.buffer.length < ctx.bytesToRead) {
+			ctx.keepProcessing = false;
+			return;
+		}
+
+		// Skip metadata
+		ctx.buffer = ctx.buffer.slice(ctx.bytesToRead);
+		ctx.bytesToRead = 0;
+
+		if (ctx.currentEvent?.payload_length && ctx.currentEvent.payload_length > 0) {
+			ctx.state = ParserState.READING_PAYLOAD;
+			ctx.bytesToRead = ctx.currentEvent.payload_length;
+		} else {
+			if (ctx.currentEvent) {
+				this.handleEvent(ctx.currentEvent, null, ctx.audioChunks, resolve, cleanup);
+				ctx.currentEvent = null;
+			}
+			ctx.state = ParserState.READING_MESSAGE;
+		}
+	}
+
+	private processPayload(
+		ctx: ParserContext,
+		resolve: (value: Buffer) => void,
+		cleanup: (isResolved: boolean) => void
+	): void {
+		if (ctx.buffer.length < ctx.bytesToRead) {
+			ctx.keepProcessing = false;
+			return;
+		}
+
+		const payloadData = ctx.buffer.slice(0, ctx.bytesToRead);
+		ctx.buffer = ctx.buffer.slice(ctx.bytesToRead);
+		ctx.bytesToRead = 0;
+
+		if (ctx.currentEvent) {
+			this.handleEvent(ctx.currentEvent, payloadData, ctx.audioChunks, resolve, cleanup);
+			ctx.currentEvent = null;
+		}
+
+		ctx.state = ParserState.READING_MESSAGE;
 	}
 
 	private handleEvent(
 		event: WyomingEvent,
 		payload: Buffer | null,
 		audioChunks: Array<Buffer>,
-		socket: Socket,
 		resolve: (value: Buffer) => void,
-		reject: (reason: Error) => void,
-		resolved: {value: boolean},
-		timeout: NodeJS.Timeout
+		cleanup: (isResolved: boolean) => void
 	): void {
-		switch (event.type) {
-			case 'audio-chunk': {
-				if (payload) {
-					audioChunks.push(payload);
-					logger.info(`Collected audio chunk: ${payload.length} bytes`);
-				}
-				break;
-			}
-
-			case 'audio-stop': {
-				if (resolved.value) return;
-				clearTimeout(timeout);
-				socket.end();
-				const fullAudio = Buffer.concat(audioChunks);
-				logger.info(`Received ${fullAudio.length} bytes of audio from Wyoming`);
-				resolved.value = true;
-				resolve(fullAudio);
-				break;
-			}
-
-			case 'error': {
-				if (resolved.value) return;
-				clearTimeout(timeout);
-				socket.end();
-				resolved.value = true;
-				reject(new Error(`Wyoming error: ${JSON.stringify(event.data)}`));
-				break;
-			}
-
-			default:
-				// Ignore other event types
-				logger.info(`Ignoring Wyoming event: ${event.type}`);
-				break;
+		if (event.type === 'audio-chunk' && payload) {
+			audioChunks.push(payload);
+		} else if (event.type === 'audio-stop') {
+			cleanup(true);
+			resolve(Buffer.concat(audioChunks));
 		}
+		// Ignore all other events
 	}
 }
