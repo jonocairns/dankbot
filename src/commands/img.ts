@@ -29,8 +29,6 @@ export const img: Command = {
 				model: process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1',
 				prompt: prompt,
 				n: 1,
-				size: 'auto',
-				quality: 'auto',
 			});
 
 			const imageUrl = response.data?.[0]?.url;
