@@ -3,7 +3,7 @@ import {logger} from './logger';
 import OpenAI from 'openai';
 import {donald} from './prompts/donald';
 
-export const AI_MODEL = process.env.OPENAI_API_KEY ?? 'gpt-4o-mini';
+export const AI_MODEL = process.env.OPENAI_MODEL ?? 'gpt-4o-mini';
 
 interface Input {
 	message: Message;
