@@ -6,16 +6,16 @@ A dank soundboard for discord. Check out the sounds folder for all the current l
 
 Uses node, typescript, eslint, github actions (build) and docker
 
-## Docs
+## Commands
 
-Play a random meme with `/meme` or `/meme {specific meme here}`
-
-Typing `/yt https://www.youtube.com/watch?v=PGNiXGX2nLU` will stream the youtube audio to the current users voice channel.
+- `/meme` - Play a random meme sound, or `/meme {specific meme}` to play a specific one
+- `/ask {question}` - Ask the bot a question using AI, with text-to-speech response in voice channel
+- `/img prompt: {description}` - Generate an image using AI (supports optional image attachment for context)
 
 ## Getting Started
 1. Clone this repository
-2. Ensure you're running node 16.X then run `yarn install` on this project.
-3. Create an authorize your bot (see prerequisites), then update .env with the APPLICATION_ID and DISCORD_BOT_TOKEN
+2. Ensure you're running Node 22.0.0+ then run `yarn install` on this project
+3. Create and authorize your bot (see prerequisites), then update .env with the APPLICATION_ID and DISCORD_BOT_TOKEN
 4. Run `yarn start` from the project
 
 ### Prerequisites

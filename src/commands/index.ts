@@ -1,4 +1,3 @@
-export * from './ask';
-export * from './img';
-export * from './meme';
-export * from './yt';
+export * from "./ask";
+export * from "./img";
+export * from "./meme";

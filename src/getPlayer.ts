@@ -1,11 +1,18 @@
-import {createAudioPlayer, joinVoiceChannel} from '@discordjs/voice';
-import {CacheType, ChatInputCommandInteraction, GuildMember} from 'discord.js';
-import {logger} from './logger';
+import { createAudioPlayer, joinVoiceChannel } from "@discordjs/voice";
+import {
+	CacheType,
+	ChatInputCommandInteraction,
+	GuildMember,
+} from "discord.js";
+import { logger } from "./logger";
 
-export const UNABLE_TO_CONNECT_ERROR = 'I cannot play sounds due to reasons above what your simple mind can handle.';
+export const UNABLE_TO_CONNECT_ERROR =
+	"I cannot play sounds due to reasons above what your simple mind can handle.";
 
-export const getPlayer = (interaction: ChatInputCommandInteraction<CacheType>) => {
-	const {member, guild, guildId} = interaction;
+export const getPlayer = (
+	interaction: ChatInputCommandInteraction<CacheType>,
+) => {
+	const { member, guild, guildId } = interaction;
 	const voiceChannel = (member as GuildMember)?.voice?.channel?.id;
 	const player = createAudioPlayer();
 
@@ -26,13 +33,13 @@ export const getPlayer = (interaction: ChatInputCommandInteraction<CacheType>) =
 
 	connection.subscribe(player);
 
-	connection.on('error', (error) => {
+	connection.on("error", (error) => {
 		logger.error(error);
 	});
 
-	player.on('error', (error) => {
+	player.on("error", (error) => {
 		logger.error(error);
 	});
 
-	return {player, connection};
+	return { player, connection };
 };

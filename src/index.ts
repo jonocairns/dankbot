@@ -1,20 +1,19 @@
-import {meme, yt, ask, img} from './commands';
-import {Client, Events, GatewayIntentBits, REST, Routes} from 'discord.js';
-import dotenv from 'dotenv';
-import {generateDependencyReport} from '@discordjs/voice';
-
-import {readFiles} from './util';
-import {getVariables} from './getVariables';
-import {logger} from './logger';
-import {ai} from './ai';
+import { generateDependencyReport } from "@discordjs/voice";
+import { Client, Events, GatewayIntentBits, REST, Routes } from "discord.js";
+import dotenv from "dotenv";
+import { ai } from "./ai";
+import { ask, img, meme } from "./commands";
+import { getVariables } from "./getVariables";
+import { logger } from "./logger";
+import { readFiles } from "./util";
 
 dotenv.config();
 export const sounds: Array<string> = [];
 
-const {appId, token} = getVariables();
-const commands = [meme, yt, ask, img];
+const { appId, token } = getVariables();
+const commands = [meme, ask, img];
 
-readFiles('../sounds', (files) => files.forEach((file) => sounds.push(file)));
+readFiles("../sounds", (files) => files.forEach((file) => sounds.push(file)));
 
 logger.info(generateDependencyReport());
 
@@ -31,9 +30,11 @@ client.login(token);
 
 client.on(Events.MessageCreate, async (message) => {
 	if (message.author.bot) return;
-	const mentionsBot = message.mentions.members?.find((m) => m.id === client.application?.id);
+	const mentionsBot = message.mentions.members?.find(
+		(m) => m.id === client.application?.id,
+	);
 	if (mentionsBot) {
-		await ai({message, botId: mentionsBot.id});
+		await ai({ message, botId: mentionsBot.id });
 	}
 });
 
@@ -42,9 +43,9 @@ client.once(Events.ClientReady, async (c) => {
 	const guildIds = client.guilds.cache.map((guild) => guild.id);
 
 	for (const guildId of guildIds) {
-		const commandList = commands.map((c) => c.id).join(', ');
+		const commandList = commands.map((c) => c.id).join(", ");
 		logger.info(`registering ${commandList} run guild ${guildId}`);
-		const rest = new REST({version: '10'}).setToken(token);
+		const rest = new REST({ version: "10" }).setToken(token);
 		await rest.put(Routes.applicationGuildCommands(appId, guildId), {
 			body: commands.map((c) => c.register),
 		});
