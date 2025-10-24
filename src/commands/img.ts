@@ -26,11 +26,9 @@ export const img: Command = {
 
 		try {
 			const response = await openai.images.generate({
-				model: process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1-mini',
+				model: process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1',
 				prompt: prompt,
 				n: 1,
-				size: '1024x1024',
-				quality: 'standard',
 			});
 
 			const imageUrl = response.data?.[0]?.url;
