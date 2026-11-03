@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 
 # Compile native dependencies when the current Alpine release has no prebuild.
 RUN apk add --no-cache python3 build-base
@@ -22,7 +22,7 @@ RUN yarn build
 
 RUN yarn workspaces focus --production
 
-FROM node:22-alpine 
+FROM node:26-alpine 
 
 RUN apk update && apk add --no-cache ffmpeg
 
