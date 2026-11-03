@@ -1,12 +1,17 @@
 import OpenAI from "openai";
 import { logger } from "../logger";
+import { AI_TIMEOUT_MS } from "../security";
 import { TTSService } from "./tts-service";
 
 export class OpenAITTSService implements TTSService {
 	private client: OpenAI;
 
 	constructor() {
-		this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+		this.client = new OpenAI({
+			apiKey: process.env.OPENAI_API_KEY,
+			timeout: AI_TIMEOUT_MS,
+			maxRetries: 0,
+		});
 	}
 
 	async generateSpeech(text: string, voice = "onyx"): Promise<Buffer> {

@@ -1,5 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 import { logger } from "../logger";
+import {
+	AI_TIMEOUT_MS,
+	RequestRejectedError,
+	validatePrompt,
+} from "../security";
+import { decodeGeneratedImage, downloadDiscordImage } from "./download-image";
 import { ImageService } from "./image-service";
 
 export class GeminiImageService implements ImageService {
@@ -13,7 +19,7 @@ export class GeminiImageService implements ImageService {
 			);
 		}
 
-		this.client = new GoogleGenAI({});
+		this.client = new GoogleGenAI({ httpOptions: { timeout: AI_TIMEOUT_MS } });
 		this.model = process.env.GEMINI_IMAGE_MODEL ?? "gemini-2.5-flash-image";
 		logger.info(`Initialized Gemini image service with model: ${this.model}`);
 	}
@@ -22,6 +28,9 @@ export class GeminiImageService implements ImageService {
 		prompt: string,
 		inputImageUrls?: Array<string>,
 	): Promise<Buffer> {
+		validatePrompt(prompt);
+		if (inputImageUrls && inputImageUrls.length > 1)
+			throw new RequestRejectedError("Please attach only one image.");
 		logger.info(`Generating image with Gemini model ${this.model}`);
 
 		try {
@@ -43,33 +52,10 @@ export class GeminiImageService implements ImageService {
 				}> = [{ text: prompt }];
 
 				for (const imageUrl of inputImageUrls) {
-					try {
-						const imageResponse = await fetch(imageUrl);
-						const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-						const base64Image = imageBuffer.toString("base64");
-
-						let mimeType = "image/png";
-						if (imageUrl.includes(".jpg") || imageUrl.includes(".jpeg")) {
-							mimeType = "image/jpeg";
-						} else if (imageUrl.includes(".gif")) {
-							mimeType = "image/gif";
-						} else if (imageUrl.includes(".webp")) {
-							mimeType = "image/webp";
-						}
-
-						parts.push({
-							inlineData: {
-								mimeType,
-								data: base64Image,
-							},
-						});
-
-						logger.info(
-							`Added image to request (${imageBuffer.length} bytes, ${mimeType})`,
-						);
-					} catch (error) {
-						logger.error(`Error fetching image from ${imageUrl}:`, error);
-					}
+					const { buffer, mimeType } = await downloadDiscordImage(imageUrl);
+					parts.push({
+						inlineData: { mimeType, data: buffer.toString("base64") },
+					});
 				}
 
 				contents = parts;
@@ -96,7 +82,7 @@ export class GeminiImageService implements ImageService {
 			for (const part of parts) {
 				if (part.inlineData && part.inlineData.data) {
 					const imageData = part.inlineData.data;
-					const buffer = Buffer.from(imageData, "base64");
+					const buffer = decodeGeneratedImage(imageData);
 					logger.info(
 						`Successfully generated image with Gemini (${buffer.length} bytes)`,
 					);

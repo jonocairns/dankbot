@@ -1,7 +1,12 @@
 import { Collection, Message } from "discord.js";
 import OpenAI from "openai";
-import { logger } from "./logger";
 import { donald } from "./prompts/donald";
+import {
+	AI_TIMEOUT_MS,
+	MAX_COMPLETION_TOKENS,
+	MAX_CONTEXT_LENGTH,
+	validatePrompt,
+} from "./security";
 
 export const AI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
 
@@ -16,35 +21,23 @@ const BOT_NAME = "@realDonaldTrump";
 export const ai = async ({ message, botId }: Input) => {
 	const messages: Array<OpenAI.Chat.ChatCompletionMessageParam> = [];
 
-	try {
-		const isThread = message.channel.isThread();
-		const prompt = getContent({ message, botId });
-		if (isThread) {
-			if (message.channel.locked) {
-				return;
-			}
-			message.channel.sendTyping();
-			const thread = await message.channel.messages.fetch({ limit: LIMIT });
-
-			if (thread.size >= LIMIT) {
-				await message.reply({
-					content: `I'm sick of this thread. I'm off to try bigly and betterly things.`,
-				});
-				await message.channel.setLocked(true);
-				return;
-			}
-			messages.push(...prepareThread({ thread, botId }));
-			messages.reverse();
-		} else {
-			messages.push({ role: "user", content: prompt });
+	const isThread = message.channel.isThread();
+	const prompt = getContent({ message, botId });
+	validatePrompt(prompt);
+	if (isThread) {
+		if (message.channel.locked) {
+			return;
 		}
-		const content = await request(messages);
-		await message.reply({ content });
-	} catch (err) {
-		logger.error(JSON.stringify(err));
-		logger.info(messages);
-		message.reply({ content: "I may or may not have shat myself..." });
+		await message.channel.sendTyping();
+		const thread = await message.channel.messages.fetch({ limit: LIMIT });
+
+		messages.push(...prepareThread({ thread, botId }));
+		messages.reverse();
+	} else {
+		messages.push({ role: "user", content: prompt });
 	}
+	const content = await request(messages);
+	await message.reply({ content });
 };
 
 const getContent = ({ message, botId }: { message: Message; botId: string }) =>
@@ -53,15 +46,20 @@ const getContent = ({ message, botId }: { message: Message; botId: string }) =>
 const request = async (
 	messages: Array<OpenAI.Chat.ChatCompletionMessageParam>,
 ) => {
-	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+	const openai = new OpenAI({
+		apiKey: process.env.OPENAI_API_KEY,
+		timeout: AI_TIMEOUT_MS,
+		maxRetries: 0,
+	});
 
 	const completion = await openai.chat.completions.create({
 		model: AI_MODEL,
+		max_completion_tokens: MAX_COMPLETION_TOKENS,
 		messages: [donald, ...messages],
 	});
 
 	return (
-		completion.choices[0].message?.content ??
+		completion.choices[0]?.message?.content?.slice(0, 2000) ??
 		`My response requires a bigly IQ, so bigly that you wouldn't understand. Sad!`
 	);
 };
@@ -71,21 +69,26 @@ interface MapThreadInput {
 	thread: Collection<string, Message>;
 }
 
-const prepareThread = ({ thread, botId }: MapThreadInput) =>
-	thread
+export const prepareThread = ({ thread, botId }: MapThreadInput) => {
+	let remaining = MAX_CONTEXT_LENGTH;
+	return thread
 		.filter((f) => {
 			const mentionsBot = f.mentions.members?.find((f) => f.id === botId);
-			const isBot = f.author.bot;
+			const isBot = f.author.id === botId;
 			return mentionsBot || isBot;
 		})
 		.map((t) => {
 			const content = getContent({ message: t, botId });
-			const { bot, username } = t.author;
+			const { username } = t.author;
+			const bot = t.author.id === botId;
 			const author = bot ? "" : `${username} said `;
+			const text = `${author}${content}`.slice(0, remaining);
+			remaining -= text.length;
 
 			return {
 				role: bot ? ("assistant" as const) : ("user" as const),
-				content: `${author}${content}`,
-				name: bot ? BOT_NAME.replace("@", "") : username,
+				content: text,
 			};
-		});
+		})
+		.filter((message) => message.content.length > 0);
+};

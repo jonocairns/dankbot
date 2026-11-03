@@ -4,7 +4,13 @@ import {
 	SlashCommandBuilder,
 } from "discord.js";
 import { getImageService, SafetyViolationError } from "../image";
+import { IMAGE_MIME_TYPES, MAX_IMAGE_BYTES } from "../image/download-image";
 import { logger } from "../logger";
+import {
+	MAX_PROMPT_LENGTH,
+	RequestRejectedError,
+	validatePrompt,
+} from "../security";
 import { Command, CommandName } from "../util";
 
 const OPTIONS = {
@@ -27,6 +33,7 @@ export const img: Command = {
 			option
 				.setName(OPTIONS.prompt.name)
 				.setDescription(OPTIONS.prompt.description)
+				.setMaxLength(MAX_PROMPT_LENGTH)
 				.setRequired(true),
 		)
 		.addAttachmentOption((option) =>
@@ -39,20 +46,19 @@ export const img: Command = {
 		const prompt = interaction.options.get(OPTIONS.prompt.name)
 			?.value as string;
 		const attachment = interaction.options.getAttachment(OPTIONS.image.name);
-
-		logger.info(`Generating image with prompt: ${prompt}`);
+		validatePrompt(prompt);
 
 		const inputImageUrls: Array<string> = [];
 		if (attachment) {
-			logger.info(
-				`Attachment found: ${attachment.name} (${attachment.contentType})`,
-			);
-			if (attachment.contentType?.startsWith("image/")) {
-				inputImageUrls.push(attachment.url);
-				logger.info(`Added attachment URL: ${attachment.url}`);
-			} else {
-				logger.warn(`Attachment is not an image: ${attachment.contentType}`);
+			if (
+				!IMAGE_MIME_TYPES.has(attachment.contentType ?? "") ||
+				attachment.size > MAX_IMAGE_BYTES
+			) {
+				throw new RequestRejectedError(
+					"Please attach a PNG, JPEG, WebP or GIF image of 10 MiB or smaller.",
+				);
 			}
+			inputImageUrls.push(attachment.url);
 		}
 
 		try {
@@ -63,7 +69,7 @@ export const img: Command = {
 			);
 
 			await interaction.editReply({
-				content: `Generated image for: "${prompt}"`,
+				content: `Generated image for: "${prompt}"`.slice(0, 2000),
 				files: [
 					{
 						attachment: imageBuffer,
@@ -74,6 +80,7 @@ export const img: Command = {
 
 			logger.info("Image sent successfully");
 		} catch (error) {
+			if (error instanceof RequestRejectedError) throw error;
 			logger.error("Error generating image:", error);
 
 			const isSafetyError =
