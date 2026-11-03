@@ -44,4 +44,6 @@ The `tar` resolution keeps native dependency installers on a patched release;
 check native Opus loading when updating it. Docker publishing accepts only a
 successful push build on this repository's `master` branch and builds the exact
 commit that passed CI.
+Superseded CI runs skip publishing so an older commit cannot replace a newer
+production image.
 
