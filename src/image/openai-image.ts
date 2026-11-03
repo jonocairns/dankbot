@@ -1,5 +1,11 @@
 import OpenAI from "openai";
 import { logger } from "../logger";
+import {
+	AI_TIMEOUT_MS,
+	RequestRejectedError,
+	validatePrompt,
+} from "../security";
+import { decodeGeneratedImage, downloadDiscordImage } from "./download-image";
 import { ImageGenerationError, SafetyViolationError } from "./image-errors";
 import { ImageService } from "./image-service";
 
@@ -14,7 +20,11 @@ export class OpenAIImageService implements ImageService {
 			);
 		}
 
-		this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+		this.client = new OpenAI({
+			apiKey: process.env.OPENAI_API_KEY,
+			timeout: AI_TIMEOUT_MS,
+			maxRetries: 0,
+		});
 		this.model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1-mini";
 		logger.info(`Initialized OpenAI image service with model: ${this.model}`);
 	}
@@ -23,6 +33,9 @@ export class OpenAIImageService implements ImageService {
 		prompt: string,
 		inputImageUrls?: Array<string>,
 	): Promise<Buffer> {
+		validatePrompt(prompt);
+		if (inputImageUrls && inputImageUrls.length > 1)
+			throw new RequestRejectedError("Please attach only one image.");
 		logger.info(`Generating image with OpenAI model ${this.model}`);
 
 		try {
@@ -32,6 +45,7 @@ export class OpenAIImageService implements ImageService {
 
 			return await this.generateImageFromText(prompt);
 		} catch (error) {
+			if (error instanceof RequestRejectedError) throw error;
 			const parsedError = this.parseOpenAIError(error);
 			logger.error("Error generating image with OpenAI:", parsedError);
 			throw parsedError;
@@ -72,7 +86,7 @@ export class OpenAIImageService implements ImageService {
 		};
 
 		if (isDalleModel) {
-			requestParams.response_format = "url";
+			requestParams.response_format = "b64_json";
 		}
 
 		const response = await this.client.images.generate(requestParams);
@@ -86,21 +100,12 @@ export class OpenAIImageService implements ImageService {
 		const imageFiles: Array<File> = [];
 
 		for (const imageUrl of imageUrls) {
-			try {
-				const imageResponse = await fetch(imageUrl);
-				const imageBuffer = await imageResponse.arrayBuffer();
-				const contentType =
-					imageResponse.headers.get("content-type") || "image/png";
-				const filename = imageUrl.split("/").pop() || "image.png";
-
-				const file = new File([imageBuffer], filename, { type: contentType });
-				imageFiles.push(file);
-				logger.info(
-					`Fetched image: ${filename} (${imageBuffer.byteLength} bytes, ${contentType})`,
-				);
-			} catch (error) {
-				logger.error(`Error fetching image from ${imageUrl}:`, error);
-			}
+			const { buffer, mimeType } = await downloadDiscordImage(imageUrl);
+			imageFiles.push(
+				new File([new Uint8Array(buffer)], `image.${mimeType.split("/")[1]}`, {
+					type: mimeType,
+				}),
+			);
 		}
 
 		return imageFiles;
@@ -116,27 +121,10 @@ export class OpenAIImageService implements ImageService {
 		}
 
 		if (imageData.b64_json) {
-			logger.info("Image generated successfully (base64 format)");
-			const buffer = Buffer.from(imageData.b64_json, "base64");
-			logger.info(
-				`Successfully processed base64 image from OpenAI (${buffer.length} bytes)`,
-			);
-			return buffer;
+			return decodeGeneratedImage(imageData.b64_json);
 		}
 
-		if (imageData.url) {
-			logger.info(
-				`Image generated successfully (URL format): ${imageData.url}`,
-			);
-			const imageResponse = await fetch(imageData.url);
-			const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-			logger.info(
-				`Successfully fetched image from OpenAI (${imageBuffer.length} bytes)`,
-			);
-			return imageBuffer;
-		}
-
-		throw new Error("No image URL or base64 data returned from OpenAI API");
+		throw new Error("No base64 image data returned from OpenAI API");
 	}
 
 	private parseOpenAIError(error: unknown): Error {

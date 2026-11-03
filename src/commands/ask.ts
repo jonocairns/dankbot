@@ -10,6 +10,12 @@ import { Readable } from "stream";
 import { AI_MODEL } from "../ai";
 import { getPlayer, UNABLE_TO_CONNECT_ERROR } from "../getPlayer";
 import { logger } from "../logger";
+import {
+	AI_TIMEOUT_MS,
+	MAX_COMPLETION_TOKENS,
+	MAX_PROMPT_LENGTH,
+	validatePrompt,
+} from "../security";
 import { getTTSService } from "../tts";
 import { Command, CommandName } from "../util";
 import { voices } from "../voices";
@@ -32,11 +38,17 @@ export const ask: Command = {
 			option
 				.setName(OPTIONS.ask.name)
 				.setDescription(OPTIONS.ask.description)
+				.setMaxLength(MAX_PROMPT_LENGTH)
 				.setRequired(true),
 		),
 	async run(interaction: ChatInputCommandInteraction<CacheType>) {
 		const content = interaction.options.get(OPTIONS.ask.name)?.value as string;
-		const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+		validatePrompt(content);
+		const openai = new OpenAI({
+			apiKey: process.env.OPENAI_API_KEY,
+			timeout: AI_TIMEOUT_MS,
+			maxRetries: 0,
+		});
 		const canJoin = (interaction.member as GuildMember)?.voice?.channel?.id;
 
 		if (!canJoin) {
@@ -46,11 +58,11 @@ export const ask: Command = {
 
 		const completion = await openai.chat.completions.create({
 			model: AI_MODEL,
+			max_completion_tokens: MAX_COMPLETION_TOKENS,
 			messages: [voices[0].system, { role: "user", content }],
 		});
 
-		const text = completion.choices[0].message?.content;
-		logger.info(`response: ${text}`);
+		const text = completion.choices[0]?.message?.content?.slice(0, 2000);
 
 		if (!text) {
 			await interaction.editReply("Sorry, I could not generate a response.");

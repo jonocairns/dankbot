@@ -1,4 +1,7 @@
-FROM node:22-alpine as build
+FROM node:22-alpine AS build
+
+# Compile native dependencies when the current Alpine release has no prebuild.
+RUN apk add --no-cache python3 build-base
 
 WORKDIR /usr/src/app
 
@@ -11,7 +14,7 @@ RUN touch .env
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn
 
-RUN yarn install --immutable
+RUN yarn install --immutable --inline-builds
 
 COPY . .
 

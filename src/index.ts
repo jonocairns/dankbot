@@ -5,6 +5,11 @@ import { ai } from "./ai";
 import { ask, img, meme } from "./commands";
 import { getVariables } from "./getVariables";
 import { logger } from "./logger";
+import {
+	ALLOWED_MENTIONS,
+	aiRequestLimiter,
+	RequestRejectedError,
+} from "./security";
 import { readFiles } from "./util";
 
 dotenv.config();
@@ -18,6 +23,7 @@ readFiles("../sounds", (files) => files.forEach((file) => sounds.push(file)));
 logger.info(generateDependencyReport());
 
 const client = new Client({
+	allowedMentions: ALLOWED_MENTIONS,
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildVoiceStates,
@@ -26,15 +32,38 @@ const client = new Client({
 	],
 });
 
-client.login(token);
+client.on(Events.Error, (error) => logger.error(error));
+client.login(token).catch((error) => {
+	logger.error(error);
+	process.exitCode = 1;
+});
 
 client.on(Events.MessageCreate, async (message) => {
-	if (message.author.bot) return;
+	if (message.author.bot || !message.inGuild()) return;
 	const mentionsBot = message.mentions.members?.find(
 		(m) => m.id === client.application?.id,
 	);
 	if (mentionsBot) {
-		await ai({ message, botId: mentionsBot.id });
+		let release: (() => void) | undefined;
+		try {
+			release = aiRequestLimiter.acquire({
+				userId: message.author.id,
+				guildId: message.guildId,
+			});
+			await ai({ message, botId: mentionsBot.id });
+		} catch (error) {
+			if (!(error instanceof RequestRejectedError)) logger.error(error);
+			await message
+				.reply({
+					content:
+						error instanceof RequestRejectedError
+							? error.message
+							: "Unable to process this request.",
+				})
+				.catch((replyError) => logger.error(replyError));
+		} finally {
+			release?.();
+		}
 	}
 });
 
@@ -55,18 +84,31 @@ client.once(Events.ClientReady, async (c) => {
 client.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 
-	await interaction.deferReply();
 	const command = commands.find((c) => c.id === interaction.commandName);
+	if (!command || !interaction.inGuild()) return;
 
-	if (!command) {
-		await interaction.editReply(`That command does not exist.`);
-		return;
-	}
-
+	let release: (() => void) | undefined;
 	try {
+		await interaction.deferReply();
+		if (command.id === ask.id || command.id === img.id) {
+			release = aiRequestLimiter.acquire({
+				userId: interaction.user.id,
+				guildId: interaction.guildId,
+			});
+		}
 		await command.run(interaction);
 	} catch (err) {
-		logger.error(err);
-		await interaction.editReply(`I may or may not have shat myself.`);
+		if (!(err instanceof RequestRejectedError)) logger.error(err);
+		if (interaction.deferred || interaction.replied) {
+			await interaction
+				.editReply(
+					err instanceof RequestRejectedError
+						? err.message
+						: "I may or may not have shat myself.",
+				)
+				.catch((replyError) => logger.error(replyError));
+		}
+	} finally {
+		release?.();
 	}
 });

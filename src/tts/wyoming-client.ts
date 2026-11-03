@@ -1,27 +1,17 @@
 import { Socket } from "net";
-import { logger } from "../logger";
 
 interface WyomingEvent {
 	type: string;
-	data?: Record<string, unknown>;
 	data_length?: number;
 	payload_length?: number;
 }
 
-enum ParserState {
-	READING_MESSAGE,
-	READING_DATA,
-	READING_PAYLOAD,
-}
-
-interface ParserContext {
-	buffer: Buffer;
-	state: ParserState;
-	bytesToRead: number;
-	currentEvent: WyomingEvent | null;
-	audioChunks: Array<Buffer>;
-	keepProcessing: boolean;
-}
+const MAX_HEADER_BYTES = 16 * 1024;
+const MAX_DATA_BYTES = 64 * 1024;
+const MAX_PAYLOAD_BYTES = 1024 * 1024;
+const MAX_AUDIO_BYTES = 16 * 1024 * 1024;
+const MAX_RESPONSE_BYTES = 32 * 1024 * 1024;
+const MAX_EVENTS = 4096;
 
 export class WyomingClient {
 	constructor(
@@ -32,180 +22,115 @@ export class WyomingClient {
 	async synthesize(text: string, voice?: string): Promise<Buffer> {
 		return new Promise((resolve, reject) => {
 			const socket = new Socket();
-			let resolved = false;
+			let settled = false;
+			let buffer = Buffer.alloc(0);
+			let event: WyomingEvent | null = null;
+			let receivedBytes = 0;
+			let audioBytes = 0;
+			let eventCount = 0;
+			const audioChunks: Array<Buffer> = [];
 
-			const ctx: ParserContext = {
-				buffer: Buffer.alloc(0),
-				state: ParserState.READING_MESSAGE,
-				bytesToRead: 0,
-				currentEvent: null,
-				audioChunks: [],
-				keepProcessing: true,
-			};
-
-			const cleanup = (isResolved: boolean) => {
-				resolved = isResolved;
+			const finish = (error?: Error) => {
+				if (settled) return;
+				settled = true;
 				clearTimeout(timeout);
-				socket.end();
+				socket.destroy();
+				if (error) reject(error);
+				else resolve(Buffer.concat(audioChunks, audioBytes));
 			};
+			const timeout = setTimeout(
+				() => finish(new Error("Wyoming protocol timeout")),
+				10000,
+			);
 
-			const timeout = setTimeout(() => {
-				if (resolved) return;
-				logger.error("Wyoming timeout");
-				cleanup(true);
-				reject(new Error("Wyoming protocol timeout"));
-			}, 10000);
-
-			socket.on("error", (err) => {
-				if (resolved) return;
-				cleanup(true);
-				reject(err);
-			});
-
+			socket.on("error", finish);
+			socket.on("close", () =>
+				finish(new Error("Connection closed before audio-stop")),
+			);
 			socket.on("data", (data) => {
-				ctx.buffer = Buffer.concat([ctx.buffer, data]);
-				ctx.keepProcessing = true;
+				if (settled) return;
+				try {
+					receivedBytes += data.length;
+					if (receivedBytes > MAX_RESPONSE_BYTES)
+						throw new Error("Wyoming response is too large");
+					buffer = Buffer.concat([buffer, data]);
 
-				while (ctx.keepProcessing) {
-					if (ctx.state === ParserState.READING_MESSAGE) {
-						this.processMessage(ctx, resolve, cleanup);
-					} else if (ctx.state === ParserState.READING_DATA) {
-						this.processData(ctx, resolve, cleanup);
-					} else if (ctx.state === ParserState.READING_PAYLOAD) {
-						this.processPayload(ctx, resolve, cleanup);
+					while (!settled) {
+						if (!event) {
+							const newline = buffer.indexOf("\n");
+							if (newline === -1) {
+								if (buffer.length > MAX_HEADER_BYTES)
+									throw new Error("Wyoming header is too large");
+								return;
+							}
+							if (newline > MAX_HEADER_BYTES)
+								throw new Error("Wyoming header is too large");
+							const parsed: unknown = JSON.parse(
+								buffer.subarray(0, newline).toString("utf8"),
+							);
+							if (++eventCount > MAX_EVENTS)
+								throw new Error("Too many Wyoming events");
+							buffer = buffer.subarray(newline + 1);
+							if (
+								!parsed ||
+								typeof parsed !== "object" ||
+								!("type" in parsed) ||
+								typeof parsed.type !== "string"
+							) {
+								throw new Error("Invalid Wyoming event");
+							}
+							event = parsed as WyomingEvent;
+							for (const [length, maximum] of [
+								[event.data_length ?? 0, MAX_DATA_BYTES],
+								[event.payload_length ?? 0, MAX_PAYLOAD_BYTES],
+							]) {
+								if (
+									!Number.isSafeInteger(length) ||
+									length < 0 ||
+									length > maximum
+								) {
+									throw new Error("Invalid Wyoming frame length");
+								}
+							}
+						}
+
+						const dataLength = event.data_length ?? 0;
+						const payloadLength = event.payload_length ?? 0;
+						const frameLength = dataLength + payloadLength;
+						if (buffer.length < frameLength) return;
+						if (event.type === "audio-chunk" && payloadLength > 0) {
+							audioBytes += payloadLength;
+							if (audioBytes > MAX_AUDIO_BYTES)
+								throw new Error("Wyoming audio is too large");
+							audioChunks.push(
+								Buffer.from(buffer.subarray(dataLength, frameLength)),
+							);
+						} else if (event.type === "audio-stop") {
+							finish();
+						} else if (event.type === "error") {
+							throw new Error("Wyoming server reported an error");
+						}
+						buffer = buffer.subarray(frameLength);
+						event = null;
 					}
-				}
-			});
-
-			socket.on("close", () => {
-				if (!resolved && ctx.audioChunks.length === 0) {
-					cleanup(true);
-					reject(new Error("Connection closed without receiving audio"));
+				} catch (error) {
+					finish(
+						error instanceof Error
+							? error
+							: new Error("Invalid Wyoming response"),
+					);
 				}
 			});
 
 			socket.connect(this.port, this.host, () => {
-				const request = {
-					type: "synthesize",
-					data: { text },
-					...(voice && { voice }),
-				};
-				socket.write(JSON.stringify(request) + "\n");
+				socket.write(
+					JSON.stringify({
+						type: "synthesize",
+						data: { text },
+						...(voice && { voice }),
+					}) + "\n",
+				);
 			});
 		});
-	}
-
-	private processMessage(
-		ctx: ParserContext,
-		resolve: (value: Buffer) => void,
-		cleanup: (isResolved: boolean) => void,
-	): void {
-		const newlineIndex = ctx.buffer.indexOf("\n");
-		if (newlineIndex === -1) {
-			ctx.keepProcessing = false;
-			return;
-		}
-
-		const messageLine = ctx.buffer.slice(0, newlineIndex).toString("utf-8");
-		ctx.buffer = ctx.buffer.slice(newlineIndex + 1);
-
-		if (!messageLine.trim()) return;
-
-		try {
-			const event = JSON.parse(messageLine) as WyomingEvent;
-			ctx.currentEvent = event;
-
-			if (event.data_length && event.data_length > 0) {
-				ctx.state = ParserState.READING_DATA;
-				ctx.bytesToRead = event.data_length;
-			} else if (event.payload_length && event.payload_length > 0) {
-				ctx.state = ParserState.READING_PAYLOAD;
-				ctx.bytesToRead = event.payload_length;
-			} else {
-				this.handleEvent(event, null, ctx.audioChunks, resolve, cleanup);
-				ctx.currentEvent = null;
-			}
-		} catch (_err) {
-			// Skip invalid JSON lines
-		}
-	}
-
-	private processData(
-		ctx: ParserContext,
-		resolve: (value: Buffer) => void,
-		cleanup: (isResolved: boolean) => void,
-	): void {
-		if (ctx.buffer.length < ctx.bytesToRead) {
-			ctx.keepProcessing = false;
-			return;
-		}
-
-		// Skip metadata
-		ctx.buffer = ctx.buffer.slice(ctx.bytesToRead);
-		ctx.bytesToRead = 0;
-
-		if (
-			ctx.currentEvent?.payload_length &&
-			ctx.currentEvent.payload_length > 0
-		) {
-			ctx.state = ParserState.READING_PAYLOAD;
-			ctx.bytesToRead = ctx.currentEvent.payload_length;
-		} else {
-			if (ctx.currentEvent) {
-				this.handleEvent(
-					ctx.currentEvent,
-					null,
-					ctx.audioChunks,
-					resolve,
-					cleanup,
-				);
-				ctx.currentEvent = null;
-			}
-			ctx.state = ParserState.READING_MESSAGE;
-		}
-	}
-
-	private processPayload(
-		ctx: ParserContext,
-		resolve: (value: Buffer) => void,
-		cleanup: (isResolved: boolean) => void,
-	): void {
-		if (ctx.buffer.length < ctx.bytesToRead) {
-			ctx.keepProcessing = false;
-			return;
-		}
-
-		const payloadData = ctx.buffer.slice(0, ctx.bytesToRead);
-		ctx.buffer = ctx.buffer.slice(ctx.bytesToRead);
-		ctx.bytesToRead = 0;
-
-		if (ctx.currentEvent) {
-			this.handleEvent(
-				ctx.currentEvent,
-				payloadData,
-				ctx.audioChunks,
-				resolve,
-				cleanup,
-			);
-			ctx.currentEvent = null;
-		}
-
-		ctx.state = ParserState.READING_MESSAGE;
-	}
-
-	private handleEvent(
-		event: WyomingEvent,
-		payload: Buffer | null,
-		audioChunks: Array<Buffer>,
-		resolve: (value: Buffer) => void,
-		cleanup: (isResolved: boolean) => void,
-	): void {
-		if (event.type === "audio-chunk" && payload) {
-			audioChunks.push(payload);
-		} else if (event.type === "audio-stop") {
-			cleanup(true);
-			resolve(Buffer.concat(audioChunks));
-		}
-		// Ignore all other events
 	}
 }
