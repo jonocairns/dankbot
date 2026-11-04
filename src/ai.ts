@@ -1,5 +1,6 @@
 import { Collection, Message } from "discord.js";
 import OpenAI from "openai";
+import { getAIModel } from "./config";
 import { donald } from "./prompts/donald";
 import {
 	AI_TIMEOUT_MS,
@@ -7,8 +8,6 @@ import {
 	MAX_CONTEXT_LENGTH,
 	validatePrompt,
 } from "./security";
-
-export const AI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
 
 interface Input {
 	message: Message;
@@ -53,7 +52,7 @@ const request = async (
 	});
 
 	const completion = await openai.chat.completions.create({
-		model: AI_MODEL,
+		model: getAIModel(),
 		max_completion_tokens: MAX_COMPLETION_TOKENS,
 		messages: [donald, ...messages],
 	});

@@ -1,4 +1,3 @@
-import { createAudioResource } from "@discordjs/voice";
 import {
 	CacheType,
 	ChatInputCommandInteraction,
@@ -8,7 +7,7 @@ import {
 import { createReadStream } from "fs";
 import { sounds } from "../";
 import { cleanUp } from "../cleanUp";
-import { getPlayer, UNABLE_TO_CONNECT_ERROR } from "../getPlayer";
+import { playAudio, UNABLE_TO_CONNECT_ERROR } from "../getPlayer";
 import { logger } from "../logger";
 import { Command, CommandName } from "../util";
 
@@ -42,10 +41,7 @@ export const meme: Command = {
 		const meme = sound.split(".")[0];
 		await interaction.editReply(`memed '${meme}'`);
 		logger.info(`${interaction.member?.user.id} triggered ${meme}`);
-		const { player } = getPlayer(interaction);
-		const stream = createReadStream(`./sounds/${sound}`);
-		const resource = createAudioResource(stream);
-		player.play(resource);
+		await playAudio(interaction, createReadStream(`./sounds/${sound}`));
 		await cleanUp(interaction);
 	},
 };

@@ -1,8 +1,13 @@
+import { getTTSProvider } from "../config";
 import { OpenAITTSService } from "./openai-tts";
 import { PiperTTSService } from "./piper-tts";
 
 export interface TTSService {
-	generateSpeech(text: string, voice?: string): Promise<Buffer>;
+	generateSpeech(
+		text: string,
+		voice?: string,
+		signal?: AbortSignal,
+	): Promise<Buffer>;
 }
 
 export enum TTSProvider {
@@ -11,15 +16,13 @@ export enum TTSProvider {
 }
 
 export function getTTSService(): TTSService {
-	const provider = (
-		process.env.TTS_PROVIDER || TTSProvider.OPENAI
-	).toLowerCase();
-
+	const provider = getTTSProvider();
 	switch (provider) {
 		case TTSProvider.PIPER:
 			return new PiperTTSService();
 		case TTSProvider.OPENAI:
-		default:
 			return new OpenAITTSService();
+		default:
+			throw new Error(`Unsupported TTS provider: ${provider}`);
 	}
 }

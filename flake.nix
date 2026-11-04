@@ -1,32 +1,105 @@
 {
-  description = "Node.js dev env (pnpm/yarn/ts + Claude Code)";
+  description = "Dankbot development environment and Docker image";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";  # <-- was 24.05
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;  # <-- required for claude-code
+        pkgs = import nixpkgs { inherit system; };
+        inherit (pkgs) lib;
+        node = pkgs.nodejs_22;
+        ffmpeg = pkgs.ffmpeg-headless;
+        # Use the committed Yarn version, independently of Corepack or host PATH.
+        yarn = pkgs.writeShellScriptBin "yarn" ''
+          exec ${node}/bin/node ${./.yarn/releases/yarn-4.10.3.cjs} "$@"
+        '';
+        nativeEnv = {
+          FFMPEG_BIN = "${ffmpeg}/bin/ffmpeg";
+          npm_config_nodedir = "${pkgs.srcOnly node}";
+          npm_config_node_gyp = "${node}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js";
+          npm_config_build_from_source = "true";
         };
-        node = pkgs.nodejs_22;        # Node 18+ required; 22 is fine
-      in {
-        devShells.default = pkgs.mkShell {
-          packages = [
+        devShell = pkgs.mkShell (
+          nativeEnv
+          // {
+            packages = [
+              node
+              yarn
+              ffmpeg
+              pkgs.python3
+              pkgs.pkg-config
+            ];
+            NODE_OPTIONS = "--max-old-space-size=4096";
+          }
+        );
+        bot = pkgs.callPackage ./nix/package.nix {
+          inherit
             node
-            # Yarn 4 via Corepack (don't use pkgs.nodePackages.yarn)
-            pkgs.claude-code            # <-- the CLI
-          ];
-
-          shellHook = ''
-            export NODE_OPTIONS="--max-old-space-size=4096"
-            # Yarn 4 is already in .yarn/releases, no corepack enable needed
-            echo "Node $(node -v) | Yarn $(yarn -v 2>/dev/null || echo 'run: yarn install') | Claude $(claude --version 2>/dev/null || echo not-installed)"
-          '';
+            yarn
+            ffmpeg
+            nativeEnv
+            ;
         };
-      });
+      in
+      {
+        devShells = {
+          default = devShell;
+          # Personal AI tooling is opt-in and does not affect the bot's closure.
+          claude = devShell.overrideAttrs (old: {
+            nativeBuildInputs = old.nativeBuildInputs ++ [
+              (import nixpkgs {
+                inherit system;
+                config.allowUnfreePredicate = pkg: lib.getName pkg == "claude-code";
+              }).claude-code
+            ];
+          });
+        };
+
+        packages = {
+          default = bot;
+          inherit bot;
+        }
+        // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          dockerImage = pkgs.dockerTools.buildLayeredImage {
+            name = "jonocairns/dankbot";
+            tag = "latest";
+            contents = [ pkgs.cacert ];
+            extraCommands = ''
+              mkdir -p tmp
+              chmod 1777 tmp
+            '';
+            config = {
+              User = "1000:1000";
+              WorkingDir = "${bot}/lib/dankbot";
+              Cmd = [ "${bot}/bin/dankbot" ];
+              Env = [
+                "NODE_ENV=production"
+                "PATH=${
+                  lib.makeBinPath [
+                    node
+                    ffmpeg
+                  ]
+                }"
+                "FFMPEG_BIN=${ffmpeg}/bin/ffmpeg"
+                "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+                "NODE_EXTRA_CA_CERTS=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+              ];
+              Labels = {
+                "org.opencontainers.image.source" = "https://github.com/jonocairns/dankbot";
+                "org.opencontainers.image.version" = bot.version;
+              };
+            };
+          };
+        };
+
+        checks.default = bot;
+        formatter = pkgs.nixfmt;
+      }
+    );
 }

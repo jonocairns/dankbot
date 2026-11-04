@@ -1,3 +1,4 @@
+import { getPiperConnection } from "../config";
 import { logger } from "../logger";
 import { pcmToWav } from "./audio-utils";
 import { TTSService } from "./tts-service";
@@ -7,19 +8,22 @@ export class PiperTTSService implements TTSService {
 	private client: WyomingClient;
 
 	constructor() {
-		const host = process.env.PIPER_HOST || "192.168.1.75";
-		const port = parseInt(process.env.PIPER_PORT || "10200", 10);
+		const { host, port } = getPiperConnection();
 		this.client = new WyomingClient(host, port);
 		logger.info(
 			`Piper TTS service initialized with Wyoming server: ${host}:${port}`,
 		);
 	}
 
-	async generateSpeech(text: string, voice?: string): Promise<Buffer> {
+	async generateSpeech(
+		text: string,
+		voice?: string,
+		signal?: AbortSignal,
+	): Promise<Buffer> {
 		logger.info(`Generating speech with Piper TTS via Wyoming protocol...`);
 
 		try {
-			const pcmData = await this.client.synthesize(text, voice);
+			const pcmData = await this.client.synthesize(text, voice, signal);
 			logger.info(
 				`Received ${pcmData.length} bytes of PCM audio from Piper TTS`,
 			);

@@ -7,7 +7,7 @@ const validate = (arg: string) => {
 	const value = process.env[arg] ?? "";
 
 	if (!value) {
-		throw new Error(`${value} not defined in .env`);
+		throw new Error(`${arg} not defined in .env`);
 	}
 
 	return value;

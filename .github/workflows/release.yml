@@ -1,0 +1,197 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Pipeline-created vX.Y.Z release to rebuild (blank maintains the release PR)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+      tag: ${{ steps.source.outputs.tag }}
+      create: ${{ steps.source.outputs.create }}
+      update: ${{ steps.source.outputs.update }}
+      build: ${{ steps.source.outputs.build }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Resolve and verify release provenance
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECOVERY_TAG: ${{ inputs.tag }}
+        run: node scripts/release/cli.mjs resolve
+
+  quality:
+    needs: resolve
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.resolve.outputs.sha }}
+
+  release-please:
+    needs: [resolve, quality]
+    if: needs.resolve.outputs.create == 'true' || needs.resolve.outputs.update == 'true'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+      sha: ${{ steps.release.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Recheck master before PR maintenance
+        id: context
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/release/cli.mjs check-current
+      - name: Mint release PR token
+        id: app-token
+        if: steps.context.outputs.current == 'true' && needs.resolve.outputs.update == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+      - name: Mint release creation token
+        id: release-token
+        if: needs.resolve.outputs.create == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+          permission-workflows: write
+      - name: Create tag and draft release
+        id: release
+        if: needs.resolve.outputs.create == 'true'
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          target-branch: master
+          token: ${{ steps.release-token.outputs.token }}
+          skip-github-pull-request: true
+      - name: Create or update release PR
+        if: steps.context.outputs.current == 'true' && needs.resolve.outputs.update == 'true'
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          target-branch: master
+          token: ${{ steps.app-token.outputs.token }}
+          skip-github-release: true
+
+  build-and-publish:
+    needs: [resolve, quality, release-please]
+    if: >-
+      always() && needs.quality.result == 'success' &&
+      (needs.release-please.outputs.released == 'true' || needs.resolve.outputs.build == 'true')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ needs.release-please.outputs.tag || needs.resolve.outputs.tag }}
+      EXPECTED_SHA: ${{ needs.resolve.outputs.sha }}
+      IMAGE: jonocairns/dankbot
+    defaults:
+      run:
+        working-directory: source
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      sha: ${{ needs.resolve.outputs.sha }}
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - name: Check out automation
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          path: automation
+      - name: Check out verified release source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+          persist-credentials: false
+          path: source
+      - name: Verify tag, commit, and versions
+        id: release
+        run: node ../automation/scripts/release/cli.mjs verify
+      - name: Install Nix
+        uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31.11.2
+      - name: Build the Nix image
+        run: nix build .#dockerImage --print-build-logs
+      - name: Smoke test the release image
+        env:
+          EXPECTED_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          docker load --input result
+          bash ../automation/scripts/smoke-container.sh "$IMAGE:latest" "$EXPECTED_VERSION"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Log in to Docker Hub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Push versioned image
+        id: push
+        run: |
+          docker tag "$IMAGE:latest" "$IMAGE:$RELEASE_TAG"
+          docker push "$IMAGE:$RELEASE_TAG"
+          digest="$(docker buildx imagetools inspect "$IMAGE:$RELEASE_TAG" --format '{{.Manifest.Digest}}')"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+      - name: Upload container archive to the draft release
+        run: |
+          cp --dereference result "dankbot-$RELEASE_TAG-linux-amd64.tar.gz"
+          gh release upload "$RELEASE_TAG" "dankbot-$RELEASE_TAG-linux-amd64.tar.gz" --clobber
+
+  publish:
+    needs: build-and-publish
+    if: always() && needs.build-and-publish.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ needs.build-and-publish.outputs.tag }}
+      EXPECTED_SHA: ${{ needs.build-and-publish.outputs.sha }}
+      IMAGE: jonocairns/dankbot
+      IMAGE_DIGEST: ${{ needs.build-and-publish.outputs.digest }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Log in to Docker Hub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publish release, then promote its image to latest
+        run: node scripts/release/cli.mjs publish

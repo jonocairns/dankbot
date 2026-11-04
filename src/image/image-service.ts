@@ -1,3 +1,4 @@
+import { getImageProvider } from "../config";
 import { GeminiImageService } from "./gemini-image";
 import { OpenAIImageService } from "./openai-image";
 
@@ -14,15 +15,15 @@ export enum ImageProvider {
 }
 
 export function getImageService(): ImageService {
-	const provider = (
-		process.env.IMAGE_PROVIDER || ImageProvider.OPENAI
-	).toLowerCase();
-
+	const provider = getImageProvider();
 	switch (provider) {
-		case ImageProvider.GEMINI:
+		case "gemini":
 			return new GeminiImageService();
-		case ImageProvider.OPENAI:
-		default:
+		case "openai":
 			return new OpenAIImageService();
+		default: {
+			const unsupported: never = provider;
+			throw new Error(`Unsupported image provider: ${unsupported}`);
+		}
 	}
 }
