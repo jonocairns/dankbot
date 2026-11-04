@@ -62,6 +62,8 @@ stdenv.mkDerivation (
 
     configurePhase = ''
       runHook preConfigure
+      # Nix builders have an unwritable home; keep Yarn's metadata local too.
+      export YARN_GLOBAL_FOLDER="$TMPDIR/yarn-global"
       export YARN_CACHE_FOLDER="$PWD/.yarn/cache"
       cp -r "$offlineCache/cache" "$YARN_CACHE_FOLDER"
       chmod -R u+w "$YARN_CACHE_FOLDER"
