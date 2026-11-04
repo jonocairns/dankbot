@@ -19,7 +19,11 @@ export class WyomingClient {
 		private port: number,
 	) {}
 
-	async synthesize(text: string, voice?: string): Promise<Buffer> {
+	async synthesize(
+		text: string,
+		voice?: string,
+		signal?: AbortSignal,
+	): Promise<Buffer> {
 		return new Promise((resolve, reject) => {
 			const socket = new Socket();
 			let settled = false;
@@ -34,6 +38,7 @@ export class WyomingClient {
 				if (settled) return;
 				settled = true;
 				clearTimeout(timeout);
+				signal?.removeEventListener("abort", onAbort);
 				socket.destroy();
 				if (error) reject(error);
 				else resolve(Buffer.concat(audioChunks, audioBytes));
@@ -42,6 +47,12 @@ export class WyomingClient {
 				() => finish(new Error("Wyoming protocol timeout")),
 				10000,
 			);
+			const onAbort = () => finish(new Error("Wyoming request aborted"));
+			if (signal?.aborted) {
+				onAbort();
+				return;
+			}
+			signal?.addEventListener("abort", onAbort, { once: true });
 
 			socket.on("error", finish);
 			socket.on("close", () =>

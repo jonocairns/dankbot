@@ -1,0 +1,24 @@
+name: Conventional PR title
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+
+permissions: {}
+
+jobs:
+  validate:
+    name: conventional-title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          node <<'NODE'
+          const title = process.env.PR_TITLE ?? "";
+          if (!/^(?:feat|fix|docs|refactor|perf|build|ci|test|chore|revert)(?:\([a-z0-9][a-z0-9-]*\))?!?: \S(?:.*\S)?$/.test(title)) {
+            console.error("::error::Use a conventional PR title such as fix: handle audio startup failures");
+            process.exitCode = 1;
+          }
+          NODE

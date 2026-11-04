@@ -4,6 +4,17 @@ const { Client, Collection, Events } = require("discord.js");
 const security = require("../dist/security");
 
 test("production handlers apply shared AI guards and contain reply failures", async (t) => {
+	const startupConfig = ["TTS_PROVIDER", "IMAGE_PROVIDER", "PIPER_PORT"];
+	const originalStartupConfig = new Map(
+		startupConfig.map((name) => [name, process.env[name]]),
+	);
+	for (const name of startupConfig) delete process.env[name];
+	t.after(() => {
+		for (const [name, value] of originalStartupConfig) {
+			if (value === undefined) delete process.env[name];
+			else process.env[name] = value;
+		}
+	});
 	let client;
 	let calls;
 	let run;

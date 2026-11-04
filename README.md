@@ -1,10 +1,10 @@
 # dankbot
-![build-status](https://github.com/jonocairns/dankbot/actions/workflows/ci.yml/badge.svg?branch=master)
-![build-status](https://github.com/jonocairns/dankbot/actions/workflows/docker.yml/badge.svg?branch=master)
+![build-status](https://github.com/jonocairns/dankbot/actions/workflows/ci.yml/badge.svg)
+![release-status](https://github.com/jonocairns/dankbot/actions/workflows/release.yml/badge.svg?branch=master)
 
 A dank soundboard for discord. Check out the sounds folder for all the current lols.
 
-Uses node, typescript, eslint, github actions (build) and docker
+Uses Node, TypeScript, Biome, Nix, GitHub Actions, and Docker.
 
 ## Commands
 
@@ -12,11 +12,36 @@ Uses node, typescript, eslint, github actions (build) and docker
 - `/ask {question}` - Ask the bot a question using AI, with text-to-speech response in voice channel
 - `/img prompt: {description}` - Generate an image using AI (supports optional image attachment for context)
 
+Voice commands replace the current playback in the same server. The bot leaves
+the voice channel after 60 seconds without playback. `/ask` sends its text answer
+before generating speech, so an audio failure does not lose the answer. Chat,
+speech generation and playback startup share a two-minute deadline.
+
 ## Getting Started
 1. Clone this repository
 2. Ensure you're running Node 22.12.0+ then run `yarn install` on this project
 3. Create and authorize your bot (see prerequisites), then update .env with the APPLICATION_ID and DISCORD_BOT_TOKEN
 4. Run `yarn start` from the project
+
+### Development with Nix
+
+With Nix and flakes enabled, run `nix develop`, then `yarn install --immutable`.
+The shell supplies Node 22, the committed Yarn 4 version, FFmpeg, Python, and a
+C/C++ toolchain for native Opus builds. Corepack is not required. Existing
+direnv users can run `direnv allow` to load the same shell automatically.
+Claude Code is available only in the optional `nix develop .#claude` shell.
+
+Run `nix flake check --print-build-logs` to build, lint, and test the bot offline
+after Nix fetches the pinned dependencies. Run `nix fmt flake.nix nix/package.nix`
+to format Nix files.
+After changing `yarn.lock`, update the extra platform checksums and dependency
+cache hash using the instructions in [nix/README.md](nix/README.md).
+
+`TTS_PROVIDER` accepts `openai` or `piper`; `IMAGE_PROVIDER` accepts `openai` or
+`gemini`. Invalid provider names stop startup instead of selecting a fallback.
+When using Piper, set `PIPER_HOST` to a server reachable from the bot and
+`PIPER_PORT` to an integer from 1 to 65535. API keys are checked when their
+provider is used, so soundboard-only setups do not require them.
 
 ### Prerequisites
   - Create a new [Discord application](https://discordapp.com/developers/applications/me)
@@ -42,8 +67,21 @@ a 15-second download deadline. Replies do not notify mentioned users or roles.
 Run `yarn test`, `yarn lint`, and `yarn audit:production` before deploying.
 The `tar` resolution keeps native dependency installers on a patched release;
 check native Opus loading when updating it. Docker publishing accepts only a
-successful push build on this repository's `master` branch and builds the exact
-commit that passed CI.
-Superseded CI runs skip publishing so an older commit cannot replace a newer
-production image.
+verified release commit on this repository's `master` history, after quality
+checks and a container smoke test pass.
+
+## Docker and releases
+
+Run `yarn docker:build` to build and load `jonocairns/dankbot:latest`, then
+`yarn docker:run` to start it with your `.env` file. The equivalent build commands
+are `nix build .#dockerImage` and `docker load --input result` (Linux only).
+Nix supplies the runtime dependencies directly; no Dockerfile or Alpine package
+installation is needed. The image runs as UID 1000 and includes FFmpeg, native
+voice dependencies, CA certificates, and the bundled sounds.
+
+Releases use the same Release Please pattern as Ripcord: merge conventional
+commits, review and merge the generated release PR, then let automation build
+and publish the release. Docker Hub receives `vX.Y.Z` and `latest` tags; ordinary
+pushes no longer publish `latest`. See [docs/releases.md](docs/releases.md) for
+the GitHub App setup and release recovery.
 

@@ -3,6 +3,7 @@ import { Client, Events, GatewayIntentBits, REST, Routes } from "discord.js";
 import dotenv from "dotenv";
 import { ai } from "./ai";
 import { ask, img, meme } from "./commands";
+import { validateStartupConfig } from "./config";
 import { getVariables } from "./getVariables";
 import { logger } from "./logger";
 import {
@@ -13,6 +14,7 @@ import {
 import { readFiles } from "./util";
 
 dotenv.config();
+validateStartupConfig();
 export const sounds: Array<string> = [];
 
 const { appId, token } = getVariables();

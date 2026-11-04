@@ -1,14 +1,14 @@
-import { createAudioResource } from "@discordjs/voice";
 import {
 	CacheType,
 	ChatInputCommandInteraction,
 	GuildMember,
+	MessageFlags,
 	SlashCommandBuilder,
 } from "discord.js";
 import OpenAI from "openai";
 import { Readable } from "stream";
-import { AI_MODEL } from "../ai";
-import { getPlayer, UNABLE_TO_CONNECT_ERROR } from "../getPlayer";
+import { getAIModel } from "../config";
+import { playAudio, UNABLE_TO_CONNECT_ERROR } from "../getPlayer";
 import { logger } from "../logger";
 import {
 	AI_TIMEOUT_MS,
@@ -28,6 +28,7 @@ const OPTIONS = {
 };
 
 const TTS_VOICE = "onyx" as const;
+const AUDIO_ERROR = "I couldn't play the audio for this answer.";
 
 export const ask: Command = {
 	id: CommandName.ask,
@@ -44,11 +45,6 @@ export const ask: Command = {
 	async run(interaction: ChatInputCommandInteraction<CacheType>) {
 		const content = interaction.options.get(OPTIONS.ask.name)?.value as string;
 		validatePrompt(content);
-		const openai = new OpenAI({
-			apiKey: process.env.OPENAI_API_KEY,
-			timeout: AI_TIMEOUT_MS,
-			maxRetries: 0,
-		});
 		const canJoin = (interaction.member as GuildMember)?.voice?.channel?.id;
 
 		if (!canJoin) {
@@ -56,39 +52,56 @@ export const ask: Command = {
 			return;
 		}
 
-		const completion = await openai.chat.completions.create({
-			model: AI_MODEL,
-			max_completion_tokens: MAX_COMPLETION_TOKENS,
-			messages: [voices[0].system, { role: "user", content }],
+		const openai = new OpenAI({
+			apiKey: process.env.OPENAI_API_KEY,
+			timeout: AI_TIMEOUT_MS,
+			maxRetries: 0,
 		});
 
-		const text = completion.choices[0]?.message?.content?.slice(0, 2000);
+		// One deadline covers generation, speech download and playback startup.
+		// Aborting cancels the underlying requests, so the caller's limiter slot
+		// is only released once that work has settled.
+		const controller = new AbortController();
+		const deadline = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+		try {
+			const completion = await openai.chat.completions.create(
+				{
+					model: getAIModel(),
+					max_completion_tokens: MAX_COMPLETION_TOKENS,
+					messages: [voices[0].system, { role: "user", content }],
+				},
+				{ signal: controller.signal },
+			);
 
-		if (!text) {
-			await interaction.editReply("Sorry, I could not generate a response.");
-			return;
+			const text = completion.choices[0]?.message?.content?.slice(0, 2000);
+
+			if (!text) {
+				await interaction.editReply("Sorry, I could not generate a response.");
+				return;
+			}
+
+			// Deliver the answer before speech so audio failures cannot lose it.
+			await interaction.editReply(text);
+
+			try {
+				const buffer = await getTTSService().generateSpeech(
+					text,
+					TTS_VOICE,
+					controller.signal,
+				);
+				logger.info(`Received speech buffer of size: ${buffer.length} bytes`);
+				await playAudio(interaction, Readable.from(buffer), controller.signal);
+			} catch (error) {
+				logger.error(error);
+				await interaction
+					.followUp({
+						content: AUDIO_ERROR,
+						flags: MessageFlags.Ephemeral,
+					})
+					.catch((replyError) => logger.error(replyError));
+			}
+		} finally {
+			clearTimeout(deadline);
 		}
-
-		logger.info(`Getting TTS service...`);
-		const ttsService = getTTSService();
-		logger.info(`Calling generateSpeech with text length: ${text.length}`);
-		const buffer = await ttsService.generateSpeech(text, TTS_VOICE);
-		logger.info(`Received buffer of size: ${buffer.length} bytes`);
-
-		logger.info(`creating readable stream...`);
-		const stream = Readable.from(buffer);
-
-		const { player } = getPlayer(interaction);
-		const resource = createAudioResource(stream);
-
-		resource.playStream.on("error", (error: Error) => {
-			logger.error(error.message);
-		});
-
-		logger.info(`attempting to play...`);
-		player.play(resource);
-
-		await interaction.editReply(text);
-		logger.info(`complete`);
 	},
 };

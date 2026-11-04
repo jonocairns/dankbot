@@ -4,14 +4,14 @@
 	"description": "A dank discord bot",
 	"main": "dist/index.js",
 	"scripts": {
-		"test": "yarn build && node --test tests/*.test.cjs",
+		"test": "yarn build && node --test tests/*.test.cjs scripts/release/*.test.mjs",
 		"audit:production": "yarn npm audit --environment production --recursive --severity high",
 		"start": "nodemon",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write .",
 		"build": "tsc",
-		"docker:build": "docker build . -t jonocairns/dankbot",
+		"docker:build": "nix build .#dockerImage && docker load --input result",
 		"docker:run": "docker run --env-file=.env -d jonocairns/dankbot:latest",
 		"docker:push": "docker push jonocairns/dankbot:latest"
 	},
