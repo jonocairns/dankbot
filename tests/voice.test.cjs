@@ -11,9 +11,10 @@ const { VoiceManager, playAudio } = require("../dist/getPlayer");
 beforeEach((t) => t.mock.timers.enable({ apis: ["setTimeout"] }));
 
 class FakeConnection extends EventEmitter {
-	constructor(status) {
+	constructor(status, config) {
 		super();
 		this._state = { status };
+		this.joinConfig = { ...config };
 		this.subscriptions = [];
 		this.rejoins = [];
 	}
@@ -33,7 +34,12 @@ class FakeConnection extends EventEmitter {
 	}
 	rejoin(config) {
 		this.rejoins.push(config);
-		return this.state.status !== VoiceConnectionStatus.Destroyed;
+		if (this.state.status === VoiceConnectionStatus.Destroyed) return false;
+		Object.assign(this.joinConfig, config);
+		if (this.state.status !== VoiceConnectionStatus.Ready) {
+			this.setStatus(VoiceConnectionStatus.Signalling);
+		}
+		return true;
 	}
 	destroy() {
 		this.setStatus(VoiceConnectionStatus.Destroyed);
@@ -83,8 +89,8 @@ function harness({ status = VoiceConnectionStatus.Ready, timeouts } = {}) {
 	const resources = [];
 	const manager = new VoiceManager(
 		{
-			joinVoiceChannel: () => {
-				const connection = new FakeConnection(status);
+			joinVoiceChannel: (config) => {
+				const connection = new FakeConnection(status, config);
 				connections.push(connection);
 				return connection;
 			},
@@ -395,14 +401,61 @@ test("playback that never starts times out and stops the player", async (t) => {
 	connections[0].destroy();
 });
 
-test("disconnects that do not recover within the reconnect window end the session", async (t) => {
+test("the reconnect deadline covers all intermediate states without restarting", async (t) => {
+	const { manager, play, connections, players, resources } = harness();
+	const input = new PassThrough();
+	const done = play(input);
+	players[0].startPlaying();
+	await done;
+
+	connections[0].setStatus(VoiceConnectionStatus.Disconnected);
+	t.mock.timers.tick(10);
+	connections[0].setStatus(VoiceConnectionStatus.Signalling);
+	t.mock.timers.tick(10);
+	connections[0].setStatus(VoiceConnectionStatus.Connecting);
+	connections[0].setStatus(VoiceConnectionStatus.Disconnected);
+	t.mock.timers.tick(10);
+	assert.equal(manager.size, 0);
+	assert.equal(input.destroyed, true);
+	assert.equal(resources[0].playStream.destroyed, true);
+	assert.equal(players[0].state.status, AudioPlayerStatus.Idle);
+	assert.equal(connections[0].state.status, VoiceConnectionStatus.Destroyed);
+	assert.equal(connections[0].listenerCount("stateChange"), 0);
+	assert.equal(players[0].listenerCount("stateChange"), 0);
+});
+
+for (const status of [
+	VoiceConnectionStatus.Disconnected,
+	VoiceConnectionStatus.Signalling,
+	VoiceConnectionStatus.Connecting,
+]) {
+	test(`a reconnect stalled in ${status} releases playback and the connection`, async (t) => {
+		const { manager, play, connections, players, resources } = harness();
+		const input = new PassThrough();
+		const done = play(input);
+		players[0].startPlaying();
+		await done;
+		connections[0].setStatus(status);
+		t.mock.timers.tick(TIMEOUTS.reconnectMs);
+		assert.equal(manager.size, 0);
+		assert.equal(input.destroyed, true);
+		assert.equal(resources[0].playStream.destroyed, true);
+		assert.equal(connections[0].state.status, VoiceConnectionStatus.Destroyed);
+	});
+}
+
+test("a successful reconnect clears its deadline and the next reconnect gets a new budget", async (t) => {
 	const { manager, play, connections, players } = harness();
 	const done = play();
 	players[0].startPlaying();
 	await done;
 
 	connections[0].setStatus(VoiceConnectionStatus.Disconnected);
+	t.mock.timers.tick(10);
 	connections[0].setStatus(VoiceConnectionStatus.Signalling);
+	t.mock.timers.tick(10);
+	connections[0].setStatus(VoiceConnectionStatus.Connecting);
+	connections[0].setStatus(VoiceConnectionStatus.Ready);
 	t.mock.timers.tick(TIMEOUTS.reconnectMs);
 	assert.equal(manager.size, 1);
 
@@ -410,6 +463,53 @@ test("disconnects that do not recover within the reconnect window end the sessio
 	t.mock.timers.tick(TIMEOUTS.reconnectMs);
 	assert.equal(manager.size, 0);
 	assert.equal(connections[0].state.status, VoiceConnectionStatus.Destroyed);
+});
+
+test("initial connection progress retains the startup deadline rather than the reconnect budget", async (t) => {
+	const { manager, play, connections } = harness({
+		status: VoiceConnectionStatus.Signalling,
+	});
+	const rejected = assert.rejects(play(), /Timed out connecting/);
+	connections[0].setStatus(VoiceConnectionStatus.Connecting);
+	t.mock.timers.tick(TIMEOUTS.reconnectMs);
+	assert.equal(manager.size, 1);
+	t.mock.timers.tick(TIMEOUTS.readyMs - TIMEOUTS.reconnectMs);
+	await rejected;
+	assert.equal(manager.size, 0);
+});
+
+test("a command returns a manually moved bot to the caller's channel", async () => {
+	const { play, connections, players } = harness();
+	const first = play();
+	players[0].startPlaying();
+	await first;
+	connections[0].joinConfig.channelId = "moved-by-discord";
+	connections[0].setStatus(VoiceConnectionStatus.Disconnected);
+	connections[0].setStatus(VoiceConnectionStatus.Connecting);
+	connections[0].setStatus(VoiceConnectionStatus.Ready);
+
+	const second = play();
+	players[0].startPlaying();
+	await second;
+	assert.equal(connections.length, 1);
+	assert.equal(connections[0].joinConfig.channelId, "channel");
+	assert.deepEqual(connections[0].rejoins, [
+		{ channelId: "channel", selfDeaf: false, selfMute: false },
+	]);
+	connections[0].destroy();
+});
+
+test("a command in the bot's manually selected channel does not rejoin unnecessarily", async () => {
+	const { play, connections, players } = harness();
+	const first = play();
+	players[0].startPlaying();
+	await first;
+	connections[0].joinConfig.channelId = "moved-by-discord";
+	const second = play(new PassThrough(), { channelId: "moved-by-discord" });
+	players[0].startPlaying();
+	await second;
+	assert.deepEqual(connections[0].rejoins, []);
+	connections[0].destroy();
 });
 
 test("moving to another channel rejoins the existing connection", async () => {

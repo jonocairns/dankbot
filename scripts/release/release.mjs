@@ -118,14 +118,19 @@ export function mergedReleasePrs(repository, label, run = command) {
 	// Label filters route `gh pr list` through the search index, which can lag
 	// behind the merge push that triggered this run. List PRs directly instead.
 	// Project only the fields used below; full PR bodies overflow execFileSync's buffer.
-	const prs = JSON.parse(
-		run("gh", [
-			"api",
-			`repos/${repository}/pulls?state=closed&base=master&sort=updated&direction=desc&per_page=100`,
-			"--jq",
-			"map({merged_at, merge_commit_sha, head: {ref: .head.ref}, labels: [.labels[] | {name}]})",
-		]),
-	);
+	const prs = [];
+	for (let page = 1; ; page++) {
+		const batch = JSON.parse(
+			run("gh", [
+				"api",
+				`repos/${repository}/pulls?state=closed&base=master&sort=updated&direction=desc&per_page=100&page=${page}`,
+				"--jq",
+				"map({merged_at, merge_commit_sha, head: {ref: .head.ref}, labels: [.labels[] | {name}]})",
+			]),
+		);
+		prs.push(...batch);
+		if (batch.length < 100) break;
+	}
 	return prs.filter(
 		(pr) =>
 			pr.merged_at &&

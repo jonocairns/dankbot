@@ -21,7 +21,7 @@ const tag = "v1.0.2";
 const repository = "owner/dankbot";
 const digest = `sha256:${"d".repeat(64)}`;
 const mergedPrs =
-	"pulls?state=closed&base=master&sort=updated&direction=desc&per_page=100";
+	"pulls?state=closed&base=master&sort=updated&direction=desc&per_page=100&page=1";
 const pendingPr = {
 	number: 42,
 	merged_at: "2026-09-27",
@@ -241,6 +241,40 @@ test("a pending release merged before a later tested master commit is still rele
 		update: false,
 		build: false,
 	});
+});
+
+test("a pending release on the second page is discovered for blank-tag recovery", () => {
+	const ordinaryPr = { ...taggedPr, head: { ref: "ordinary-feature" } };
+	assert.deepEqual(
+		resolve({
+			[mergedPrs]: Array.from({ length: 100 }, () => ordinaryPr),
+			[mergedPrs.replace("&page=1", "&page=2")]: [pendingPr],
+		}),
+		{ sha: sourceSha, tag: "", create: true, update: false, build: false },
+	);
+});
+
+test("pagination detects multiple pending releases across page boundaries", () => {
+	assert.throws(
+		() =>
+			resolve({
+				[mergedPrs]: [pendingPr, ...Array.from({ length: 99 }, () => taggedPr)],
+				[mergedPrs.replace("&page=1", "&page=2")]: [
+					{ ...pendingPr, number: 43 },
+				],
+			}),
+		/Multiple pending/,
+	);
+});
+
+test("a full final page is followed by an empty page before PR maintenance", () => {
+	assert.equal(
+		resolve({
+			[mergedPrs]: Array.from({ length: 100 }, () => taggedPr),
+			[mergedPrs.replace("&page=1", "&page=2")]: [],
+		}).update,
+		true,
+	);
 });
 
 test("the original release run remains valid when master has advanced", () => {

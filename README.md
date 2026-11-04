@@ -32,7 +32,8 @@ direnv users can run `direnv allow` to load the same shell automatically.
 Claude Code is available only in the optional `nix develop .#claude` shell.
 
 Run `nix flake check --print-build-logs` to build, lint, and test the bot offline
-after Nix fetches the pinned dependencies. Run `nix fmt` to format Nix files.
+after Nix fetches the pinned dependencies. Run `nix fmt flake.nix nix/package.nix`
+to format Nix files.
 After changing `yarn.lock`, update the extra platform checksums and dependency
 cache hash using the instructions in [nix/README.md](nix/README.md).
 

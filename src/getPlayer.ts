@@ -32,7 +32,7 @@ export interface VoiceTimeouts {
 	readyMs: number;
 	/** How long to wait for a resource to start playing once queued. */
 	startMs: number;
-	/** How long a Disconnected connection may take to start reconnecting. */
+	/** How long a reconnect attempt may take to become ready. */
 	reconnectMs: number;
 	/** How long an idle connection stays in the channel before leaving. */
 	idleMs: number;
@@ -68,7 +68,6 @@ interface Playback {
 
 interface GuildSession {
 	guildId: string;
-	channelId: string;
 	connection: VoiceConnection;
 	player: AudioPlayer;
 	current?: Playback;
@@ -201,8 +200,7 @@ export class VoiceManager {
 	private getSession(request: PlayRequest): GuildSession {
 		const existing = this.sessions.get(request.guildId);
 		if (existing) {
-			if (existing.channelId !== request.channelId) {
-				existing.channelId = request.channelId;
+			if (existing.connection.joinConfig.channelId !== request.channelId) {
 				if (
 					!existing.connection.rejoin({
 						channelId: request.channelId,
@@ -231,12 +229,11 @@ export class VoiceManager {
 
 		const session: GuildSession = {
 			guildId: request.guildId,
-			channelId: request.channelId,
 			connection,
 			player,
 			disposed: false,
-			onConnectionState: (_oldState, newState) =>
-				this.onConnectionState(session, newState),
+			onConnectionState: (oldState, newState) =>
+				this.onConnectionState(session, oldState, newState),
 			onPlayerState: (oldState, newState) =>
 				this.onPlayerState(session, oldState, newState),
 			onError: (error) => logger.error(error),
@@ -253,24 +250,34 @@ export class VoiceManager {
 
 	private onConnectionState(
 		session: GuildSession,
+		oldState: VoiceConnectionState,
 		newState: VoiceConnectionState,
 	) {
 		if (session.disposed) return;
-		clearTimeout(session.reconnectTimer);
-		session.reconnectTimer = undefined;
 
 		switch (newState.status) {
 			case VoiceConnectionStatus.Ready:
+				clearTimeout(session.reconnectTimer);
+				session.reconnectTimer = undefined;
 				if (session.current && !session.current.resource) {
 					this.settle(session.current);
 				}
 				break;
 			case VoiceConnectionStatus.Disconnected:
-				// Give Discord a moment to move us (Signalling/Connecting), else leave.
-				session.reconnectTimer = setTimeout(
-					() => this.dispose(session),
-					this.timeouts.reconnectMs,
-				);
+			case VoiceConnectionStatus.Signalling:
+			case VoiceConnectionStatus.Connecting:
+				// Startup has its own readyMs deadline. Once reconnecting, retain
+				// one deadline through every intermediate state until Ready.
+				if (
+					newState.status === VoiceConnectionStatus.Disconnected ||
+					oldState.status === VoiceConnectionStatus.Ready ||
+					session.reconnectTimer !== undefined
+				) {
+					session.reconnectTimer ??= setTimeout(
+						() => this.dispose(session),
+						this.timeouts.reconnectMs,
+					);
+				}
 				break;
 			case VoiceConnectionStatus.Destroyed:
 				this.dispose(session);
